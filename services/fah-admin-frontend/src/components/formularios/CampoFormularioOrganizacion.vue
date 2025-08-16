@@ -1,6 +1,4 @@
 <template>
-  <!-- COMPONENTE CAMPO FORMULARIO ESPECIALIZADO ORGANIZACIÓN -->
-  <!-- Versión específica para módulos de organización -->
   <div
     :class="[
       'contenedor-campo-organizacion',
@@ -86,7 +84,7 @@
       <AyudaCampo v-if="configuracion.ayuda" :texto="configuracion.ayuda" />
     </div>
 
-    <!-- ✅ CAMPO FORÁNEO AUTOCOMPLETADO ORGANIZACIÓN -->
+    <!-- CAMPO FORÁNEO AUTOCOMPLETADO ORGANIZACIÓN -->
     <div v-else-if="esTipoForaneoAutocompletado" class="grupo-campo-org">
       <label :for="idCampo" class="etiqueta-campo-org">
         {{ configuracion.etiqueta }}
@@ -103,6 +101,7 @@
         :disabled="deshabilitado"
         :class="clasesCampoForaneoOrg"
         option-label="etiqueta"
+        option-value="valor"
         force-selection
         complete-on-focus
         :min-length="0"
@@ -129,7 +128,7 @@
       <AyudaCampo v-if="configuracion.ayuda" :texto="configuracion.ayuda" />
     </div>
 
-    <!-- CAMPO DE ÁREA DE TEXTO ORGANIZACIÓN -->
+    <!-- CAMPO DE ÁREA DE TEXTO ORGANIZACIÓN - ESTA ES LA SECCIÓN QUE FALTABA -->
     <div v-else-if="esTipoAreaTexto" class="grupo-campo-org">
       <label :for="idCampo" class="etiqueta-campo-org">
         {{ configuracion.etiqueta }}
@@ -216,7 +215,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import { computed, ref, watch, onMounted } from "vue";
 
@@ -240,8 +238,7 @@ import { useCatalogosStore } from "@/stores/catalogosStore";
 
 // Services específicos de organización
 import * as organizacionService from "@/services/organizacionService";
-
-import { usarCrudDinamico } from "@/composables/usarCrudDinamico.js";
+import * as catalogosService from "@/services/catalogosService";
 
 export default {
   name: "CampoFormularioOrganizacion",
@@ -293,26 +290,20 @@ export default {
   emits: ["actualizar"],
 
   setup(props, { emit }) {
-    // =====================================
-    // STORES ESPECÍFICOS ORGANIZACIÓN
-    // =====================================
+    // Stores específicos organización
     const organizacionStore = useOrganizacionStore();
     const catalogosStore = useCatalogosStore();
 
-    // =====================================
-    // ESTADO REACTIVO
-    // =====================================
+    // Estado reactivo
     const validandoCampo = ref(false);
     const sugerenciasAutocompletadoOrg = ref([]);
     const cargandoDatosForaneosOrg = ref(false);
     const datosForaneosCacheOrg = ref(new Map());
 
-    // =====================================
-    // CARGAR DATOS AL MONTAR
-    // =====================================
+    // Cargar datos al montar
     onMounted(async () => {
       console.log(
-        "🏛️ CampoFormularioOrganizacion montado:",
+        "CampoFormularioOrganizacion montado:",
         props.configuracion.nombre
       );
 
@@ -321,9 +312,7 @@ export default {
       }
     });
 
-    // =====================================
-    // COMPUTED PROPERTIES
-    // =====================================
+    // Computed properties
     const idCampo = computed(() => {
       return `campo-org-${props.configuracion.nombre}-${Date.now()}`;
     });
@@ -363,7 +352,107 @@ export default {
       return props.configuracion.tipo === "fecha";
     });
 
-    // ✅ VALOR A MOSTRAR EN AUTOCOMPLETADO ORGANIZACIÓN
+    // Clases CSS dinámicas organizacion
+    const clasesCampoTextoOrg = computed(() => [
+      "fah-form-control-org",
+      "fah-form-control-texto-org",
+      {
+        "fah-form-control-error": tieneError.value,
+        "fah-form-control-disabled": props.deshabilitado,
+      },
+    ]);
+
+    const clasesCampoNumeroOrg = computed(() => [
+      "fah-form-control-org",
+      "fah-form-control-numero-org",
+      {
+        "fah-form-control-error": tieneError.value,
+        "fah-form-control-disabled": props.deshabilitado,
+      },
+    ]);
+
+    const clasesCampoSeleccionOrg = computed(() => [
+      "fah-form-control-org",
+      "fah-form-control-seleccion-org",
+      {
+        "fah-form-control-error": tieneError.value,
+        "fah-form-control-disabled": props.deshabilitado,
+      },
+    ]);
+
+    const clasesCampoForaneoOrg = computed(() => [
+      "fah-form-control-org",
+      "fah-form-control-foraneo-autocompletado-org",
+      {
+        "fah-form-control-error": tieneError.value,
+        "fah-form-control-disabled": props.deshabilitado,
+      },
+    ]);
+
+    const clasesCampoAreaTextoOrg = computed(() => [
+      "fah-form-control-org",
+      "fah-form-control-area-texto-org",
+      {
+        "fah-form-control-error": tieneError.value,
+        "fah-form-control-disabled": props.deshabilitado,
+      },
+    ]);
+
+    const clasesCampoSwitchOrg = computed(() => [
+      "fah-form-control-org",
+      "fah-form-control-switch-org",
+      {
+        "fah-form-control-error": tieneError.value,
+        "fah-form-control-disabled": props.deshabilitado,
+      },
+    ]);
+
+    const clasesCampoFechaOrg = computed(() => [
+      "fah-form-control-org",
+      "fah-form-control-fecha-org",
+      {
+        "fah-form-control-error": tieneError.value,
+        "fah-form-control-disabled": props.deshabilitado,
+      },
+    ]);
+
+    // Opciones para seleccion organizacion
+    const opcionesSeleccion = computed(() => {
+      if (!esTipoSeleccion.value) {
+        return [];
+      }
+
+      if (props.opcionesExternas && props.opcionesExternas.length > 0) {
+        return props.opcionesExternas;
+      }
+
+      if (
+        props.configuracion.opciones &&
+        Array.isArray(props.configuracion.opciones)
+      ) {
+        return props.configuracion.opciones;
+      }
+
+      if (props.configuracion.tablaReferencia) {
+        switch (props.configuracion.tablaReferencia) {
+          case "tipos_estructura_militar":
+            const tiposEstructura = catalogosStore.tiposEstructuraMilitar || [];
+            if (tiposEstructura.length > 0) {
+              return tiposEstructura
+                .filter((tipo) => tipo.is_active !== false)
+                .map((tipo) => ({
+                  etiqueta: tipo.nombre_tipo || tipo.codigo_tipo,
+                  valor: tipo.id,
+                }));
+            }
+            break;
+        }
+      }
+
+      return [];
+    });
+
+    // Valor a mostrar en autocompletado organizacion
     const valorMostrarOrg = computed(() => {
       if (!esTipoForaneoAutocompletado.value || !props.valor) {
         return props.valor;
@@ -378,6 +467,17 @@ export default {
       let registro = null;
 
       switch (tablaReferencia) {
+        case "paises":
+          registro = catalogosStore.paises?.find((p) => p.id === valorId);
+          if (registro) {
+            return {
+              etiqueta: registro.nombre,
+              valor: registro.id,
+              codigo: registro.codigo_iso3,
+            };
+          }
+          break;
+
         case "departamentos":
           registro = organizacionStore.departamentos?.find(
             (d) => d.id === valorId
@@ -465,7 +565,6 @@ export default {
           }
           break;
 
-        // También soportar algunos catálogos
         case "tipos_estructura_militar":
           registro = catalogosStore.tiposEstructuraMilitar?.find(
             (t) => t.id === valorId
@@ -480,152 +579,44 @@ export default {
           break;
       }
 
-      return `ID: ${props.valor}`;
+      return props.valor;
     });
 
-    // Clases CSS específicas de organización (tema purple)
-    const clasesCampoTextoOrg = computed(() => [
-      "fah-form-control-org",
-      "fah-form-control-org-texto",
-      {
-        "fah-form-control-org-error": tieneError.value,
-        "fah-form-control-org-disabled": props.deshabilitado,
-      },
-    ]);
+    // Métodos específicos organizacion
 
-    const clasesCampoNumeroOrg = computed(() => [
-      "fah-form-control-org",
-      "fah-form-control-org-numero",
-      {
-        "fah-form-control-org-error": tieneError.value,
-        "fah-form-control-org-disabled": props.deshabilitado,
-      },
-    ]);
-
-    const clasesCampoSeleccionOrg = computed(() => [
-      "fah-form-control-org",
-      "fah-form-control-org-select",
-      {
-        "fah-form-control-org-error": tieneError.value,
-        "fah-form-control-org-disabled": props.deshabilitado,
-      },
-    ]);
-
-    const clasesCampoForaneoOrg = computed(() => [
-      "fah-form-control-org",
-      "fah-form-control-org-foraneo",
-      {
-        "fah-form-control-org-error": tieneError.value,
-        "fah-form-control-org-disabled": props.deshabilitado,
-      },
-    ]);
-
-    const clasesCampoAreaTextoOrg = computed(() => [
-      "fah-form-control-org",
-      "fah-form-control-org-textarea",
-      {
-        "fah-form-control-org-error": tieneError.value,
-        "fah-form-control-org-disabled": props.deshabilitado,
-      },
-    ]);
-
-    const clasesCampoSwitchOrg = computed(() => [
-      "fah-form-switch-org",
-      {
-        "fah-form-switch-org-error": tieneError.value,
-        "fah-form-switch-org-disabled": props.deshabilitado,
-      },
-    ]);
-
-    const clasesCampoFechaOrg = computed(() => [
-      "fah-form-control-org",
-      "fah-form-control-org-fecha",
-      {
-        "fah-form-control-org-error": tieneError.value,
-        "fah-form-control-org-disabled": props.deshabilitado,
-      },
-    ]);
-
-    // ✅ OPCIONES PARA SELECCIÓN ORGANIZACIÓN
-    const opcionesSeleccion = computed(() => {
-      if (!esTipoSeleccion.value) {
-        return [];
-      }
-
-      if (props.opcionesExternas && props.opcionesExternas.length > 0) {
-        return props.opcionesExternas;
-      }
-
-      if (
-        props.configuracion.opciones &&
-        Array.isArray(props.configuracion.opciones)
-      ) {
-        return props.configuracion.opciones;
-      }
-
-      if (props.configuracion.tablaReferencia) {
-        switch (props.configuracion.tablaReferencia) {
-          case "tipos_estructura_militar":
-            const tiposEstructura = catalogosStore.tiposEstructuraMilitar || [];
-            if (tiposEstructura.length > 0) {
-              return tiposEstructura
-                .filter((tipo) => tipo.is_active !== false)
-                .map((tipo) => ({
-                  etiqueta: tipo.nombre_tipo || tipo.codigo_tipo,
-                  valor: tipo.id,
-                }));
-            }
-            break;
-        }
-      }
-
-      return [];
-    });
-
-    // =====================================
-    // MÉTODOS ESPECÍFICOS ORGANIZACIÓN
-    // =====================================
-
-    // Cargar datos foráneos específicos de organización
+    // Cargar datos foraneos específicos de organizacion
     const cargarDatosForaneosOrg = async () => {
       if (!props.configuracion.tablaReferencia) return;
 
       const tablaRef = props.configuracion.tablaReferencia;
 
-      // ✅ NUEVO: Detectar si requiere servicio externo (catalogos)
+      // Detectar si requiere servicio externo catalogos
       const configuracionCompleta = props.configuracion.tipoCampoCompleto || "";
       const requiereCatalogos =
         configuracionCompleta.includes("servicio:catalogos");
 
       console.log(
-        `🛡️ Cargando datos foráneos: ${tablaRef}, requiere catálogos: ${requiereCatalogos}`
+        `Cargando datos foraneos: ${tablaRef}, requiere catalogos: ${requiereCatalogos}`
       );
-
-      console.log("🔍 DEBUG configuración completa:", props.configuracion);
-      console.log(
-        "🔍 DEBUG tipoCampoCompleto:",
-        props.configuracion.tipoCampoCompleto
-      );
-      console.log("🔍 DEBUG configuracionCompleta:", configuracionCompleta);
 
       if (datosForaneosCacheOrg.value.has(tablaRef)) {
-        console.log(`✅ Usando cache organización para ${tablaRef}`);
+        console.log(`Usando cache organizacion para ${tablaRef}`);
         return;
       }
 
       cargandoDatosForaneosOrg.value = true;
 
       try {
-        // ✅ NUEVO: Si requiere catálogos, usar servicio de catálogos
+        // Si requiere catalogos, usar servicio de catalogos
         if (requiereCatalogos && tablaRef === "paises") {
-          console.log(`🌍 Cargando países desde servicio de catálogos`);
+          console.log(`Cargando paises desde servicio de catalogos`);
 
           if (!catalogosStore.paises?.length) {
             await catalogosStore.loadPaises();
           }
 
           console.log(
-            `✅ Países cargados desde catálogos:`,
+            `Paises cargados desde catalogos:`,
             catalogosStore.paises
           );
 
@@ -636,18 +627,18 @@ export default {
           return;
         }
 
-        console.log(`🏛️ Cargando datos foráneos organización: ${tablaRef}`);
+        console.log(`Cargando datos foraneos organizacion: ${tablaRef}`);
 
         switch (tablaRef) {
           case "paises":
-            console.log(`🌍 Cargando países desde servicio de catálogos`);
+            console.log(`Cargando paises desde servicio de catalogos`);
 
             if (!catalogosStore.paises?.length) {
               await catalogosStore.loadPaises();
             }
 
             console.log(
-              `✅ Países cargados desde catálogos:`,
+              `Paises cargados desde catalogos:`,
               catalogosStore.paises
             );
 
@@ -736,16 +727,16 @@ export default {
 
           default:
             console.log(
-              "⚠️ Tabla de referencia organización no soportada:",
+              "Tabla de referencia organizacion no soportada:",
               tablaRef
             );
             break;
         }
 
-        console.log(`✅ Datos foráneos organización cargados: ${tablaRef}`);
+        console.log(`Datos foraneos organizacion cargados: ${tablaRef}`);
       } catch (error) {
         console.error(
-          `❌ Error cargando datos foráneos organización ${tablaRef}:`,
+          `Error cargando datos foraneos organizacion ${tablaRef}:`,
           error
         );
       } finally {
@@ -753,22 +744,152 @@ export default {
       }
     };
 
-    // Buscar sugerencias foráneas organización
+    // Formatear sugerencias organizacion
+    const formatearSugerenciasOrg = (resultados) => {
+      if (!Array.isArray(resultados)) return [];
+
+      return resultados.slice(0, 10).map((item) => {
+        let etiqueta, codigo;
+
+        switch (props.configuracion.tablaReferencia) {
+          case "paises":
+            etiqueta = item.nombre;
+            codigo = item.codigo_iso3;
+            break;
+          case "departamentos":
+            etiqueta = item.nombre_departamento;
+            codigo = item.codigo_departamento;
+            break;
+          case "municipios":
+            etiqueta = item.nombre_municipio;
+            codigo = item.codigo_municipio;
+            break;
+          case "ciudades":
+            etiqueta = item.nombre_ciudad;
+            codigo = item.codigo_ciudad;
+            break;
+          case "ubicaciones_geograficas":
+            etiqueta = item.nombre_ubicacion;
+            codigo = item.codigo_ubicacion;
+            break;
+          case "estructura_militar":
+            etiqueta = item.nombre_unidad;
+            codigo = item.codigo_unidad;
+            break;
+          case "cargos":
+            etiqueta = item.nombre_cargo;
+            codigo = item.codigo_cargo;
+            break;
+          case "roles_funcionales":
+            etiqueta = item.nombre_rol;
+            codigo = item.codigo_rol;
+            break;
+          case "tipos_estructura_militar":
+            etiqueta = item.nombre_tipo;
+            codigo = item.codigo_tipo;
+            break;
+          default:
+            etiqueta = item.nombre || item.codigo || `Item ${item.id}`;
+            codigo = item.codigo;
+            break;
+        }
+
+        return {
+          etiqueta,
+          valor: item.id,
+          codigo,
+          datos: item,
+        };
+      });
+    };
+
+    // Busqueda en cache local organizacion
+    const buscarEnCacheLocalOrg = (query, tablaRef) => {
+      let datosCompletos = [];
+
+      switch (tablaRef) {
+        case "paises":
+          datosCompletos = catalogosStore.paises || [];
+          break;
+        case "departamentos":
+          datosCompletos = organizacionStore.departamentos || [];
+          break;
+        case "municipios":
+          datosCompletos = organizacionStore.municipios || [];
+          break;
+        case "ciudades":
+          datosCompletos = organizacionStore.ciudades || [];
+          break;
+        case "ubicaciones_geograficas":
+          datosCompletos = organizacionStore.ubicacionesGeograficas || [];
+          break;
+        case "estructura_militar":
+          datosCompletos = organizacionStore.estructuraMilitar || [];
+          break;
+        case "cargos":
+          datosCompletos = organizacionStore.cargos || [];
+          break;
+        case "roles_funcionales":
+          datosCompletos = organizacionStore.rolesFuncionales || [];
+          break;
+        case "tipos_estructura_militar":
+          datosCompletos = catalogosStore.tiposEstructuraMilitar || [];
+          break;
+        default:
+          console.log("Tabla no encontrada en cache organizacion:", tablaRef);
+          return [];
+      }
+
+      return datosCompletos.filter((item) => {
+        if (item.is_active === false) return false;
+
+        const textosBusqueda = [
+          item.nombre_departamento,
+          item.codigo_departamento,
+          item.nombre_municipio,
+          item.codigo_municipio,
+          item.nombre_ciudad,
+          item.codigo_ciudad,
+          item.nombre_ubicacion,
+          item.codigo_ubicacion,
+          item.nombre_unidad,
+          item.codigo_unidad,
+          item.nombre_cargo,
+          item.codigo_cargo,
+          item.nombre_rol,
+          item.codigo_rol,
+          item.nombre_tipo,
+          item.codigo_tipo,
+          item.nombre,
+          item.codigo,
+          item.codigo_iso3,
+        ]
+          .filter(Boolean)
+          .map((texto) => texto.toLowerCase());
+
+        return textosBusqueda.some((texto) => texto.includes(query));
+      });
+    };
+
+    // Buscar sugerencias foraneas organizacion - ESTA ES LA FUNCION CLAVE QUE NECESITA EL CASE PAISES
     const buscarSugerenciasForaneasOrg = async (evento) => {
-      console.log("🏛️ Buscando sugerencias organización:", evento.query);
+      console.log("Buscando sugerencias organizacion:", evento.query);
 
       const query = evento.query.toLowerCase();
       const tablaRef = props.configuracion.tablaReferencia;
 
       if (query.length >= 2) {
         try {
-          console.log(
-            `🌐 Búsqueda API organización para ${tablaRef}: "${query}"`
-          );
+          console.log(`Busqueda API organizacion para ${tablaRef}: "${query}"`);
 
           let resultados = [];
 
           switch (tablaRef) {
+            // AGREGAR ESTE CASE QUE FALTABA
+            case "paises":
+              resultados = await catalogosService.buscarPaises(query);
+              break;
+
             case "departamentos":
               resultados = await organizacionService.buscarDepartamentos(query);
               break;
@@ -802,226 +923,83 @@ export default {
               );
               break;
 
+            case "tipos_estructura_militar":
+              resultados = await catalogosService.buscarTiposEstructuraMilitar(
+                query
+              );
+              break;
+
             default:
-              console.log(`📋 Búsqueda local organización para ${tablaRef}`);
-              await cargarDatosForaneosOrg();
-              resultados = buscarEnCacheLocalOrg(query, tablaRef);
+              console.log(
+                "Tabla de referencia no soportada en busqueda API:",
+                tablaRef
+              );
+              resultados = [];
               break;
           }
 
-          const sugerencias = mapearResultadosOrg(resultados, tablaRef);
+          sugerenciasAutocompletadoOrg.value =
+            formatearSugerenciasOrg(resultados);
           console.log(
-            `✅ ${sugerencias.length} sugerencias organización encontradas`
+            `Sugerencias encontradas para ${tablaRef}:`,
+            sugerenciasAutocompletadoOrg.value.length
           );
-          sugerenciasAutocompletadoOrg.value = sugerencias;
         } catch (error) {
-          console.error(
-            `❌ Error en búsqueda API organización ${tablaRef}:`,
-            error
-          );
-          await cargarDatosForaneosOrg();
-          const resultadosLocal = buscarEnCacheLocalOrg(query, tablaRef);
-          sugerenciasAutocompletadoOrg.value = mapearResultadosOrg(
-            resultadosLocal,
-            tablaRef
-          );
+          console.error(`Error buscando ${tablaRef}:`, error);
+          sugerenciasAutocompletadoOrg.value = [];
         }
       } else {
-        await cargarDatosForaneosOrg();
-        const resultados = buscarEnCacheLocalOrg(query, tablaRef);
-        sugerenciasAutocompletadoOrg.value = mapearResultadosOrg(
-          resultados,
-          tablaRef
-        );
+        // busqueda local para consultas cortas
+        const resultadosLocales = buscarEnCacheLocalOrg(query, tablaRef);
+        sugerenciasAutocompletadoOrg.value =
+          formatearSugerenciasOrg(resultadosLocales);
       }
     };
 
-    // Mapear resultados organización
-    const mapearResultadosOrg = (resultados, tablaRef) => {
-      return resultados.map((item) => {
-        let etiqueta, codigo;
-
-        switch (tablaRef) {
-          case "departamentos":
-            etiqueta = item.nombre_departamento;
-            codigo = item.codigo_departamento;
-            break;
-          case "municipios":
-            etiqueta = item.nombre_municipio;
-            codigo = item.codigo_municipio;
-            break;
-          case "ciudades":
-            etiqueta = item.nombre_ciudad;
-            codigo = item.codigo_ciudad;
-            break;
-          case "ubicaciones_geograficas":
-            etiqueta = item.nombre_ubicacion;
-            codigo = item.codigo_ubicacion;
-            break;
-          case "estructura_militar":
-            etiqueta = item.nombre_unidad;
-            codigo = item.codigo_unidad;
-            break;
-          case "cargos":
-            etiqueta = item.nombre_cargo;
-            codigo = item.codigo_cargo;
-            break;
-          case "roles_funcionales":
-            etiqueta = item.nombre_rol;
-            codigo = item.codigo_rol;
-            break;
-          case "tipos_estructura_militar":
-            etiqueta = item.nombre_tipo || item.codigo_tipo;
-            codigo = item.codigo_tipo;
-            break;
-          default:
-            etiqueta = item.nombre || item.codigo || `Item ${item.id}`;
-            codigo = item.codigo;
-            break;
-        }
-
-        return {
-          etiqueta,
-          valor: item.id,
-          codigo,
-          datos: item,
-        };
-      });
-    };
-
-    // Búsqueda en cache local organización
-    const buscarEnCacheLocalOrg = (query, tablaRef) => {
-      let datosCompletos = [];
-
-      switch (tablaRef) {
-        case "paises":
-          datosCompletos = catalogosStore.paises || [];
-          break;
-        case "departamentos":
-          datosCompletos = organizacionStore.departamentos || [];
-          break;
-        case "municipios":
-          datosCompletos = organizacionStore.municipios || [];
-          break;
-        case "ciudades":
-          datosCompletos = organizacionStore.ciudades || [];
-          break;
-        case "ubicaciones_geograficas":
-          datosCompletos = organizacionStore.ubicacionesGeograficas || [];
-          break;
-        case "estructura_militar":
-          datosCompletos = organizacionStore.estructuraMilitar || [];
-          break;
-        case "cargos":
-          datosCompletos = organizacionStore.cargos || [];
-          break;
-        case "roles_funcionales":
-          datosCompletos = organizacionStore.rolesFuncionales || [];
-          break;
-        case "tipos_estructura_militar":
-          datosCompletos = catalogosStore.tiposEstructuraMilitar || [];
-          break;
-        default:
-          console.log(
-            "⚠️ Tabla no encontrada en cache organización:",
-            tablaRef
-          );
-          return [];
-      }
-
-      return datosCompletos.filter((item) => {
-        if (item.is_active === false) return false;
-
-        const textosBusqueda = [
-          item.nombre_departamento,
-          item.codigo_departamento,
-          item.nombre_municipio,
-          item.codigo_municipio,
-          item.nombre_ciudad,
-          item.codigo_ciudad,
-          item.nombre_ubicacion,
-          item.codigo_ubicacion,
-          item.nombre_unidad,
-          item.codigo_unidad,
-          item.nombre_cargo,
-          item.codigo_cargo,
-          item.nombre_rol,
-          item.codigo_rol,
-          item.nombre_tipo,
-          item.codigo_tipo,
-          item.nombre,
-          item.codigo,
-        ]
-          .filter(Boolean)
-          .map((texto) => texto.toLowerCase());
-
-        return textosBusqueda.some((texto) => texto.includes(query));
-      });
-    };
-
-    // Manejar cambio foráneo organización
+    // Manejar cambio foraneo organizacion
     const manejarCambioForaneoOrg = (nuevoValor) => {
-      console.log("🏛️ Cambio foráneo organización:", nuevoValor);
+      console.log("Cambio foraneo organizacion:", nuevoValor);
 
       if (nuevoValor && typeof nuevoValor === "object" && nuevoValor.valor) {
-        console.log("📤 Emitiendo ID organización:", nuevoValor.valor);
+        // El usuario selecciono de la lista - EMITIR SOLO EL ID
+        console.log("Emitiendo ID:", nuevoValor.valor);
         emitirCambio(nuevoValor.valor);
       } else if (typeof nuevoValor === "number") {
+        // Valor numerico directo
         emitirCambio(nuevoValor);
       } else if (typeof nuevoValor === "string") {
+        // Si es texto, intentar encontrar coincidencia exacta
         const tablaRef = props.configuracion.tablaReferencia;
         const coincidencia = buscarCoincidenciaExactaOrg(nuevoValor, tablaRef);
 
         if (coincidencia) {
           console.log(
-            "📤 Coincidencia organización encontrada, emitiendo ID:",
+            "Coincidencia encontrada, emitiendo ID:",
             coincidencia.id
           );
           emitirCambio(coincidencia.id);
         } else {
-          console.log("❌ Sin coincidencia organización, emitiendo null");
+          // No hay coincidencia, emitir null
+          console.log("No hay coincidencia exacta, emitiendo null");
           emitirCambio(null);
         }
       } else {
+        // Valor nulo o undefined
         emitirCambio(null);
       }
     };
 
-    // Buscar coincidencia exacta organización
-    const buscarCoincidenciaExactaOrg = (texto, tablaRef) => {
-      if (!texto || typeof texto !== "string") return null;
+    // Buscar coincidencia exacta organizacion
+    const buscarCoincidenciaExactaOrg = (textoCompleto, tablaRef) => {
+      const resultadosLocales = buscarEnCacheLocalOrg(
+        textoCompleto.toLowerCase(),
+        tablaRef
+      );
 
-      const textoLimpio = texto.toLowerCase().trim();
-      let datosCompletos = [];
-
-      switch (tablaRef) {
-        case "departamentos":
-          datosCompletos = organizacionStore.departamentos || [];
-          break;
-        case "municipios":
-          datosCompletos = organizacionStore.municipios || [];
-          break;
-        case "ciudades":
-          datosCompletos = organizacionStore.ciudades || [];
-          break;
-        case "ubicaciones_geograficas":
-          datosCompletos = organizacionStore.ubicacionesGeograficas || [];
-          break;
-        case "estructura_militar":
-          datosCompletos = organizacionStore.estructuraMilitar || [];
-          break;
-        case "cargos":
-          datosCompletos = organizacionStore.cargos || [];
-          break;
-        case "roles_funcionales":
-          datosCompletos = organizacionStore.rolesFuncionales || [];
-          break;
-        default:
-          return null;
-      }
-
-      return datosCompletos.find((item) => {
+      // Buscar coincidencia exacta por nombre
+      return resultadosLocales.find((item) => {
         const nombres = [
+          item.nombre,
           item.nombre_departamento,
           item.nombre_municipio,
           item.nombre_ciudad,
@@ -1029,31 +1007,42 @@ export default {
           item.nombre_unidad,
           item.nombre_cargo,
           item.nombre_rol,
-          item.nombre,
+          item.nombre_tipo,
         ].filter(Boolean);
 
         return nombres.some(
-          (nombre) => nombre.toLowerCase().trim() === textoLimpio
+          (nombre) => nombre.toLowerCase() === textoCompleto.toLowerCase()
         );
       });
     };
 
-    // Emitir cambio
+    // Emitir cambio con validacion
     const emitirCambio = (nuevoValor) => {
-      emit("actualizar", props.configuracion.nombre, nuevoValor);
+      console.log(
+        `Emitiendo cambio para ${props.configuracion.nombre}:`,
+        nuevoValor
+      );
+      emit("actualizar", nuevoValor);
     };
 
-    // Validar campo
+    // Validar campo individual
     const validarCampo = () => {
-      if (validandoCampo.value) return;
       validandoCampo.value = true;
 
-      try {
-        // Validación específica organización
-      } finally {
+      setTimeout(() => {
         validandoCampo.value = false;
-      }
+      }, 500);
     };
+
+    // Watchers
+    watch(
+      () => props.configuracion.tablaReferencia,
+      () => {
+        if (esTipoForaneoAutocompletado.value) {
+          cargarDatosForaneosOrg();
+        }
+      }
+    );
 
     return {
       // Estado
@@ -1064,9 +1053,6 @@ export default {
       // Computed
       idCampo,
       tieneError,
-      valorMostrarOrg,
-
-      // Detectores de tipo
       esTipoTexto,
       esTipoNumero,
       esTipoSeleccion,
@@ -1074,8 +1060,6 @@ export default {
       esTipoAreaTexto,
       esTipoBooleano,
       esTipoFecha,
-
-      // Clases CSS específicas organización
       clasesCampoTextoOrg,
       clasesCampoNumeroOrg,
       clasesCampoSeleccionOrg,
@@ -1083,61 +1067,74 @@ export default {
       clasesCampoAreaTextoOrg,
       clasesCampoSwitchOrg,
       clasesCampoFechaOrg,
-
-      // Opciones
       opcionesSeleccion,
+      valorMostrarOrg,
 
       // Métodos
-      emitirCambio,
-      validarCampo,
+      cargarDatosForaneosOrg,
+      formatearSugerenciasOrg,
+      buscarEnCacheLocalOrg,
       buscarSugerenciasForaneasOrg,
       manejarCambioForaneoOrg,
+      buscarCoincidenciaExactaOrg,
+      emitirCambio,
+      validarCampo,
     };
   },
 };
 </script>
 
-<style>
-/* =====================================
-   IMPORTAR ESTILOS EXTERNOS ORGANIZACIÓN
-   ===================================== */
-@import "@/styles/components/formularios/campo-formulario-organizacion.css";
+<style scoped>
+/* @import "@/styles/components/formularios/campo-formulario-organizacion.css"; */
 
-/* =====================================
-   🎯 ESTILOS LOCALES ESPECÍFICOS ORGANIZACIÓN
-   Solo para casos muy específicos que no pueden ir en el CSS externo
-   ===================================== */
-
-/* Asegurar que los estilos de dropdown organización tengan la máxima prioridad */
-.contenedor-campo-organizacion
-  .fah-form-control-org-foraneo
-  :deep(.p-autocomplete-panel) {
-  z-index: 999999 !important;
-}
-
-/* Fix para asegurar que el contenedor organización tenga la clase correcta */
+/* Estilos locales específicos organizacion */
 .contenedor-campo-organizacion {
-  position: relative;
-  z-index: 1;
+  @apply mb-4;
 }
 
-/* =====================================
-   ✅ TÍTULOS BLANCOS COMO EL ORIGINAL
-   ===================================== */
+.grupo-campo-org {
+  @apply space-y-2;
+}
+
 .etiqueta-campo-org {
-  @apply block mb-2 text-sm font-medium text-white !important;
+  @apply block text-sm font-medium text-purple-200 mb-1;
 }
 
-/* =====================================
-   VARIABLES CSS CUSTOM PARA CONSISTENCIA ORGANIZACIÓN
-   ===================================== */
-:root {
-  --fah-dropdown-purple-claro: var(--fah-org-purple-50);
-  --fah-dropdown-purple-medio: var(--fah-org-purple-100);
-  --fah-dropdown-purple-oscuro: var(--fah-org-purple-800);
-  --fah-dropdown-purple-hover: var(--fah-org-purple-500);
-  --fah-dropdown-purple-activo: var(--fah-org-purple-600);
-  --fah-dropdown-purple-borde: var(--fah-org-purple-400);
-  --fah-dropdown-purple-sombra: rgba(168, 85, 247, 0.4);
+.marcador-requerido-org {
+  @apply text-red-400 ml-1;
+}
+
+.grupo-switch-org {
+  @apply flex items-center space-x-4;
+}
+
+.contenedor-switch-org {
+  @apply flex items-center space-x-3;
+}
+
+.texto-switch-org {
+  @apply text-sm text-gray-300;
+}
+
+.cargando-datos-org {
+  @apply flex items-center mt-2 text-purple-300;
+}
+
+.opcion-foranea-organizacion {
+  @apply block;
+}
+
+.codigo-organizacion {
+  @apply text-xs text-gray-500 mt-1 block;
+}
+
+.campo-con-error {
+  @apply ring-2 ring-red-500;
+}
+
+@media (max-width: 768px) {
+  .grupo-switch-org {
+    @apply flex-col items-start space-x-0 space-y-2;
+  }
 }
 </style>

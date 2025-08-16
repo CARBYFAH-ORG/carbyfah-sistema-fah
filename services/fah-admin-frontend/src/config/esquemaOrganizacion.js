@@ -1,7 +1,5 @@
-// ============================================
-// 🏛️ ESQUEMAS DE ORGANIZACIÓN CARBYFAH
+// ESQUEMAS DE ORGANIZACIÓN CARBYFAH
 // Configuración ultra-simplificada siguiendo patrón de catálogos
-// ============================================
 
 /**
  * SINTAXIS DE CAMPOS (IGUAL QUE CATÁLOGOS):
@@ -135,9 +133,7 @@ const generarPlaceholder = (nombreCampo, tipoCampo) => {
 }
 
 export const ESQUEMAS_ORGANIZACION = {
-    // ============================================
-    // 🌍 ESTRUCTURA GEOGRÁFICA
-    // ============================================
+    // ESTRUCTURA GEOGRÁFICA
 
     // Departamentos
     departamentos: {
@@ -145,7 +141,7 @@ export const ESQUEMAS_ORGANIZACION = {
         icono: '🗺️',
         tabla: 'departamentos',
         ancho: '700px',
-        servicio: 'organizacion', // ← NUEVO: especificar servicio
+        servicio: 'organizacion',
         campos: [
             'pais_id:foraneo_autocompletado:requerido:referencia:paises:servicio:catalogos',
             'codigo_departamento:texto:requerido:longitud:10',
@@ -213,9 +209,7 @@ export const ESQUEMAS_ORGANIZACION = {
         ordenarPor: 'nombre_ubicacion'
     },
 
-    // ============================================
-    // 🏛️ ESTRUCTURA MILITAR
-    // ============================================
+    // ESTRUCTURA MILITAR
 
     // Estructura Militar
     estructura_militar: {
@@ -277,9 +271,7 @@ export const ESQUEMAS_ORGANIZACION = {
     }
 }
 
-// ============================================
-// 🎯 CONFIGURACIÓN DE NOTIFICACIONES (COPIADA DE CATÁLOGOS)
-// ============================================
+// CONFIGURACIÓN DE NOTIFICACIONES
 
 export const CONFIGURACION_NOTIFICACIONES = {
     // Duraciones (milisegundos)
@@ -380,9 +372,7 @@ export const CONFIGURACION_NOTIFICACIONES = {
     }
 }
 
-// ============================================
-// 🎯 FUNCIONES AUXILIARES (COPIADAS DE CATÁLOGOS)
-// ============================================
+// FUNCIONES AUXILIARES
 
 // Obtener configuración de esquema por nombre
 export const obtenerEsquema = (nombreTabla) => {

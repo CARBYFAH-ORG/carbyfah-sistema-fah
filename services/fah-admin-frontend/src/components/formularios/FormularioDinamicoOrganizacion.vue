@@ -37,24 +37,60 @@
         class="formulario-dinamico-organizacion"
       >
         <div class="grid grid-cols-12 gap-5">
-          <!-- Generar campos dinámicamente -->
-          <CampoFormularioOrganizacion
-            v-for="configuracionCampo in camposConfigurados"
+          <!-- Generar campos dinámicamente CON SOPORTE PARA MAPA -->
+          <template
+            v-for="(configuracionCampo, index) in camposConfigurados"
             :key="configuracionCampo.nombre"
-            :configuracion="configuracionCampo"
-            :valor="datosFormulario[configuracionCampo.nombre]"
-            :error="erroresValidacion[configuracionCampo.nombre]"
-            :deshabilitado="cargando"
-            :opciones-externas="obtenerOpcionesParaCampo(configuracionCampo)"
-            @actualizar="actualizarCampo"
-            @ubicacion-seleccionada="manejarUbicacionSeleccionada"
-            @departamento-seleccionado="manejarDepartamentoSeleccionado"
-            @municipio-seleccionado="manejarMunicipioSeleccionado"
-            class="campo-wrapper"
-          />
+          >
+            <!-- Botón de mapa JUSTO ANTES del campo Latitud -->
+            <div
+              v-if="
+                configuracionCampo.nombre === 'latitud' &&
+                mostrarBotonMapaGlobal
+              "
+              class="col-span-12 contenedor-boton-mapa-antes-latitud"
+            >
+              <Button
+                icon="pi pi-map-marker"
+                label="📍 Seleccionar en Mapa"
+                class="boton-seleccionar-mapa-antes-latitud"
+                @click="abrirModalMapa"
+                :disabled="cargando"
+              />
+            </div>
+
+            <!-- Campo normal CORREGIDO -->
+            <CampoFormularioOrganizacion
+              :configuracion="configuracionCampo"
+              :valor="datosFormulario[configuracionCampo.nombre]"
+              :error="erroresValidacion[configuracionCampo.nombre]"
+              :deshabilitado="cargando"
+              :opciones-externas="obtenerOpcionesParaCampo(configuracionCampo)"
+              @actualizar="
+                (valor) => actualizarCampo(configuracionCampo.nombre, valor)
+              "
+              @coordenadas-mapa-seleccionadas="actualizarTodasLasCoordenadas"
+              @ubicacion-seleccionada="manejarUbicacionSeleccionada"
+              @departamento-seleccionado="manejarDepartamentoSeleccionado"
+              @municipio-seleccionado="manejarMunicipioSeleccionado"
+              @abrir-modal-mapa="abrirModalMapa"
+              class="campo-wrapper"
+            />
+          </template>
         </div>
       </form>
     </div>
+
+    <!-- Modal de mapa para coordenadas -->
+    <ModalMapaCoordenadas
+      v-model="modalMapaVisible"
+      :coordenadas-iniciales="{
+        latitud: datosFormulario.latitud || 14.0818,
+        longitud: datosFormulario.longitud || -87.2068,
+        altitud: datosFormulario.altitud_metros || 0,
+      }"
+      @coordenadas-seleccionadas="manejarCoordenadasModalMapa"
+    />
   </div>
 </template>
 
@@ -68,13 +104,14 @@ import Message from "primevue/message";
 
 // Componentes propios especializados
 import CampoFormularioOrganizacion from "./CampoFormularioOrganizacion.vue";
+import ModalMapaCoordenadas from "./ModalMapaCoordenadas.vue";
 
 // Composables y utilidades para organización
 import { usarFormularioDinamico } from "@/composables/usarFormularioDinamico";
 import { useOrganizacionStore } from "@/stores/organizacionStore";
-import { useCatalogosStore } from "@/stores/catalogosStore"; // Para países y tipos_estructura_militar
+import { useCatalogosStore } from "@/stores/catalogosStore";
 
-// ✅ AGREGAR ESTA LÍNEA AQUÍ:
+// Configuracion de esquemas
 import { obtenerEsquema } from "@/config/esquemaOrganizacion";
 
 export default {
@@ -84,6 +121,7 @@ export default {
     ProgressSpinner,
     Message,
     CampoFormularioOrganizacion,
+    ModalMapaCoordenadas,
   },
 
   props: {
@@ -124,7 +162,7 @@ export default {
     // Composables especializados
     const toast = useToast();
     const organizacionStore = useOrganizacionStore();
-    const catalogosStore = useCatalogosStore(); // Para foráneas de catálogos
+    const catalogosStore = useCatalogosStore();
 
     const {
       configurarEsquema,
@@ -143,7 +181,10 @@ export default {
     const configuracionEsquema = ref(null);
     const camposConfigurados = ref([]);
 
-    // 🔥 NUEVOS REFS PARA FILTRADO JERÁRQUICO
+    // Estados para modal de mapa
+    const modalMapaVisible = ref(false);
+
+    // Refs para filtrado jerarquico
     const paisSeleccionado = ref(null);
     const departamentoSeleccionado = ref(null);
     const municipioSeleccionado = ref(null);
@@ -168,7 +209,74 @@ export default {
       }
     });
 
-    // 🌍 COMPUTED PARA FILTRADO JERÁRQUICO
+    // Computed para mostrar botón de mapa solo en ubicaciones geográficas
+    const mostrarBotonMapaGlobal = computed(() => {
+      return props.esquema === "ubicaciones_geograficas";
+    });
+
+    // Abrir modal de mapa para seleccionar coordenadas
+    const abrirModalMapa = () => {
+      console.log("Abriendo modal de mapa para seleccionar coordenadas");
+      modalMapaVisible.value = true;
+    };
+
+    // Manejar coordenadas seleccionadas desde el modal de mapa
+    const manejarCoordenadasModalMapa = (coordenadas) => {
+      console.log("Coordenadas recibidas del modal de mapa:", coordenadas);
+
+      // Actualizar formulario con las coordenadas seleccionadas
+      datosFormulario.value.latitud = coordenadas.latitud;
+      datosFormulario.value.longitud = coordenadas.longitud;
+      datosFormulario.value.altitud_metros = coordenadas.altitud;
+
+      // Limpiar errores
+      delete erroresValidacion.value.latitud;
+      delete erroresValidacion.value.longitud;
+      delete erroresValidacion.value.altitud_metros;
+
+      toast.add({
+        severity: "success",
+        summary: "Coordenadas actualizadas",
+        detail: `Lat: ${coordenadas.latitud}, Lng: ${coordenadas.longitud}`,
+        life: 3000,
+      });
+
+      // Cerrar modal
+      modalMapaVisible.value = false;
+    };
+
+    // Actualizar todas las coordenadas desde el mapa
+    const actualizarTodasLasCoordenadas = (coordenadas) => {
+      console.log(
+        "Actualizando todas las coordenadas desde mapa:",
+        coordenadas
+      );
+
+      // Actualizar los campos en el formulario
+      datosFormulario.value.latitud = coordenadas.latitud;
+      datosFormulario.value.longitud = coordenadas.longitud;
+      datosFormulario.value.altitud_metros = coordenadas.altitud_metros;
+
+      // Limpiar errores de coordenadas
+      delete erroresValidacion.value.latitud;
+      delete erroresValidacion.value.longitud;
+      delete erroresValidacion.value.altitud_metros;
+
+      // Mostrar notificación de éxito
+      toast.add({
+        severity: "success",
+        summary: "Coordenadas actualizadas",
+        detail: `Latitud: ${coordenadas.latitud}, Longitud: ${coordenadas.longitud}, Altitud: ${coordenadas.altitud_metros}m`,
+        life: 4000,
+      });
+
+      console.log(
+        "Formulario actualizado con coordenadas:",
+        datosFormulario.value
+      );
+    };
+
+    // Computed para filtrado jerarquico
     const departamentosFiltrados = computed(() => {
       if (!paisSeleccionado.value) {
         return organizacionStore.departamentos || [];
@@ -235,9 +343,9 @@ export default {
       return ubicaciones;
     });
 
-    // 🎯 FUNCIÓN PARA DETECTAR CAMBIOS EN SELECCIONES Y FILTRAR
+    // Funcion para detectar cambios en selecciones y filtrar - CORREGIDA
     const actualizarFiltrosJerarquicos = (nombreCampo, valor) => {
-      console.log(`🔄 Actualizando filtros: ${nombreCampo} = ${valor}`);
+      console.log(`Actualizando filtros: ${nombreCampo} = ${valor}`);
 
       switch (nombreCampo) {
         case "pais_id":
@@ -247,7 +355,7 @@ export default {
           municipioSeleccionado.value = null;
           ciudadSeleccionada.value = null;
 
-          // ✅ LIMPIAR CAMPOS DEPENDIENTES EN EL FORMULARIO
+          // Limpiar campos dependientes en el formulario
           if (datosFormulario.value.departamento_id) {
             datosFormulario.value.departamento_id = null;
           }
@@ -257,7 +365,7 @@ export default {
           if (datosFormulario.value.ciudad_id) {
             datosFormulario.value.ciudad_id = null;
           }
-          console.log("🌍 País seleccionado, campos dependientes reseteados");
+          console.log("País seleccionado, campos dependientes reseteados");
           break;
 
         case "departamento_id":
@@ -266,7 +374,7 @@ export default {
           municipioSeleccionado.value = null;
           ciudadSeleccionada.value = null;
 
-          // ✅ LIMPIAR CAMPOS DEPENDIENTES
+          // Limpiar campos dependientes
           if (datosFormulario.value.municipio_id) {
             datosFormulario.value.municipio_id = null;
           }
@@ -274,7 +382,7 @@ export default {
             datosFormulario.value.ciudad_id = null;
           }
           console.log(
-            "🏛️ Departamento seleccionado, municipios/ciudades reseteados"
+            "Departamento seleccionado, municipios/ciudades reseteados"
           );
           break;
 
@@ -283,60 +391,61 @@ export default {
           // Reset cascada siguiente
           ciudadSeleccionada.value = null;
 
-          // ✅ LIMPIAR CAMPOS DEPENDIENTES
+          // Limpiar campos dependientes
           if (datosFormulario.value.ciudad_id) {
             datosFormulario.value.ciudad_id = null;
           }
-          console.log("🏙️ Municipio seleccionado, ciudades reseteadas");
+          console.log("Municipio seleccionado, ciudades reseteadas");
           break;
 
         case "ciudad_id":
           ciudadSeleccionada.value = valor;
-          console.log("🌃 Ciudad seleccionada");
+          console.log("Ciudad seleccionada");
           break;
       }
 
-      // ✅ FORZAR ACTUALIZACIÓN DE LA UI
+      // Forzar actualizacion de la UI
       nextTick(() => {
-        console.log("🔄 UI actualizada con nuevos filtros");
+        console.log("UI actualizada con nuevos filtros");
       });
     };
 
-    // 🚀 FUNCIÓN MEJORADA PARA OBTENER OPCIONES CON FILTRADO JERÁRQUICO
+    // Funcion mejorada para obtener opciones CORREGIDA FINAL
     const obtenerOpcionesParaCampo = (configuracionCampo) => {
-      console.log("🔍 Obteniendo opciones para:", configuracionCampo);
+      console.log(
+        "Obteniendo opciones para:",
+        configuracionCampo.nombre,
+        configuracionCampo.tablaReferencia
+      );
+      console.log("Esquema actual:", props.esquema);
+
       if (
         (configuracionCampo.tipo !== "seleccion" &&
           configuracionCampo.tipo !== "foraneo_autocompletado") ||
         !configuracionCampo.tablaReferencia
       ) {
-        console.log(
-          "❌ Campo no válido para opciones:",
-          configuracionCampo.tipo,
-          configuracionCampo.tablaReferencia
-        );
+        console.log("Campo no válido para opciones");
         return [];
       }
 
+      // Detectar si estamos en ubicaciones geograficas
+      const esUbicacionesGeograficas =
+        props.esquema === "ubicaciones_geograficas";
+      console.log("Es ubicaciones geográficas:", esUbicacionesGeograficas);
+
       switch (configuracionCampo.tablaReferencia) {
-        // REFERENCIAS A CATÁLOGOS (foráneas)
+        // Paises - siempre disponibles
         case "paises":
           const paises = catalogosStore.paises || [];
-          console.log("🌍 Países disponibles:", paises.length, paises);
+          console.log("Países disponibles:", paises.length);
 
           if (paises.length === 0) {
-            console.log("📡 Forzando carga de países...");
             catalogosStore.loadPaises();
             return [
-              {
-                etiqueta: "Cargando países...",
-                valor: null,
-                disabled: true,
-              },
+              { etiqueta: "Cargando países...", valor: null, disabled: true },
             ];
           }
 
-          console.log("✅ Retornando países:", paises.length);
           return paises
             .filter((pais) => pais.is_active !== false)
             .map((pais) => ({
@@ -345,6 +454,222 @@ export default {
               datos: pais,
             }));
 
+        // Departamentos - Filtrado solo en ubicaciones geograficas
+        case "departamentos":
+          console.log("Procesando departamentos...");
+
+          // Solo aplicar filtrado en ubicaciones geograficas
+          if (esUbicacionesGeograficas) {
+            console.log("Aplicando filtrado jerárquico para departamentos");
+            console.log(
+              "País seleccionado actualmente:",
+              paisSeleccionado.value
+            );
+
+            if (!paisSeleccionado.value) {
+              return [
+                {
+                  etiqueta: "Primero seleccione un país",
+                  valor: null,
+                  disabled: true,
+                },
+              ];
+            }
+
+            const departamentosDisponibles = departamentosFiltrados.value;
+            console.log(
+              `Departamentos filtrados para país ${paisSeleccionado.value}:`,
+              departamentosDisponibles.length
+            );
+
+            if (departamentosDisponibles.length === 0) {
+              return [
+                {
+                  etiqueta: "No hay departamentos para este país",
+                  valor: null,
+                  disabled: true,
+                },
+              ];
+            }
+
+            return departamentosDisponibles
+              .filter((depto) => depto.is_active !== false)
+              .map((depto) => ({
+                etiqueta:
+                  depto.nombre_departamento || `Departamento ${depto.id}`,
+                valor: depto.id,
+                datos: depto,
+              }));
+          } else {
+            // Para otros esquemas: mostrar todos los departamentos
+            console.log("Mostrando TODOS los departamentos (sin filtrado)");
+
+            const todosDepartamentos = organizacionStore.departamentos || [];
+
+            if (todosDepartamentos.length === 0) {
+              organizacionStore.loadDepartamentos();
+              return [
+                {
+                  etiqueta: "Cargando departamentos...",
+                  valor: null,
+                  disabled: true,
+                },
+              ];
+            }
+
+            return todosDepartamentos
+              .filter((depto) => depto.is_active !== false)
+              .map((depto) => ({
+                etiqueta:
+                  depto.nombre_departamento || `Departamento ${depto.id}`,
+                valor: depto.id,
+                datos: depto,
+              }));
+          }
+
+        // Municipios - Filtrado solo en ubicaciones geograficas
+        case "municipios":
+          console.log("Procesando municipios...");
+
+          if (esUbicacionesGeograficas) {
+            console.log("Aplicando filtrado jerárquico para municipios");
+            console.log(
+              "Departamento seleccionado actualmente:",
+              departamentoSeleccionado.value
+            );
+
+            if (!departamentoSeleccionado.value) {
+              return [
+                {
+                  etiqueta: "Primero seleccione un departamento",
+                  valor: null,
+                  disabled: true,
+                },
+              ];
+            }
+
+            const municipiosDisponibles = municipiosFiltrados.value;
+            console.log(
+              `Municipios filtrados para departamento ${departamentoSeleccionado.value}:`,
+              municipiosDisponibles.length
+            );
+
+            if (municipiosDisponibles.length === 0) {
+              return [
+                {
+                  etiqueta: "No hay municipios para este departamento",
+                  valor: null,
+                  disabled: true,
+                },
+              ];
+            }
+
+            return municipiosDisponibles
+              .filter((municipio) => municipio.is_active !== false)
+              .map((municipio) => ({
+                etiqueta:
+                  municipio.nombre_municipio || `Municipio ${municipio.id}`,
+                valor: municipio.id,
+                datos: municipio,
+              }));
+          } else {
+            // Para otros esquemas: mostrar todos los municipios
+            console.log("Mostrando TODOS los municipios (sin filtrado)");
+
+            const todosMunicipios = organizacionStore.municipios || [];
+
+            if (todosMunicipios.length === 0) {
+              organizacionStore.loadMunicipios();
+              return [
+                {
+                  etiqueta: "Cargando municipios...",
+                  valor: null,
+                  disabled: true,
+                },
+              ];
+            }
+
+            return todosMunicipios
+              .filter((municipio) => municipio.is_active !== false)
+              .map((municipio) => ({
+                etiqueta:
+                  municipio.nombre_municipio || `Municipio ${municipio.id}`,
+                valor: municipio.id,
+                datos: municipio,
+              }));
+          }
+
+        // Ciudades - Filtrado solo en ubicaciones geograficas
+        case "ciudades":
+          console.log("Procesando ciudades...");
+
+          if (esUbicacionesGeograficas) {
+            console.log("Aplicando filtrado jerárquico para ciudades");
+            console.log(
+              "Municipio seleccionado actualmente:",
+              municipioSeleccionado.value
+            );
+
+            if (!municipioSeleccionado.value) {
+              return [
+                {
+                  etiqueta: "Primero seleccione un municipio",
+                  valor: null,
+                  disabled: true,
+                },
+              ];
+            }
+
+            const ciudadesDisponibles = ciudadesFiltradas.value;
+            console.log(
+              `Ciudades filtradas para municipio ${municipioSeleccionado.value}:`,
+              ciudadesDisponibles.length
+            );
+
+            if (ciudadesDisponibles.length === 0) {
+              return [
+                {
+                  etiqueta: "No hay ciudades para este municipio",
+                  valor: null,
+                  disabled: true,
+                },
+              ];
+            }
+
+            return ciudadesDisponibles
+              .filter((ciudad) => ciudad.is_active !== false)
+              .map((ciudad) => ({
+                etiqueta: ciudad.nombre_ciudad || `Ciudad ${ciudad.id}`,
+                valor: ciudad.id,
+                datos: ciudad,
+              }));
+          } else {
+            // Para otros esquemas: mostrar todas las ciudades
+            console.log("Mostrando TODAS las ciudades (sin filtrado)");
+
+            const todasCiudades = organizacionStore.ciudades || [];
+
+            if (todasCiudades.length === 0) {
+              organizacionStore.loadCiudades();
+              return [
+                {
+                  etiqueta: "Cargando ciudades...",
+                  valor: null,
+                  disabled: true,
+                },
+              ];
+            }
+
+            return todasCiudades
+              .filter((ciudad) => ciudad.is_active !== false)
+              .map((ciudad) => ({
+                etiqueta: ciudad.nombre_ciudad || `Ciudad ${ciudad.id}`,
+                valor: ciudad.id,
+                datos: ciudad,
+              }));
+          }
+
+        // Tipos estructura militar - sin filtrado
         case "tipos_estructura_militar":
           const tiposEstructura = catalogosStore.tiposEstructuraMilitar || [];
           if (tiposEstructura.length === 0) {
@@ -365,139 +690,10 @@ export default {
               datos: tipo,
             }));
 
-        // 🎯 REFERENCIAS FILTRADAS JERÁRQUICAMENTE
-        case "departamentos":
-          const departamentosDisponibles = departamentosFiltrados.value;
-          console.log(
-            `🏘️ Departamentos filtrados (país: ${paisSeleccionado.value}):`,
-            departamentosDisponibles.length
-          );
-
-          if (
-            departamentosDisponibles.length === 0 &&
-            organizacionStore.departamentos?.length === 0
-          ) {
-            organizacionStore.loadDepartamentos();
-            return [
-              {
-                etiqueta: "Cargando departamentos...",
-                valor: null,
-                disabled: true,
-              },
-            ];
-          }
-
-          if (departamentosDisponibles.length === 0 && paisSeleccionado.value) {
-            return [
-              {
-                etiqueta: "No hay departamentos para este país",
-                valor: null,
-                disabled: true,
-              },
-            ];
-          }
-
-          return departamentosDisponibles
-            .filter((depto) => depto.is_active !== false)
-            .map((depto) => ({
-              etiqueta: depto.nombre_departamento || `Departamento ${depto.id}`,
-              valor: depto.id,
-              datos: depto,
-            }));
-
-        case "municipios":
-          const municipiosDisponibles = municipiosFiltrados.value;
-          console.log(
-            `🏙️ Municipios filtrados (depto: ${departamentoSeleccionado.value}):`,
-            municipiosDisponibles.length
-          );
-
-          if (
-            municipiosDisponibles.length === 0 &&
-            organizacionStore.municipios?.length === 0
-          ) {
-            organizacionStore.loadMunicipios();
-            return [
-              {
-                etiqueta: "Cargando municipios...",
-                valor: null,
-                disabled: true,
-              },
-            ];
-          }
-
-          if (
-            municipiosDisponibles.length === 0 &&
-            departamentoSeleccionado.value
-          ) {
-            return [
-              {
-                etiqueta: "No hay municipios para este departamento",
-                valor: null,
-                disabled: true,
-              },
-            ];
-          }
-
-          return municipiosDisponibles
-            .filter((municipio) => municipio.is_active !== false)
-            .map((municipio) => ({
-              etiqueta:
-                municipio.nombre_municipio || `Municipio ${municipio.id}`,
-              valor: municipio.id,
-              datos: municipio,
-            }));
-
-        case "ciudades":
-          const ciudadesDisponibles = ciudadesFiltradas.value;
-          console.log(
-            `🌃 Ciudades filtradas (municipio: ${municipioSeleccionado.value}):`,
-            ciudadesDisponibles.length
-          );
-
-          if (
-            ciudadesDisponibles.length === 0 &&
-            organizacionStore.ciudades?.length === 0
-          ) {
-            organizacionStore.loadCiudades();
-            return [
-              {
-                etiqueta: "Cargando ciudades...",
-                valor: null,
-                disabled: true,
-              },
-            ];
-          }
-
-          if (ciudadesDisponibles.length === 0 && municipioSeleccionado.value) {
-            return [
-              {
-                etiqueta: "No hay ciudades para este municipio",
-                valor: null,
-                disabled: true,
-              },
-            ];
-          }
-
-          return ciudadesDisponibles
-            .filter((ciudad) => ciudad.is_active !== false)
-            .map((ciudad) => ({
-              etiqueta: ciudad.nombre_ciudad || `Ciudad ${ciudad.id}`,
-              valor: ciudad.id,
-              datos: ciudad,
-            }));
-
+        // NUEVO: Ubicaciones geograficas - todas disponibles
         case "ubicaciones_geograficas":
-          const ubicacionesDisponibles = ubicacionesFiltradas.value;
-          console.log(
-            `📍 Ubicaciones filtradas:`,
-            ubicacionesDisponibles.length
-          );
-
-          if (
-            ubicacionesDisponibles.length === 0 &&
-            organizacionStore.ubicacionesGeograficas?.length === 0
-          ) {
+          const ubicacionesGeo = organizacionStore.ubicacionesGeograficas || [];
+          if (ubicacionesGeo.length === 0) {
             organizacionStore.loadUbicacionesGeograficas();
             return [
               {
@@ -507,8 +703,7 @@ export default {
               },
             ];
           }
-
-          return ubicacionesDisponibles
+          return ubicacionesGeo
             .filter((ubicacion) => ubicacion.is_active !== false)
             .map((ubicacion) => ({
               etiqueta:
@@ -517,39 +712,47 @@ export default {
               datos: ubicacion,
             }));
 
+        // NUEVO: Estructura militar padre - todas las unidades existentes
         case "estructura_militar":
-          const estructuras = organizacionStore.estructuraMilitar || [];
-          if (estructuras.length === 0) {
+          const estructurasMilitares =
+            organizacionStore.estructuraMilitar || [];
+          if (estructurasMilitares.length === 0) {
             organizacionStore.loadEstructuraMilitar();
             return [
               {
-                etiqueta: "Cargando estructuras...",
+                etiqueta: "Cargando unidades...",
                 valor: null,
                 disabled: true,
               },
             ];
           }
-          return estructuras
+          return estructurasMilitares
             .filter((estructura) => estructura.is_active !== false)
             .map((estructura) => ({
-              etiqueta: estructura.nombre_unidad || `Unidad ${estructura.id}`,
+              etiqueta:
+                estructura.nombre_unidad ||
+                `Unidad ${estructura.codigo_unidad}`,
               valor: estructura.id,
               datos: estructura,
             }));
 
         default:
+          console.log(
+            "Tabla de referencia no reconocida:",
+            configuracionCampo.tablaReferencia
+          );
           return [];
       }
     };
 
-    // Inicializar formulario ESPECIALIZADO PARA ORGANIZACIÓN
+    // Inicializar formulario especializado para organizacion
     const inicializarFormulario = async () => {
       cargando.value = true;
       limpiarErrores();
       erroresValidacion.value = {};
 
       try {
-        // Usar import estático que ya existe arriba
+        // Usar import estatico que ya existe arriba
         const configuracion = obtenerEsquema(props.esquema);
 
         if (!configuracion) {
@@ -596,25 +799,25 @@ export default {
       }
     };
 
-    // 🚀 CARGA INTELIGENTE DE DEPENDENCIAS - MEJORADA CON VERIFICACIÓN
+    // Carga inteligente de dependencias mejorada con verificacion
     const cargarDependenciasEsquema = async (esquema) => {
       try {
         switch (esquema) {
           case "departamentos":
-            // Necesita países - CARGA FORZADA
-            console.log("🌍 Iniciando carga de países para departamentos...");
+            // Necesita países - carga forzada
+            console.log("Iniciando carga de países para departamentos...");
             await catalogosStore.loadPaises();
 
             // Verificar que se cargaron
             const paisesVerificados = catalogosStore.paises || [];
             console.log(
-              "✅ Países verificados:",
+              "Países verificados:",
               paisesVerificados.length,
               paisesVerificados
             );
 
             if (paisesVerificados.length === 0) {
-              console.warn("⚠️ No se cargaron países - reintentando...");
+              console.warn("No se cargaron países - reintentando...");
               await catalogosStore.loadPaises();
             }
             break;
@@ -625,7 +828,7 @@ export default {
               catalogosStore.loadPaises(),
               organizacionStore.loadDepartamentos(),
             ]);
-            console.log("🏘️ Países y departamentos cargados para municipios");
+            console.log("Países y departamentos cargados para municipios");
             break;
 
           case "ciudades":
@@ -635,7 +838,7 @@ export default {
               organizacionStore.loadDepartamentos(),
               organizacionStore.loadMunicipios(),
             ]);
-            console.log("🏙️ Cascada hasta municipios cargada para ciudades");
+            console.log("Cascada hasta municipios cargada para ciudades");
             break;
 
           case "ubicaciones_geograficas":
@@ -646,65 +849,67 @@ export default {
               organizacionStore.loadMunicipios(),
               organizacionStore.loadCiudades(),
             ]);
-            console.log("🌍 Cascada geográfica completa cargada");
+            console.log("Cascada geográfica completa cargada");
             break;
 
           case "estructura_militar":
-            // Necesita tipos_estructura_militar y ubicaciones
+            // ACTUALIZADO: Necesita tipos_estructura_militar, ubicaciones Y estructura militar existente
             await Promise.all([
               catalogosStore.loadTiposEstructuraMilitar(),
               organizacionStore.loadUbicacionesGeograficas(),
+              organizacionStore.loadEstructuraMilitar(), // AGREGADO: Para unidad padre
               catalogosStore.loadPaises(), // Para filtros de ubicaciones
               organizacionStore.loadDepartamentos(),
               organizacionStore.loadMunicipios(),
               organizacionStore.loadCiudades(),
             ]);
-            console.log("🏛️ Tipos estructura y cascada geográfica cargados");
+            console.log(
+              "Tipos estructura, ubicaciones y unidades padre cargados"
+            );
             break;
 
           case "cargos":
             // Necesita estructura_militar
             await organizacionStore.loadEstructuraMilitar();
-            console.log("👔 Estructura militar cargada para cargos");
+            console.log("Estructura militar cargada para cargos");
             break;
 
           case "roles_funcionales":
             // No necesita dependencias externas
-            console.log("🎭 Roles funcionales - sin dependencias");
+            console.log("Roles funcionales - sin dependencias");
             break;
 
           default:
-            console.log(`ℹ️ Sin dependencias específicas para: ${esquema}`);
+            console.log(`Sin dependencias específicas para: ${esquema}`);
         }
       } catch (error) {
-        console.error(`❌ Error cargando dependencias para ${esquema}:`, error);
+        console.error(`Error cargando dependencias para ${esquema}:`, error);
       }
     };
 
-    // 🎯 ACTUALIZAR CAMPO CON FILTRADO JERÁRQUICO
+    // Actualizar campo con filtrado jerarquico - CORREGIDA
     const actualizarCampo = (nombreCampo, nuevoValor) => {
-      console.log(`🔄 Campo actualizado: ${nombreCampo} = ${nuevoValor}`);
+      console.log(`Campo actualizado: ${nombreCampo} = ${nuevoValor}`);
 
-      // ✅ ACTUALIZAR EL FORMULARIO
+      // Actualizar el formulario
       datosFormulario.value[nombreCampo] = nuevoValor;
 
-      // 🔥 ACTUALIZAR FILTROS JERÁRQUICOS
-      actualizarFiltrosJerarquicos(nombreCampo, nuevoValor);
+      // IMPORTANTE: Solo aplicar filtros jerárquicos en ubicaciones geográficas
+      if (props.esquema === "ubicaciones_geograficas") {
+        actualizarFiltrosJerarquicos(nombreCampo, nuevoValor);
+      }
 
-      // ✅ LIMPIAR ERRORES
+      // Limpiar errores
       if (erroresValidacion.value[nombreCampo]) {
         delete erroresValidacion.value[nombreCampo];
       }
     };
 
-    // 🌍 MANEJO DE EVENTOS ESPECÍFICOS DE ORGANIZACIÓN
+    // Manejo de eventos especificos de organizacion
 
-    // Auto-llenado cuando selecciona ubicación geográfica
+    // Auto-llenado cuando selecciona ubicacion geografica
     const manejarUbicacionSeleccionada = (ubicacionData) => {
-      console.log(
-        "📍 Ubicación seleccionada para auto-llenado:",
-        ubicacionData
-      );
+      console.log("Ubicación seleccionada para auto-llenado:", ubicacionData);
 
       const mapaAutollenado = {
         latitud: ubicacionData.latitud,
@@ -720,7 +925,7 @@ export default {
 
     // Auto-llenado cuando selecciona departamento
     const manejarDepartamentoSeleccionado = (departamentoData) => {
-      console.log("🏘️ Departamento seleccionado:", departamentoData);
+      console.log("Departamento seleccionado:", departamentoData);
 
       toast.add({
         severity: "info",
@@ -732,7 +937,7 @@ export default {
 
     // Auto-llenado cuando selecciona municipio
     const manejarMunicipioSeleccionado = (municipioData) => {
-      console.log("🏙️ Municipio seleccionado:", municipioData);
+      console.log("Municipio seleccionado:", municipioData);
 
       toast.add({
         severity: "info",
@@ -742,7 +947,7 @@ export default {
       });
     };
 
-    // Función helper para aplicar auto-llenado
+    // Funcion helper para aplicar auto-llenado
     const aplicarAutollenado = (mapaAutollenado, nombreReferencia) => {
       Object.keys(mapaAutollenado).forEach((nombreCampo) => {
         if (
@@ -751,7 +956,7 @@ export default {
         ) {
           datosFormulario.value[nombreCampo] = mapaAutollenado[nombreCampo];
           console.log(
-            `🔄 Auto-llenado: ${nombreCampo} = ${mapaAutollenado[nombreCampo]}`
+            `Auto-llenado: ${nombreCampo} = ${mapaAutollenado[nombreCampo]}`
           );
         }
       });
@@ -868,25 +1073,22 @@ export default {
     // Lifecycle
     onMounted(async () => {
       console.log(
-        "🛠️ FormularioDinamicoOrganizacion montado para:",
+        "FormularioDinamicoOrganizacion montado para:",
         props.esquema
       );
 
-      // 🔥 DEBUG: Forzar carga de países
-      console.log("📡 Estado inicial países:", catalogosStore.paises);
+      // Debug forzar carga de países
+      console.log("Estado inicial países:", catalogosStore.paises);
 
       try {
         await catalogosStore.loadPaises();
-        console.log("✅ Países después de cargar:", catalogosStore.paises);
+        console.log("Países después de cargar:", catalogosStore.paises);
       } catch (error) {
-        console.error("❌ Error cargando países:", error);
+        console.error("Error cargando países:", error);
       }
 
-      // 🔥 DEBUG: Verificar configuración esquema
-      console.log(
-        "📋 Configuración esquema actual:",
-        configuracionEsquema.value
-      );
+      // Debug verificar configuracion esquema
+      console.log("Configuración esquema actual:", configuracionEsquema.value);
 
       inicializarFormulario();
     });
@@ -898,15 +1100,20 @@ export default {
       erroresValidacion,
       configuracionEsquema,
       camposConfigurados,
+      modalMapaVisible,
 
       // Computed
       nombreEsquema,
       esquemaValido,
       tieneErrores,
       mensajeCarga,
+      mostrarBotonMapaGlobal,
 
       // Métodos
       actualizarCampo,
+      actualizarTodasLasCoordenadas,
+      abrirModalMapa,
+      manejarCoordenadasModalMapa,
       manejarUbicacionSeleccionada,
       manejarDepartamentoSeleccionado,
       manejarMunicipioSeleccionado,
@@ -953,7 +1160,7 @@ export default {
   @apply opacity-50 pointer-events-none;
 }
 
-/* Tema púrpura para organización */
+/* Tema purpura para organizacion */
 .contenedor-formulario-dinamico-organizacion .text-purple-300 {
   color: #d8b4fe;
 }
@@ -965,6 +1172,15 @@ export default {
 @media (max-width: 768px) {
   .formulario-dinamico-organizacion .grid {
     @apply grid-cols-1 gap-3;
+  }
+
+  .contenedor-boton-mapa-antes-latitud {
+    margin-bottom: 15px;
+  }
+
+  .boton-seleccionar-mapa-antes-latitud {
+    font-size: 13px !important;
+    padding: 10px 20px !important;
   }
 }
 </style>
