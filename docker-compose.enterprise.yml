@@ -595,7 +595,7 @@ services:
     restart: unless-stopped
     working_dir: /var/www/html
     ports:
-      - "8000:8080"
+      - "8000:8000"
     volumes:
       - ./services/fah-auth-service:/var/www/html
     environment:

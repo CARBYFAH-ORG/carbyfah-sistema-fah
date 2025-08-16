@@ -18,7 +18,7 @@ export default defineConfig({
                 changeOrigin: true,
                 secure: false,
                 configure: (proxy, options) => {
-                    console.log('🎯 Proxy personal-service:', options.target)
+                    console.log('👥 Proxy personal:', options.target)
                 }
             }
         }

@@ -1,0 +1,302 @@
+/* Reset global para fullscreen personal service */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--fah-font-family);
+  background: var(--fah-content-bg);
+  min-height: 100vh;
+  color: var(--fah-personal-text);
+}
+
+#app {
+  width: 100vw;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Ajustes para login personal */
+.login-container {
+  width: 100vw;
+  min-height: 100vh;
+  margin: 0;
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(
+    135deg,
+    var(--fah-azul-naval) 0%,
+    var(--fah-agregar) 100%
+  );
+}
+
+/* Ajustes para dashboard personal */
+.dashboard-layout {
+  width: 100vw;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* Eliminar márgenes de router-view */
+.router-view {
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Override para primevue con colores FAH */
+.p-card {
+  max-width: none;
+  background-color: var(--fah-card-bg);
+  border: 1px solid var(--fah-border);
+  box-shadow: var(--fah-shadow-md);
+}
+
+.p-card .p-card-header {
+  background: linear-gradient(
+    135deg,
+    var(--fah-azul-naval) 0%,
+    var(--fah-dorado) 100%
+  );
+  color: var(--fah-blanco);
+  border-bottom: 2px solid var(--fah-dorado);
+}
+
+.p-card .p-card-title {
+  color: var(--fah-blanco);
+  font-weight: var(--fah-font-weight-semibold);
+}
+
+.p-card .p-card-subtitle {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Botones primevue con paleta FAH */
+.p-button.p-button-primary {
+  background-color: var(--fah-agregar);
+  border-color: var(--fah-agregar);
+}
+
+.p-button.p-button-primary:hover {
+  background-color: #0284c7;
+  border-color: #0284c7;
+}
+
+.p-button.p-button-secondary {
+  background-color: var(--fah-actualizar);
+  border-color: var(--fah-actualizar);
+}
+
+.p-button.p-button-secondary:hover {
+  background-color: #4a90c2;
+  border-color: #4a90c2;
+}
+
+.p-button.p-button-danger {
+  background-color: var(--fah-eliminar);
+  border-color: var(--fah-eliminar);
+}
+
+.p-button.p-button-danger:hover {
+  background-color: #b55a5f;
+  border-color: #b55a5f;
+}
+
+.p-button.p-button-info {
+  background-color: var(--fah-cancelar);
+  border-color: var(--fah-cancelar);
+}
+
+.p-button.p-button-info:hover {
+  background-color: #5a6268;
+  border-color: #5a6268;
+}
+
+/* Datatable con colores FAH */
+.p-datatable .p-datatable-header {
+  background: var(--fah-azul-naval);
+  color: var(--fah-blanco);
+  border: 1px solid var(--fah-azul-naval);
+}
+
+.p-datatable .p-datatable-thead > tr > th {
+  background: var(--fah-azul-naval);
+  color: var(--fah-blanco);
+  border-color: var(--fah-dorado);
+  font-weight: var(--fah-font-weight-semibold);
+}
+
+.p-datatable .p-datatable-tbody > tr {
+  background: var(--fah-blanco);
+}
+
+.p-datatable .p-datatable-tbody > tr:nth-child(even) {
+  background: var(--fah-gris-claro-fondo);
+}
+
+.p-datatable .p-datatable-tbody > tr:hover {
+  background: rgba(14, 165, 233, 0.1);
+}
+
+.p-datatable .p-datatable-tbody > tr > td {
+  border-color: var(--fah-border);
+}
+
+/* Toolbar con colores FAH */
+.p-toolbar {
+  background: linear-gradient(
+    135deg,
+    var(--fah-azul-naval) 0%,
+    var(--fah-dorado) 100%
+  );
+  border-color: var(--fah-dorado);
+  color: var(--fah-blanco);
+}
+
+/* Inputs y formularios */
+.p-inputtext {
+  border-color: var(--fah-border);
+}
+
+.p-inputtext:focus {
+  border-color: var(--fah-agregar);
+  box-shadow: 0 0 0 0.2rem rgba(14, 165, 233, 0.25);
+}
+
+.p-dropdown {
+  border-color: var(--fah-border);
+}
+
+.p-dropdown:focus {
+  border-color: var(--fah-agregar);
+  box-shadow: 0 0 0 0.2rem rgba(14, 165, 233, 0.25);
+}
+
+.p-autocomplete .p-inputtext {
+  border-color: var(--fah-border);
+}
+
+.p-autocomplete .p-inputtext:focus {
+  border-color: var(--fah-agregar);
+  box-shadow: 0 0 0 0.2rem rgba(14, 165, 233, 0.25);
+}
+
+/* Tags y badges */
+.p-tag.p-tag-primary {
+  background: var(--fah-azul-naval);
+}
+
+.p-tag.p-tag-success {
+  background: var(--fah-verde-exito);
+}
+
+.p-tag.p-tag-warning {
+  background: var(--fah-amarillo-advertencia);
+  color: var(--fah-gris-oscuro-headers);
+}
+
+.p-tag.p-tag-danger {
+  background: var(--fah-rojo-error);
+}
+
+.p-tag.p-tag-info {
+  background: var(--fah-azul-informacion);
+}
+
+.p-badge.p-badge-primary {
+  background: var(--fah-azul-naval);
+}
+
+.p-badge.p-badge-success {
+  background: var(--fah-verde-exito);
+}
+
+.p-badge.p-badge-warning {
+  background: var(--fah-amarillo-advertencia);
+}
+
+.p-badge.p-badge-danger {
+  background: var(--fah-rojo-error);
+}
+
+.p-badge.p-badge-info {
+  background: var(--fah-azul-informacion);
+}
+
+/* Mensajes y toasts */
+.p-message.p-message-success {
+  background-color: rgba(40, 167, 69, 0.1);
+  border-color: var(--fah-verde-exito);
+  color: var(--fah-verde-exito);
+}
+
+.p-message.p-message-warn {
+  background-color: rgba(255, 193, 7, 0.1);
+  border-color: var(--fah-amarillo-advertencia);
+  color: #856404;
+}
+
+.p-message.p-message-error {
+  background-color: rgba(220, 53, 69, 0.1);
+  border-color: var(--fah-rojo-error);
+  color: var(--fah-rojo-error);
+}
+
+.p-message.p-message-info {
+  background-color: rgba(23, 162, 184, 0.1);
+  border-color: var(--fah-azul-informacion);
+  color: var(--fah-azul-informacion);
+}
+
+/* Progress bar */
+.p-progressbar .p-progressbar-value {
+  background: linear-gradient(
+    135deg,
+    var(--fah-agregar) 0%,
+    var(--fah-dorado) 100%
+  );
+}
+
+/* Ajustes responsive fullscreen */
+@media (max-width: 1200px) {
+  #app {
+    width: 100vw;
+  }
+}
+
+@media (max-width: 768px) {
+  #app {
+    width: 100vw;
+  }
+
+  .login-container {
+    padding: 15px;
+  }
+}
+
+@media (max-width: 480px) {
+  #app {
+    width: 100vw;
+  }
+
+  .login-container {
+    padding: 10px;
+  }
+}

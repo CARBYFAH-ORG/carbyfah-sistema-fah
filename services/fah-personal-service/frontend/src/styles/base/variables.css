@@ -1,0 +1,313 @@
+/* Variables CSS paleta FAH para Personal Service
+   Centro Automatizado de Recursos para FAH - FA-1 Personal
+   Basado en la paleta de colores FAH autorizada */
+
+:root {
+  /* Colores principales FAH */
+  --fah-azul-naval: #1e3a5f; /* Azul Naval FAH - Color principal institucional */
+  --fah-dorado: #d4af37; /* Dorado Institucional - Acentos y elementos destacados */
+  --fah-blanco: #ffffff; /* Blanco Pureza - Fondos principales */
+
+  /* Botones CRUD */
+  --fah-agregar: #0ea5e9; /* AGREGAR - Azul Celeste Patrio */
+  --fah-actualizar: #5a9bd4; /* ACTUALIZAR - Azul Medio */
+  --fah-eliminar: #c1666b; /* ELIMINAR - Rojo Suave */
+  --fah-cancelar: #6c757d; /* CANCELAR - Gris Neutro */
+
+  /* Colores complementarios */
+  --fah-gris-claro-fondo: #f8f9fa; /* Gris Claro Fondo */
+  --fah-gris-bordes: #e9ecef; /* Gris Bordes */
+  --fah-gris-texto-secundario: #495057; /* Gris Texto Secundario */
+  --fah-gris-oscuro-headers: #343a40; /* Gris Oscuro Headers */
+
+  /* Estados y alertas */
+  --fah-verde-exito: #28a745; /* Verde Éxito */
+  --fah-amarillo-advertencia: #ffc107; /* Amarillo Advertencia */
+  --fah-rojo-error: #dc3545; /* Rojo Error */
+  --fah-azul-informacion: #17a2b8; /* Azul Información */
+
+  /* Aliases para compatibilidad */
+  --fah-primary: var(--fah-azul-naval);
+  --fah-secondary: var(--fah-dorado);
+  --fah-success: var(--fah-verde-exito);
+  --fah-warning: var(--fah-amarillo-advertencia);
+  --fah-danger: var(--fah-rojo-error);
+  --fah-info: var(--fah-azul-informacion);
+
+  /* Colores de layout personal */
+  --fah-sidebar-bg: var(--fah-azul-naval);
+  --fah-sidebar-header-bg: linear-gradient(
+    145deg,
+    #2a4f7a 0%,
+    var(--fah-azul-naval) 100%
+  );
+  --fah-sidebar-hover: rgba(14, 165, 233, 0.1);
+  --fah-sidebar-active: rgba(212, 175, 55, 0.15);
+  --fah-sidebar-text: #ecf0f1;
+  --fah-sidebar-icon-bg: rgba(14, 165, 233, 0.2);
+
+  --fah-header-bg: linear-gradient(
+    135deg,
+    var(--fah-azul-naval) 0%,
+    var(--fah-agregar) 100%
+  );
+  --fah-header-text: var(--fah-blanco);
+  --fah-header-search-bg: rgba(255, 255, 255, 0.95);
+  --fah-header-button-hover: rgba(255, 255, 255, 0.15);
+
+  --fah-content-bg: var(--fah-gris-claro-fondo);
+  --fah-card-bg: var(--fah-blanco);
+  --fah-card-shadow: 0 2px 10px rgba(30, 58, 95, 0.1);
+  --fah-border: var(--fah-gris-bordes);
+  --fah-border-light: #e9ecef;
+
+  /* Tipografía */
+  --fah-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --fah-font-family-mono: 'Courier New', monospace;
+
+  /* Tamaños de fuente */
+  --fah-font-size-xs: 0.75rem; /* 12px */
+  --fah-font-size-sm: 0.875rem; /* 14px */
+  --fah-font-size-base: 1rem; /* 16px */
+  --fah-font-size-lg: 1.125rem; /* 18px */
+  --fah-font-size-xl: 1.25rem; /* 20px */
+  --fah-font-size-2xl: 1.5rem; /* 24px */
+  --fah-font-size-3xl: 1.875rem; /* 30px */
+
+  /* Pesos de fuente */
+  --fah-font-weight-light: 300;
+  --fah-font-weight-normal: 400;
+  --fah-font-weight-medium: 500;
+  --fah-font-weight-semibold: 600;
+  --fah-font-weight-bold: 700;
+
+  /* Espaciados */
+  --fah-spacing-xs: 0.25rem; /* 4px */
+  --fah-spacing-sm: 0.5rem; /* 8px */
+  --fah-spacing-md: 1rem; /* 16px */
+  --fah-spacing-lg: 1.5rem; /* 24px */
+  --fah-spacing-xl: 2rem; /* 32px */
+  --fah-spacing-2xl: 3rem; /* 48px */
+  --fah-spacing-3xl: 4rem; /* 64px */
+
+  /* Radios de borde */
+  --fah-radius-sm: 4px;
+  --fah-radius-md: 6px;
+  --fah-radius-lg: 8px;
+  --fah-radius-xl: 12px;
+  --fah-radius-full: 50%;
+
+  /* Sombras */
+  --fah-shadow-sm: 0 1px 3px rgba(30, 58, 95, 0.1);
+  --fah-shadow-md: 0 2px 6px rgba(30, 58, 95, 0.1);
+  --fah-shadow-lg: 0 4px 12px rgba(30, 58, 95, 0.15);
+  --fah-shadow-xl: 0 8px 25px rgba(30, 58, 95, 0.15);
+
+  /* Transiciones */
+  --fah-transition-fast: 0.15s ease;
+  --fah-transition-normal: 0.3s ease;
+  --fah-transition-slow: 0.5s ease;
+
+  /* Dimensiones de layout */
+  --fah-header-height: 70px;
+  --fah-sidebar-width: 280px;
+  --fah-sidebar-collapsed-width: 70px;
+  --fah-content-padding: 30px;
+
+  /* Breakpoints */
+  --fah-breakpoint-sm: 576px;
+  --fah-breakpoint-md: 768px;
+  --fah-breakpoint-lg: 992px;
+  --fah-breakpoint-xl: 1200px;
+
+  /* Z-index */
+  --fah-z-dropdown: 1000;
+  --fah-z-header: 1010;
+  --fah-z-sidebar: 1020;
+  --fah-z-modal: 1030;
+  --fah-z-tooltip: 1040;
+
+  /* Específico para personal FA-1 */
+  --fah-personal-primary: var(--fah-azul-naval);
+  --fah-personal-accent: var(--fah-dorado);
+  --fah-personal-card-bg: var(--fah-blanco);
+  --fah-personal-text: var(--fah-gris-oscuro-headers);
+  --fah-personal-border: var(--fah-gris-bordes);
+}
+
+/* Tema oscuro FAH */
+[data-theme='dark'] {
+  --fah-content-bg: #1a1a1a;
+  --fah-card-bg: #2d2d2d;
+  --fah-border: #404040;
+  --fah-border-light: #353535;
+  --fah-gris-texto-secundario: #a0a0a0;
+  --fah-gris-claro-fondo: #808080;
+}
+
+/* Utilidades de colores FAH */
+.fah-bg-primary {
+  background-color: var(--fah-azul-naval) !important;
+}
+.fah-bg-secondary {
+  background-color: var(--fah-dorado) !important;
+}
+.fah-bg-success {
+  background-color: var(--fah-verde-exito) !important;
+}
+.fah-bg-warning {
+  background-color: var(--fah-amarillo-advertencia) !important;
+}
+.fah-bg-danger {
+  background-color: var(--fah-rojo-error) !important;
+}
+.fah-bg-info {
+  background-color: var(--fah-azul-informacion) !important;
+}
+
+.fah-text-primary {
+  color: var(--fah-azul-naval) !important;
+}
+.fah-text-secondary {
+  color: var(--fah-dorado) !important;
+}
+.fah-text-success {
+  color: var(--fah-verde-exito) !important;
+}
+.fah-text-warning {
+  color: var(--fah-amarillo-advertencia) !important;
+}
+.fah-text-danger {
+  color: var(--fah-rojo-error) !important;
+}
+.fah-text-info {
+  color: var(--fah-azul-informacion) !important;
+}
+.fah-text-white {
+  color: var(--fah-blanco) !important;
+}
+.fah-text-muted {
+  color: var(--fah-gris-texto-secundario) !important;
+}
+
+/* Utilidades de botones CRUD */
+.btn-fah-agregar {
+  background-color: var(--fah-agregar);
+  border-color: var(--fah-agregar);
+  color: var(--fah-blanco);
+}
+
+.btn-fah-actualizar {
+  background-color: var(--fah-actualizar);
+  border-color: var(--fah-actualizar);
+  color: var(--fah-blanco);
+}
+
+.btn-fah-eliminar {
+  background-color: var(--fah-eliminar);
+  border-color: var(--fah-eliminar);
+  color: var(--fah-blanco);
+}
+
+.btn-fah-cancelar {
+  background-color: var(--fah-cancelar);
+  border-color: var(--fah-cancelar);
+  color: var(--fah-blanco);
+}
+
+/* Utilidades de espaciado */
+.fah-p-xs {
+  padding: var(--fah-spacing-xs) !important;
+}
+.fah-p-sm {
+  padding: var(--fah-spacing-sm) !important;
+}
+.fah-p-md {
+  padding: var(--fah-spacing-md) !important;
+}
+.fah-p-lg {
+  padding: var(--fah-spacing-lg) !important;
+}
+.fah-p-xl {
+  padding: var(--fah-spacing-xl) !important;
+}
+
+.fah-m-xs {
+  margin: var(--fah-spacing-xs) !important;
+}
+.fah-m-sm {
+  margin: var(--fah-spacing-sm) !important;
+}
+.fah-m-md {
+  margin: var(--fah-spacing-md) !important;
+}
+.fah-m-lg {
+  margin: var(--fah-spacing-lg) !important;
+}
+.fah-m-xl {
+  margin: var(--fah-spacing-xl) !important;
+}
+
+/* Utilidades de tipografía */
+.fah-font-xs {
+  font-size: var(--fah-font-size-xs) !important;
+}
+.fah-font-sm {
+  font-size: var(--fah-font-size-sm) !important;
+}
+.fah-font-base {
+  font-size: var(--fah-font-size-base) !important;
+}
+.fah-font-lg {
+  font-size: var(--fah-font-size-lg) !important;
+}
+.fah-font-xl {
+  font-size: var(--fah-font-size-xl) !important;
+}
+
+.fah-font-light {
+  font-weight: var(--fah-font-weight-light) !important;
+}
+.fah-font-normal {
+  font-weight: var(--fah-font-weight-normal) !important;
+}
+.fah-font-medium {
+  font-weight: var(--fah-font-weight-medium) !important;
+}
+.fah-font-semibold {
+  font-weight: var(--fah-font-weight-semibold) !important;
+}
+.fah-font-bold {
+  font-weight: var(--fah-font-weight-bold) !important;
+}
+
+/* Utilidades de bordes */
+.fah-rounded-sm {
+  border-radius: var(--fah-radius-sm) !important;
+}
+.fah-rounded-md {
+  border-radius: var(--fah-radius-md) !important;
+}
+.fah-rounded-lg {
+  border-radius: var(--fah-radius-lg) !important;
+}
+.fah-rounded-xl {
+  border-radius: var(--fah-radius-xl) !important;
+}
+.fah-rounded-full {
+  border-radius: var(--fah-radius-full) !important;
+}
+
+/* Utilidades de sombras */
+.fah-shadow-sm {
+  box-shadow: var(--fah-shadow-sm) !important;
+}
+.fah-shadow-md {
+  box-shadow: var(--fah-shadow-md) !important;
+}
+.fah-shadow-lg {
+  box-shadow: var(--fah-shadow-lg) !important;
+}
+.fah-shadow-xl {
+  box-shadow: var(--fah-shadow-xl) !important;
+}
