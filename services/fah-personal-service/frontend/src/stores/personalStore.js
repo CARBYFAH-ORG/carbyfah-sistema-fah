@@ -1,348 +1,127 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { personalAPI } from '@/services/personalService'
 
+// Store básico para personal - versión inicial
 export const usePersonalStore = defineStore('personal', () => {
-    // Estado reactivo principal
-    const datos = ref([])
-    const datoActual = ref(null)
-    const isLoading = ref(false)
+    // Estado básico
+    const loading = ref(false)
     const error = ref(null)
-    const totalRegistros = ref(0)
-    const paginaActual = ref(1)
-    const registrosPorPagina = ref(10)
-
-    // Estado específico para Personal FAH
-    const filtros = ref({
-        busqueda: '',
-        categoria_personal_id: null,
-        especialidad_id: null,
-        grado_id: null,
-        unidad_id: null,
-        estado: 'ACTIVO'
-    })
-
-    // Estadísticas de personal
+    const personal = ref([])
     const estadisticas = ref({
-        total_efectivos: 3644,
-        oficiales: 551,
-        suboficiales: 711,
-        tropa: 1472,
-        auxiliares: 460,
-        activos: 0,
-        en_mision: 0,
-        en_licencia: 0,
-        baja_temporal: 0
+        total: 3644,
+        ocupacion: 87,
+        vacantes: 518,
+        deficit: 13,
+        alertas: 12
     })
 
-    // Estado para formularios y vistas
-    const mostrarFormulario = ref(false)
-    const modoFormulario = ref('crear')
-    const esquemaActivo = ref('datos_personales')
-    const datosFormulario = ref({})
+    // Datos de configuración por rol
+    const configuracionRol = ref(null)
+    const dashboardData = ref(null)
 
-    // Computed properties
-    const totalPaginas = computed(() => {
-        return Math.ceil(totalRegistros.value / registrosPorPagina.value)
-    })
+    // Computados básicos
+    const totalPersonal = computed(() => estadisticas.value.total)
+    const personalOperativo = computed(() => Math.round(estadisticas.value.total * 0.92))
 
-    const hayDatos = computed(() => {
-        return datos.value && datos.value.length > 0
-    })
-
-    const hayError = computed(() => {
-        return error.value !== null
-    })
-
-    const personalActivo = computed(() => {
-        return datos.value.filter(p => p.estado === 'ACTIVO')
-    })
-
-    const personalEnMision = computed(() => {
-        return datos.value.filter(p => p.estado === 'EN_MISION')
-    })
-
-    // Acciones principales
-    const cargarDatos = async (esquema = 'datos_personales', opciones = {}) => {
+    // Acciones básicas
+    const cargarConfiguracionRol = async (rolFuncional) => {
         try {
-            isLoading.value = true
-            error.value = null
+            loading.value = true
 
-            const parametros = {
-                page: paginaActual.value,
-                per_page: registrosPorPagina.value,
-                ...filtros.value,
-                ...opciones
+            // Simulación de carga - reemplazar con API real
+            configuracionRol.value = {
+                codigo_rol: rolFuncional?.codigo_rol || 'GENERAL',
+                nombre_rol: rolFuncional?.nombre_rol || 'Usuario General',
+                nivel_autoridad: rolFuncional?.nivel_autoridad || 1
             }
 
-            let response
-            switch (esquema) {
-                case 'datos_personales':
-                    response = await personalAPI.get('/personal/datos-personales', { params: parametros })
-                    break
-                case 'perfiles_militares':
-                    response = await personalAPI.get('/personal/perfiles-militares', { params: parametros })
-                    break
-                case 'asignaciones_actuales':
-                    response = await personalAPI.get('/personal/asignaciones-actuales', { params: parametros })
-                    break
-                case 'usuarios_sistema':
-                    response = await personalAPI.get('/personal/usuarios-sistema', { params: parametros })
-                    break
-                default:
-                    response = await personalAPI.get('/personal/datos-personales', { params: parametros })
-            }
-
-            datos.value = response.data.data || []
-            totalRegistros.value = response.data.meta?.total || 0
-            esquemaActivo.value = esquema
-
-            console.log(`✅ Datos cargados para esquema: ${esquema}`, {
-                registros: datos.value.length,
-                total: totalRegistros.value
-            })
-
-            return response.data
-
+            console.log('Configuración del rol cargada:', configuracionRol.value)
         } catch (err) {
-            console.error(`❌ Error cargando datos de ${esquema}:`, err)
-            error.value = err.response?.data?.message || 'Error al cargar datos de personal'
-            datos.value = []
-            totalRegistros.value = 0
-            throw err
+            error.value = err.message
+            console.error('Error cargando configuración del rol:', err)
         } finally {
-            isLoading.value = false
+            loading.value = false
         }
+    }
+
+    const cargarDashboardJefeFA1 = async () => {
+        console.log('Cargando dashboard para Jefe FA-1')
+        dashboardData.value = { tipo: 'jefe_fa1' }
+    }
+
+    const cargarDashboardEncS1 = async (codigoBase) => {
+        console.log('Cargando dashboard para Enc S-1 de base:', codigoBase)
+        dashboardData.value = { tipo: 'enc_s1', base: codigoBase }
+    }
+
+    const cargarDashboardComandanteBase = async (baseComandante) => {
+        console.log('Cargando dashboard para Comandante de base:', baseComandante)
+        dashboardData.value = { tipo: 'comandante_base', base: baseComandante }
+    }
+
+    const cargarDashboardAreaEspecifica = async (rolFuncional) => {
+        console.log('Cargando dashboard para área específica:', rolFuncional)
+        dashboardData.value = { tipo: 'area_especifica', area: rolFuncional }
+    }
+
+    const cargarDashboardGeneral = async () => {
+        console.log('Cargando dashboard general')
+        dashboardData.value = { tipo: 'general' }
+    }
+
+    const actualizarEstadoPersonalEnDashboard = (personal, estadoNuevo) => {
+        console.log('Actualizando estado en dashboard:', personal, estadoNuevo)
+    }
+
+    const actualizarUbicacionPersonal = (personalId, ubicacion) => {
+        console.log('Actualizando ubicación de personal:', personalId, ubicacion)
     }
 
     const cargarEstadisticas = async () => {
         try {
-            const response = await personalAPI.get('/personal/datos-personales/estadisticas/generales')
-            estadisticas.value = { ...estadisticas.value, ...response.data.data }
-            console.log('✅ Estadísticas de personal cargadas:', estadisticas.value)
-        } catch (err) {
-            console.error('❌ Error cargando estadísticas:', err)
-        }
-    }
+            loading.value = true
 
-    const crear = async (esquema, datosNuevos) => {
-        try {
-            isLoading.value = true
-            error.value = null
-
-            let endpoint = ''
-            switch (esquema) {
-                case 'datos_personales':
-                    endpoint = '/personal/datos-personales'
-                    break
-                case 'perfiles_militares':
-                    endpoint = '/personal/perfiles-militares'
-                    break
-                case 'asignaciones_actuales':
-                    endpoint = '/personal/asignaciones-actuales'
-                    break
-                case 'usuarios_sistema':
-                    endpoint = '/personal/usuarios-sistema'
-                    break
-                default:
-                    throw new Error(`Esquema no válido: ${esquema}`)
+            // Simular carga de estadísticas - reemplazar con API real
+            estadisticas.value = {
+                total: 3644,
+                ocupacion: 87,
+                vacantes: 518,
+                deficit: 13,
+                alertas: 12,
+                operativo: Math.round(3644 * 0.92)
             }
 
-            const response = await personalAPI.post(endpoint, datosNuevos)
-
-            await cargarDatos(esquema)
-
-            console.log(`✅ ${esquema} creado exitosamente:`, response.data)
-            return response.data
-
+            console.log('Estadísticas cargadas:', estadisticas.value)
         } catch (err) {
-            console.error(`❌ Error creando ${esquema}:`, err)
-            error.value = err.response?.data?.message || `Error al crear ${esquema}`
-            throw err
+            error.value = err.message
+            console.error('Error cargando estadísticas:', err)
         } finally {
-            isLoading.value = false
+            loading.value = false
         }
-    }
-
-    const actualizar = async (esquema, id, datosActualizados) => {
-        try {
-            isLoading.value = true
-            error.value = null
-
-            let endpoint = ''
-            switch (esquema) {
-                case 'datos_personales':
-                    endpoint = `/personal/datos-personales/${id}`
-                    break
-                case 'perfiles_militares':
-                    endpoint = `/personal/perfiles-militares/${id}`
-                    break
-                case 'asignaciones_actuales':
-                    endpoint = `/personal/asignaciones-actuales/${id}`
-                    break
-                case 'usuarios_sistema':
-                    endpoint = `/personal/usuarios-sistema/${id}`
-                    break
-                default:
-                    throw new Error(`Esquema no válido: ${esquema}`)
-            }
-
-            const response = await personalAPI.put(endpoint, datosActualizados)
-
-            await cargarDatos(esquema)
-
-            console.log(`✅ ${esquema} actualizado exitosamente:`, response.data)
-            return response.data
-
-        } catch (err) {
-            console.error(`❌ Error actualizando ${esquema}:`, err)
-            error.value = err.response?.data?.message || `Error al actualizar ${esquema}`
-            throw err
-        } finally {
-            isLoading.value = false
-        }
-    }
-
-    const eliminar = async (esquema, id) => {
-        try {
-            isLoading.value = true
-            error.value = null
-
-            let endpoint = ''
-            switch (esquema) {
-                case 'datos_personales':
-                    endpoint = `/personal/datos-personales/${id}`
-                    break
-                case 'perfiles_militares':
-                    endpoint = `/personal/perfiles-militares/${id}`
-                    break
-                case 'asignaciones_actuales':
-                    endpoint = `/personal/asignaciones-actuales/${id}`
-                    break
-                case 'usuarios_sistema':
-                    endpoint = `/personal/usuarios-sistema/${id}`
-                    break
-                default:
-                    throw new Error(`Esquema no válido: ${esquema}`)
-            }
-
-            await personalAPI.delete(endpoint)
-
-            await cargarDatos(esquema)
-
-            console.log(`✅ ${esquema} eliminado exitosamente`)
-            return true
-
-        } catch (err) {
-            console.error(`❌ Error eliminando ${esquema}:`, err)
-            error.value = err.response?.data?.message || `Error al eliminar ${esquema}`
-            throw err
-        } finally {
-            isLoading.value = false
-        }
-    }
-
-    // Acciones específicas para Personal
-    const buscarPorIdentidad = async (numeroIdentidad) => {
-        try {
-            const response = await personalAPI.get(`/personal/datos-personales/por-identidad/${numeroIdentidad}`)
-            return response.data.data
-        } catch (err) {
-            console.error('❌ Error buscando por identidad:', err)
-            throw err
-        }
-    }
-
-    const cambiarEstadoPersonal = async (id, nuevoEstado) => {
-        try {
-            const response = await personalAPI.patch(`/personal/datos-personales/${id}/estado`, {
-                estado: nuevoEstado
-            })
-
-            await cargarDatos(esquemaActivo.value)
-            await cargarEstadisticas()
-
-            return response.data
-        } catch (err) {
-            console.error('❌ Error cambiando estado:', err)
-            throw err
-        }
-    }
-
-    // Utilidades
-    const limpiarError = () => {
-        error.value = null
-    }
-
-    const limpiarDatos = () => {
-        datos.value = []
-        datoActual.value = null
-        totalRegistros.value = 0
-        error.value = null
-    }
-
-    const establecerFiltros = (nuevosFiltros) => {
-        filtros.value = { ...filtros.value, ...nuevosFiltros }
-        paginaActual.value = 1
-    }
-
-    const cambiarPagina = (nuevaPagina) => {
-        if (nuevaPagina >= 1 && nuevaPagina <= totalPaginas.value) {
-            paginaActual.value = nuevaPagina
-        }
-    }
-
-    // Configuración de formularios
-    const abrirFormulario = (modo = 'crear', datos = null) => {
-        modoFormulario.value = modo
-        datosFormulario.value = datos ? { ...datos } : {}
-        mostrarFormulario.value = true
-    }
-
-    const cerrarFormulario = () => {
-        mostrarFormulario.value = false
-        datosFormulario.value = {}
-        modoFormulario.value = 'crear'
     }
 
     return {
         // Estado
-        datos,
-        datoActual,
-        isLoading,
+        loading,
         error,
-        totalRegistros,
-        paginaActual,
-        registrosPorPagina,
-        filtros,
+        personal,
         estadisticas,
-        mostrarFormulario,
-        modoFormulario,
-        esquemaActivo,
-        datosFormulario,
+        configuracionRol,
+        dashboardData,
 
-        // Computed
-        totalPaginas,
-        hayDatos,
-        hayError,
-        personalActivo,
-        personalEnMision,
+        // Computados
+        totalPersonal,
+        personalOperativo,
 
         // Acciones
-        cargarDatos,
-        cargarEstadisticas,
-        crear,
-        actualizar,
-        eliminar,
-        buscarPorIdentidad,
-        cambiarEstadoPersonal,
-
-        // Utilidades
-        limpiarError,
-        limpiarDatos,
-        establecerFiltros,
-        cambiarPagina,
-        abrirFormulario,
-        cerrarFormulario
+        cargarConfiguracionRol,
+        cargarDashboardJefeFA1,
+        cargarDashboardEncS1,
+        cargarDashboardComandanteBase,
+        cargarDashboardAreaEspecifica,
+        cargarDashboardGeneral,
+        actualizarEstadoPersonalEnDashboard,
+        actualizarUbicacionPersonal,
+        cargarEstadisticas
     }
 })

@@ -1,440 +1,1136 @@
 <template>
+  <!-- Botón flotante móvil -->
+  <div
+    v-if="isMobile"
+    class="mobile-sidebar-trigger"
+    @click="showMobileSidebar = true"
+  >
+    <i class="pi pi-bars"></i>
+  </div>
+
+  <!-- Backdrop para móvil -->
+  <div
+    v-if="isMobile && showMobileSidebar"
+    class="mobile-backdrop"
+    @click="showMobileSidebar = false"
+  ></div>
+
+  <!-- Sidebar principal -->
   <div
     :class="[
-      'fixed left-0 top-[70px] h-[calc(100vh-70px)] bg-white border-r border-gray-200 shadow-lg transition-all duration-300 z-40 flex flex-col',
-      collapsed ? 'w-20' : 'w-80',
+      'sidebar-container',
+      {
+        'sidebar-expanded': !collapsed && !isMobile,
+        'sidebar-collapsed': collapsed && !isMobile,
+        'sidebar-mobile-hidden': isMobile && !showMobileSidebar,
+        'sidebar-mobile-visible': isMobile && showMobileSidebar,
+      },
     ]"
   >
-    <!-- Header del Sidebar -->
-    <div
-      class="p-4 border-b border-gray-200 bg-gradient-to-r from-[#1e3a5f] to-[#2a4a6f]"
-    >
-      <div class="flex items-center justify-between">
-        <div v-if="!collapsed" class="flex items-center gap-3">
-          <div
-            class="w-8 h-8 bg-[#d4af37] rounded-lg flex items-center justify-center"
-          >
-            <i class="pi pi-users text-white text-sm font-bold"></i>
-          </div>
-          <div>
-            <h3 class="text-white font-semibold text-sm">Personal FAH</h3>
-            <p class="text-[#d4af37] text-xs">FA-1 Management</p>
-          </div>
-        </div>
+    <!-- Sidebar Header -->
+    <div class="sidebar-header">
+      <Button
+        icon="pi pi-bars"
+        :class="['toggle-button', { 'mobile-close-button': isMobile }]"
+        @click="handleToggle"
+        :title="
+          isMobile
+            ? 'Cerrar menú'
+            : collapsed
+            ? 'Expandir sidebar'
+            : 'Colapsar sidebar'
+        "
+        unstyled
+      />
 
-        <!-- Botón de colapsar -->
-        <Button
-          :icon="collapsed ? 'pi pi-angle-right' : 'pi pi-angle-left'"
-          class="p-1 bg-white bg-opacity-10 border border-white border-opacity-20 text-white hover:bg-opacity-20 rounded"
-          @click="toggleCollapse"
-          v-tooltip.right="collapsed ? 'Expandir menú' : 'Contraer menú'"
-        />
-      </div>
+      <!-- Título solo en móvil expandido -->
+      <h2 v-if="isMobile && showMobileSidebar" class="mobile-sidebar-title">
+        FAH PERSONAL
+      </h2>
     </div>
 
-    <!-- Navegación Principal -->
-    <div class="flex-1 overflow-y-auto personal-scrollbar">
-      <nav class="p-2">
-        <!-- Dashboard -->
-        <div class="mb-6">
-          <div
-            v-if="!collapsed"
-            class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider"
-          >
-            Panel Principal
-          </div>
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar-navigation">
+      <!-- I. Dashboard -->
+      <div
+        :class="[
+          'nav-item',
+          { 'nav-item-active': currentRoute === 'dashboard' },
+        ]"
+      >
+        <router-link to="/dashboard" class="nav-link" @click="handleNavigation">
+          <i class="pi pi-chart-bar nav-icon"></i>
+          <span v-if="!collapsed || isMobile" class="nav-text">Dashboard</span>
+        </router-link>
+      </div>
 
-          <router-link
-            to="/dashboard"
-            class="navigation-item group"
-            :class="{ active: currentRoute === 'dashboard' }"
+      <!-- II. Inicio -->
+      <div
+        :class="['nav-item', { 'nav-item-active': currentRoute === 'inicio' }]"
+      >
+        <router-link to="/inicio" class="nav-link" @click="handleNavigation">
+          <i class="pi pi-home nav-icon"></i>
+          <span v-if="!collapsed || isMobile" class="nav-text">Inicio</span>
+        </router-link>
+      </div>
+
+      <!-- III. Módulo Inteligente del Rol (Jefe FA-1, Enc. S-1 HCM, etc.) -->
+      <div v-if="rolUsuario" class="nav-item">
+        <div
+          @click="navigateToEspacioTrabajo()"
+          class="nav-link nav-role-workspace"
+        >
+          <i :class="rolUsuario.icono + ' nav-icon'"></i>
+          <span v-if="!collapsed || isMobile" class="nav-text">{{
+            rolUsuario.display_name
+          }}</span>
+          <span v-if="!collapsed || isMobile" class="role-badge">{{
+            rolUsuario.codigo_rol
+          }}</span>
+        </div>
+      </div>
+
+      <!-- IV. Niveles Jerárquicos (Dropdown Inteligente) -->
+      <div
+        v-if="nivelesJerarquicos.length > 0"
+        :class="[
+          'nav-item nav-dropdown',
+          { 'nav-dropdown-active': activeDropdown === 'niveles' },
+        ]"
+      >
+        <div
+          @click="toggleDropdown('niveles')"
+          class="nav-link nav-dropdown-trigger"
+        >
+          <i class="pi pi-sitemap nav-icon"></i>
+          <span v-if="!collapsed || isMobile" class="nav-text"
+            >Niveles Jerárquicos</span
           >
-            <div class="nav-icon-container">
-              <i class="pi pi-chart-line text-lg"></i>
-            </div>
-            <div v-if="!collapsed" class="nav-content">
-              <span class="nav-title">Dashboard Personal</span>
-              <span class="nav-subtitle">Estadísticas generales</span>
-            </div>
-          </router-link>
+          <i
+            v-if="!collapsed || isMobile"
+            :class="[
+              'pi pi-chevron-down nav-chevron',
+              { 'nav-chevron-rotated': activeDropdown === 'niveles' },
+            ]"
+          ></i>
         </div>
 
-        <!-- Gestión de Personal -->
-        <div class="mb-6">
-          <div
-            v-if="!collapsed"
-            class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider"
-          >
-            Gestión Personal
+        <!-- Dropdown Content Niveles -->
+        <div
+          v-if="(!collapsed || isMobile) && activeDropdown === 'niveles'"
+          class="nav-dropdown-content"
+        >
+          <!-- Unidad Principal del Usuario -->
+          <div class="dropdown-section-header">
+            {{ rolUsuario?.unidad_principal || "Mi Unidad" }}
           </div>
 
-          <!-- Datos Personales -->
-          <router-link
-            to="/gestion-personal"
-            class="navigation-item group"
-            :class="{ active: currentRoute === 'gestion-personal' }"
-          >
-            <div class="nav-icon-container">
-              <i class="pi pi-users text-lg"></i>
-            </div>
-            <div v-if="!collapsed" class="nav-content">
-              <span class="nav-title">Gestión Personal</span>
-              <span class="nav-subtitle">3,644 efectivos FAH</span>
-            </div>
-            <div v-if="!collapsed" class="nav-badge">
-              <Badge value="3644" severity="info" />
-            </div>
-          </router-link>
-
-          <!-- Perfiles Militares -->
+          <!-- Áreas de Responsabilidad según el rol -->
           <div
-            class="navigation-item cursor-pointer group"
-            @click="toggleSubmenu('perfiles')"
+            v-for="area in areasResponsabilidad"
+            :key="area.codigo"
+            @click="navigateTo(`area-${area.codigo}`)"
+            class="dropdown-item"
           >
-            <div class="nav-icon-container">
-              <i class="pi pi-id-card text-lg"></i>
+            <span class="dropdown-emoji">{{ area.icono }}</span>
+            <div class="dropdown-info">
+              <span class="dropdown-title">{{ area.nombre }}</span>
+              <span class="dropdown-description">({{ area.scope }})</span>
             </div>
-            <div v-if="!collapsed" class="nav-content">
-              <span class="nav-title">Perfiles Militares</span>
-              <span class="nav-subtitle">Rangos y especialidades</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- V. Admin (Dropdown Inteligente) -->
+      <div
+        v-if="tieneAccesoAdmin"
+        :class="[
+          'nav-item nav-dropdown',
+          { 'nav-dropdown-active': activeDropdown === 'admin' },
+        ]"
+      >
+        <div
+          @click="toggleDropdown('admin')"
+          class="nav-link nav-dropdown-trigger nav-admin-trigger"
+        >
+          <i class="pi pi-shield nav-icon"></i>
+          <span v-if="!collapsed || isMobile" class="nav-text">Admin</span>
+          <span v-if="!collapsed || isMobile" class="admin-level-badge">{{
+            rolUsuario?.tipo_admin || "LOCAL"
+          }}</span>
+          <i
+            v-if="!collapsed || isMobile"
+            :class="[
+              'pi pi-chevron-down nav-chevron',
+              { 'nav-chevron-rotated': activeDropdown === 'admin' },
+            ]"
+          ></i>
+        </div>
+
+        <div
+          v-if="(!collapsed || isMobile) && activeDropdown === 'admin'"
+          class="nav-dropdown-content"
+        >
+          <!-- A. Roles y Usuarios -->
+          <div
+            @click="navigateToRolesUsuarios"
+            :class="[
+              'dropdown-item admin-item',
+              { 'featured-item-active': currentRoute === 'roles-usuarios' },
+            ]"
+          >
+            <span class="dropdown-emoji">👤</span>
+            <div class="dropdown-info">
+              <span class="dropdown-title">Roles y Usuarios</span>
+              <span class="dropdown-badge">Disponible</span>
             </div>
-            <div v-if="!collapsed" class="nav-arrow">
+          </div>
+
+          <!-- B. Permisos y Roles -->
+          <div
+            @click="navigateTo('permisos-roles')"
+            class="dropdown-item admin-item"
+          >
+            <span class="dropdown-emoji">🔐</span>
+            <div class="dropdown-info">
+              <span class="dropdown-title">Permisos y Roles</span>
+              <span class="dropdown-badge">Próximamente</span>
+            </div>
+          </div>
+
+          <!-- C. Ver Diagrama (Inteligente según rol) -->
+          <div
+            :class="[
+              'nav-dropdown nav-dropdown-nested',
+              { 'nav-dropdown-active': activeDropdown === 'diagrama' },
+            ]"
+          >
+            <div
+              @click="toggleDropdown('diagrama')"
+              class="dropdown-item dropdown-trigger-nested"
+            >
+              <span class="dropdown-emoji">📊</span>
+              <div class="dropdown-info">
+                <span class="dropdown-title">Ver Diagrama</span>
+                <span class="dropdown-description">{{
+                  rolUsuario?.descripcion_acceso
+                }}</span>
+              </div>
               <i
                 :class="[
-                  'pi transition-transform duration-200',
-                  openSubmenus.perfiles
-                    ? 'pi-chevron-down'
-                    : 'pi-chevron-right',
+                  'pi pi-chevron-down dropdown-chevron-nested',
+                  { 'dropdown-chevron-rotated': activeDropdown === 'diagrama' },
                 ]"
               ></i>
             </div>
+
+            <!-- Nested Dropdown Content -->
+            <div
+              v-if="activeDropdown === 'diagrama'"
+              class="dropdown-content-nested"
+            >
+              <!-- FAH Completa (solo Jefe FA-1) -->
+              <div
+                v-if="rolUsuario?.acceso === 'completo'"
+                @click="navigateTo('diagrama-fah')"
+                class="dropdown-item-nested"
+              >
+                <span class="nested-emoji">🚁</span>
+                <span class="nested-title">FAH Completa</span>
+              </div>
+
+              <!-- Base Completa (Cmdte Base y Enc S-1) -->
+              <div
+                v-if="
+                  rolUsuario?.acceso_base ||
+                  rolUsuario?.acceso === 'base_completa' ||
+                  rolUsuario?.acceso === 'seccion_s1'
+                "
+                @click="navigateTo(`diagrama-base-${rolUsuario.base_codigo}`)"
+                class="dropdown-item-nested"
+              >
+                <span class="nested-emoji">🏭</span>
+                <span class="nested-title"
+                  >Base {{ rolUsuario?.base_codigo || "Local" }}</span
+                >
+              </div>
+
+              <!-- Sección S-1 (solo Enc S-1) -->
+              <div
+                v-if="rolUsuario?.acceso_seccion"
+                @click="
+                  navigateTo(`diagrama-seccion-${rolUsuario.seccion_codigo}`)
+                "
+                class="dropdown-item-nested"
+              >
+                <span class="nested-emoji">🏗️</span>
+                <span class="nested-title">{{
+                  rolUsuario?.seccion_nombre || "Mi Sección"
+                }}</span>
+              </div>
+            </div>
           </div>
 
-          <!-- Submenu Perfiles -->
+          <!-- D. Configuración Sistema -->
           <div
-            v-if="!collapsed && openSubmenus.perfiles"
-            class="ml-12 mt-2 space-y-1"
+            @click="navigateTo('configuracion-sistema')"
+            class="dropdown-item admin-item"
           >
-            <div class="submenu-item">
-              <i class="pi pi-star text-sm"></i>
-              <span>Oficiales (551)</span>
-            </div>
-            <div class="submenu-item">
-              <i class="pi pi-certificate text-sm"></i>
-              <span>Suboficiales (711)</span>
-            </div>
-            <div class="submenu-item">
-              <i class="pi pi-shield text-sm"></i>
-              <span>Tropa (1,472)</span>
-            </div>
-            <div class="submenu-item">
-              <i class="pi pi-user text-sm"></i>
-              <span>Auxiliares (460)</span>
+            <span class="dropdown-emoji">⚙️</span>
+            <div class="dropdown-info">
+              <span class="dropdown-title">Configuración Sistema</span>
+              <span class="dropdown-badge">Próximamente</span>
             </div>
           </div>
-
-          <!-- Asignaciones -->
-          <div
-            class="navigation-item cursor-pointer group"
-            @click="navigateToAsignaciones"
-          >
-            <div class="nav-icon-container">
-              <i class="pi pi-sitemap text-lg"></i>
-            </div>
-            <div v-if="!collapsed" class="nav-content">
-              <span class="nav-title">Asignaciones</span>
-              <span class="nav-subtitle">Puestos actuales</span>
-            </div>
-            <div v-if="!collapsed" class="nav-badge">
-              <Badge :value="personalActivo" severity="success" />
-            </div>
-          </div>
-        </div>
-
-        <!-- Estructura y Organigramas -->
-        <div class="mb-6">
-          <div
-            v-if="!collapsed"
-            class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider"
-          >
-            Estructura FAH
-          </div>
-
-          <router-link
-            to="/organigramas"
-            class="navigation-item group"
-            :class="{ active: currentRoute === 'organigramas' }"
-          >
-            <div class="nav-icon-container">
-              <i class="pi pi-share-alt text-lg"></i>
-            </div>
-            <div v-if="!collapsed" class="nav-content">
-              <span class="nav-title">Organigramas</span>
-              <span class="nav-subtitle">Estructura organizacional</span>
-            </div>
-          </router-link>
-        </div>
-
-        <!-- Reportes y Estadísticas -->
-        <div class="mb-6">
-          <div
-            v-if="!collapsed"
-            class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider"
-          >
-            Análisis
-          </div>
-
-          <router-link
-            to="/reportes"
-            class="navigation-item group"
-            :class="{ active: currentRoute === 'reportes' }"
-          >
-            <div class="nav-icon-container">
-              <i class="pi pi-chart-bar text-lg"></i>
-            </div>
-            <div v-if="!collapsed" class="nav-content">
-              <span class="nav-title">Reportes</span>
-              <span class="nav-subtitle">Estadísticas y análisis</span>
-            </div>
-          </router-link>
-        </div>
-
-        <!-- Enlaces Externos -->
-        <div class="mb-6">
-          <div
-            v-if="!collapsed"
-            class="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider"
-          >
-            Enlaces Rápidos
-          </div>
-
-          <div
-            class="navigation-item cursor-pointer group"
-            @click="abrirAdminPrincipal"
-          >
-            <div class="nav-icon-container">
-              <i class="pi pi-external-link text-lg"></i>
-            </div>
-            <div v-if="!collapsed" class="nav-content">
-              <span class="nav-title">Admin Principal</span>
-              <span class="nav-subtitle">Sistema centralizado</span>
-            </div>
-          </div>
-        </div>
-      </nav>
-    </div>
-
-    <!-- Footer del Sidebar -->
-    <div class="p-4 border-t border-gray-200 bg-gray-50">
-      <div v-if="!collapsed" class="text-center">
-        <div class="text-xs text-gray-500 mb-1">Personal Service v1.0</div>
-        <div class="flex items-center justify-center gap-2">
-          <div class="w-2 h-2 bg-[#28a745] rounded-full"></div>
-          <span class="text-xs text-gray-600">Sistema Operativo</span>
         </div>
       </div>
-      <div v-else class="flex justify-center">
-        <div class="w-3 h-3 bg-[#28a745] rounded-full"></div>
+
+      <!-- Separador -->
+      <div class="nav-separator"></div>
+
+      <!-- Elemento informativo del usuario -->
+      <div class="nav-item nav-user-info">
+        <div class="user-info-compact">
+          <div class="user-avatar">{{ iniciales }}</div>
+          <div v-if="!collapsed || isMobile" class="user-details">
+            <div class="user-name">{{ nombreUsuario }}</div>
+            <div class="user-role">
+              {{ rolUsuario?.nombre_corto || "Usuario" }}
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
+    </nav>
   </div>
 </template>
 
-<script>
-import { ref, computed } from "vue";
-import { useRouter, useRoute } from "vue-router";
+<script setup>
+import { ref, computed, onMounted, onUnmounted } from "vue";
+import { useRoute, useRouter } from "vue-router";
 import { useToast } from "primevue/usetoast";
+import { useAuthStore } from "@/stores/authStore";
 import { usePersonalStore } from "@/stores/personalStore";
 
-export default {
-  name: "SidebarPersonal",
-  props: {
-    collapsed: {
-      type: Boolean,
-      default: false,
-    },
+// Props y emits como el admin-frontend
+const props = defineProps({
+  collapsed: {
+    type: Boolean,
+    default: false,
   },
-  emits: ["toggle-collapse", "navigate"],
-  setup(props, { emit }) {
-    const router = useRouter();
-    const route = useRoute();
-    const toast = useToast();
-    const personalStore = usePersonalStore();
+});
 
-    // Estado reactivo
-    const openSubmenus = ref({
-      perfiles: false,
-      asignaciones: false,
-    });
+const emit = defineEmits(["toggle-collapse", "navigate"]);
 
-    // Computed properties
-    const currentRoute = computed(() => route.name);
-    const personalActivo = computed(
-      () => personalStore.estadisticas.activos || 3580
+// Composables
+const route = useRoute();
+const router = useRouter();
+const toast = useToast();
+const authStore = useAuthStore();
+const personalStore = usePersonalStore();
+
+// Estado reactivo (como admin-frontend)
+const activeDropdown = ref(null);
+const isMobile = ref(false);
+const showMobileSidebar = ref(false);
+
+// Computed
+const currentRoute = computed(() => route.name);
+
+// Detectar móvil (copiado del admin-frontend)
+const checkIsMobile = () => {
+  isMobile.value = window.innerWidth <= 480;
+  if (!isMobile.value) {
+    showMobileSidebar.value = false;
+  }
+};
+
+onMounted(() => {
+  checkIsMobile();
+  window.addEventListener("resize", checkIsMobile);
+});
+
+onUnmounted(() => {
+  window.removeEventListener("resize", checkIsMobile);
+});
+
+// Usuario y rol actual (inteligente)
+const usuario = computed(() => authStore.user);
+const rolUsuario = computed(() => {
+  if (!authStore.userRole) return null;
+
+  const rol = authStore.userRole.codigo_rol.toUpperCase();
+
+  // Configuración específica por rol
+  if (rol.includes("JEFE-FA-1")) {
+    return {
+      codigo_rol: "JEFE-FA-1",
+      display_name: "Jefe FA-1",
+      nombre_corto: "Jefe FA-1",
+      icono: "pi pi-users",
+      acceso: "completo",
+      scope: "fah_completa",
+      unidad_principal: "Departamento de Recursos Humanos FA-1",
+      nivel_autoridad: authStore.userRole.nivel_autoridad || 10,
+      tipo_admin: "NACIONAL",
+      acceso_base: true,
+      acceso_seccion: true,
+      descripcion_acceso: "Acceso completo FAH",
+    };
+  } else if (rol.includes("ENC-S-1")) {
+    const base = extraerCodigoBase(rol);
+    return {
+      codigo_rol: `ENC-S-1-${base}`,
+      display_name: `Enc. S-1 ${base}`,
+      nombre_corto: `Enc. S-1`,
+      icono: "pi pi-user",
+      acceso: "seccion_s1",
+      scope: base,
+      base_codigo: base,
+      unidad_principal: `Sección de Recursos Humanos Base ${base}`,
+      seccion_codigo: "S-1",
+      seccion_nombre: "S-1 Recursos Humanos",
+      nivel_autoridad: authStore.userRole.nivel_autoridad || 5,
+      tipo_admin: "SECCIÓN",
+      acceso_base: false,
+      acceso_seccion: true,
+      descripcion_acceso: `Sección y Base ${base}`,
+    };
+  } else if (rol.includes("CMDTE-BASE")) {
+    const base = extraerCodigoBase(rol);
+    return {
+      codigo_rol: `CMDTE-BASE-${base}`,
+      display_name: `Cmdte. Base ${base}`,
+      nombre_corto: `Comandante`,
+      icono: "pi pi-star",
+      acceso: "base_completa",
+      scope: base,
+      base_codigo: base,
+      unidad_principal: `Base Aérea ${base}`,
+      nivel_autoridad: authStore.userRole.nivel_autoridad || 8,
+      tipo_admin: "BASE",
+      acceso_base: true,
+      acceso_seccion: true,
+      descripcion_acceso: `Base ${base} completa`,
+    };
+  } else if (rol.includes("BIENESTAR")) {
+    return {
+      codigo_rol: "BIENESTAR-PERSONAL",
+      display_name: "Bienestar de Personal",
+      nombre_corto: "Bienestar",
+      icono: "pi pi-heart",
+      acceso: "area_especifica",
+      scope: "bienestar",
+      unidad_principal: "Bienestar de Personal",
+      nivel_autoridad: authStore.userRole.nivel_autoridad || 3,
+      tipo_admin: "ÁREA",
+      acceso_base: false,
+      acceso_seccion: false,
+      descripcion_acceso: "Área de Bienestar",
+    };
+  } else {
+    return {
+      codigo_rol: "GENERAL",
+      display_name: "Usuario General",
+      nombre_corto: "Usuario",
+      icono: "pi pi-user",
+      acceso: "limitado",
+      scope: "consulta",
+      unidad_principal: "Acceso General",
+      nivel_autoridad: authStore.userRole.nivel_autoridad || 1,
+      tipo_admin: "NINGUNO",
+      acceso_base: false,
+      acceso_seccion: false,
+      descripcion_acceso: "Acceso limitado",
+    };
+  }
+});
+
+// Niveles jerárquicos según el rol
+const nivelesJerarquicos = computed(() => {
+  if (!rolUsuario.value) return [];
+
+  // Retornar array no vacío para mostrar la sección
+  return ["nivel1"]; // Placeholder
+});
+
+// Áreas de responsabilidad según el rol (IV. Niveles Jerárquicos)
+const areasResponsabilidad = computed(() => {
+  if (!rolUsuario.value) return [];
+
+  const areas = [
+    {
+      codigo: "admin_personal",
+      nombre: "Administración de Personal",
+      icono: "👥",
+      scope: rolUsuario.value.scope,
+    },
+    {
+      codigo: "mantenimiento_efectivo",
+      nombre: "Mantenimiento del Efectivo",
+      icono: "📊",
+      scope: rolUsuario.value.scope,
+    },
+    {
+      codigo: "disciplina",
+      nombre: "Disciplina y Orden",
+      icono: "⚖️",
+      scope: rolUsuario.value.scope,
+    },
+    {
+      codigo: "servicios_personal",
+      nombre: "Servicios de Personal",
+      icono: "🛎️",
+      scope: rolUsuario.value.scope,
+    },
+    {
+      codigo: "bienestar",
+      nombre: "Bienestar de Personal",
+      icono: "🤝",
+      scope: rolUsuario.value.scope,
+    },
+  ];
+
+  // Filtrar según el tipo de acceso
+  if (rolUsuario.value.acceso === "area_especifica") {
+    return areas.filter((area) => area.codigo === rolUsuario.value.scope);
+  }
+
+  return areas;
+});
+
+// Verificar acceso admin
+const tieneAccesoAdmin = computed(() => {
+  return rolUsuario.value?.nivel_autoridad >= 3;
+});
+
+// Información del usuario
+const nombreUsuario = computed(() => {
+  return usuario.value?.nombre_completo || "Usuario";
+});
+
+const iniciales = computed(() => {
+  const nombre = nombreUsuario.value;
+  return nombre
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .substring(0, 2)
+    .toUpperCase();
+});
+
+// Funciones (adaptadas del admin-frontend)
+const handleToggle = () => {
+  if (isMobile.value) {
+    showMobileSidebar.value = false;
+  } else {
+    emit("toggle-collapse");
+  }
+};
+
+const handleNavigation = () => {
+  if (isMobile.value) {
+    showMobileSidebar.value = false;
+  }
+};
+
+const toggleDropdown = (dropdownName) => {
+  // En móvil o cuando está expandido
+  if (isMobile.value || !props.collapsed) {
+    if (activeDropdown.value === dropdownName) {
+      activeDropdown.value = null;
+    } else {
+      activeDropdown.value = dropdownName;
+    }
+    return;
+  }
+
+  // Si está colapsado en desktop, expandir primero
+  emit("toggle-collapse");
+  // Después abrir el dropdown
+  setTimeout(() => {
+    activeDropdown.value = dropdownName;
+  }, 300);
+};
+
+const extraerCodigoBase = (rol) => {
+  const partes = rol.split("-");
+  return partes[partes.length - 1] || "HAM";
+};
+
+// Navegación específica (como admin-frontend con toasts)
+const navigateToEspacioTrabajo = async () => {
+  try {
+    console.log(
+      `🎯 Navegando al espacio de trabajo: ${rolUsuario.value.display_name}`
     );
 
-    // Métodos
-    const toggleCollapse = () => {
-      emit("toggle-collapse");
-    };
+    toast.add({
+      severity: "success",
+      summary: "Navegación FAH",
+      detail: `Accediendo al espacio de trabajo de ${rolUsuario.value.display_name}...`,
+      life: 2000,
+    });
 
-    const toggleSubmenu = (menu) => {
-      openSubmenus.value[menu] = !openSubmenus.value[menu];
-    };
+    activeDropdown.value = null;
+    await router.push("/espacio-trabajo");
+    emit("navigate", "espacio-trabajo");
+    handleNavigation();
 
-    const navigateToAsignaciones = () => {
-      toast.add({
-        severity: "info",
-        summary: "Función Disponible",
-        detail: "Asignaciones estará disponible en próximas versiones",
-        life: 3000,
-      });
+    console.log("✅ Navegación al espacio de trabajo exitosa");
+  } catch (error) {
+    console.error("❌ Error navegando al espacio de trabajo:", error);
 
-      emit("navigate", "asignaciones");
-    };
+    toast.add({
+      severity: "error",
+      summary: "Error de Navegación",
+      detail: "No se pudo acceder al espacio de trabajo",
+      life: 4000,
+    });
+  }
+};
 
-    const abrirAdminPrincipal = () => {
-      console.log("🔗 Abriendo Admin Principal desde Sidebar");
+const navigateToRolesUsuarios = async () => {
+  try {
+    console.log("👤 Navegando a Roles y Usuarios...");
 
-      toast.add({
-        severity: "info",
-        summary: "Enlace Externo",
-        detail: "Abriendo Sistema Admin Principal FAH",
-        life: 2000,
-      });
+    toast.add({
+      severity: "success",
+      summary: "Navegación Admin",
+      detail: "Accediendo a Roles y Usuarios...",
+      life: 2000,
+    });
 
-      setTimeout(() => {
-        window.open("http://localhost:5173", "_blank");
-      }, 500);
-    };
+    activeDropdown.value = null;
+    await router.push("/admin/roles-usuarios");
+    emit("navigate", "roles-usuarios");
+    handleNavigation();
 
-    return {
-      // Estado
-      openSubmenus,
+    console.log("✅ Navegación a Roles y Usuarios exitosa");
+  } catch (error) {
+    console.error("❌ Error navegando a Roles y Usuarios:", error);
 
-      // Computed
-      currentRoute,
-      personalActivo,
+    toast.add({
+      severity: "error",
+      summary: "Error de Navegación",
+      detail: "No se pudo acceder a Roles y Usuarios",
+      life: 4000,
+    });
+  }
+};
 
-      // Métodos
-      toggleCollapse,
-      toggleSubmenu,
-      navigateToAsignaciones,
-      abrirAdminPrincipal,
-    };
-  },
+const navigateTo = (section) => {
+  const availableSections = ["roles-usuarios", "espacio-trabajo"];
+
+  if (availableSections.includes(section)) {
+    switch (section) {
+      case "roles-usuarios":
+        navigateToRolesUsuarios();
+        return;
+
+      case "espacio-trabajo":
+        navigateToEspacioTrabajo();
+        return;
+
+      default:
+        console.warn(`Sección disponible pero no implementada: ${section}`);
+        break;
+    }
+  }
+
+  // Para secciones no disponibles
+  toast.add({
+    severity: "warn",
+    summary: "Función no disponible",
+    detail: `${section.toUpperCase()} estará disponible en próximas versiones`,
+    life: 4000,
+  });
+
+  emit("navigate", section);
+  handleNavigation();
+  console.log(`⏳ Función pendiente de implementación: ${section}`);
 };
 </script>
 
 <style scoped>
-/* Estilos base para navegación */
-.navigation-item {
-  @apply flex items-center px-3 py-3 mx-1 rounded-lg transition-all duration-200 cursor-pointer;
-  @apply hover:bg-gray-50 hover:shadow-sm;
+/* COLORES FAH - PALETA INSTITUCIONAL */
+:root {
+  --fah-azul-naval: #1e3a5f;
+  --fah-dorado: #d4af37;
+  --fah-azul-celeste: #0ea5e9;
+  --fah-azul-medio: #5a9bd4;
+  --fah-rojo-suave: #c1666b;
+  --fah-gris-neutro: #6c757d;
+  --fah-fondo-claro: #f8f9fa;
+  --fah-borde: #e9ecef;
+  --fah-texto-secundario: #495057;
 }
 
-.navigation-item.active {
-  @apply bg-gradient-to-r from-[#0ea5e9] to-[#0284c7] text-white shadow-md;
+/* SIDEBAR CONTAINER */
+.sidebar-container {
+  background: linear-gradient(180deg, var(--fah-azul-naval) 0%, #2a4a6f 100%);
+  color: white;
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100vh;
+  z-index: 1000;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
 }
 
-.navigation-item.active .nav-icon-container {
-  @apply text-white;
+.sidebar-expanded {
+  width: 300px;
 }
 
-.nav-icon-container {
-  @apply w-10 h-10 flex items-center justify-center rounded-lg bg-gray-100 text-gray-600;
-  @apply group-hover:bg-gray-200 transition-colors duration-200;
+.sidebar-collapsed {
+  width: 80px;
 }
 
-.navigation-item.active .nav-icon-container {
-  @apply bg-white bg-opacity-20 text-white;
+.sidebar-mobile-hidden {
+  transform: translateX(-100%);
+  width: 300px;
 }
 
-.nav-content {
-  @apply flex-1 ml-3;
+.sidebar-mobile-visible {
+  transform: translateX(0);
+  width: min(320px, 90vw);
 }
 
-.nav-title {
-  @apply block text-sm font-medium text-gray-900;
+/* MOBILE BACKDROP */
+.mobile-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
 }
 
-.navigation-item.active .nav-title {
-  @apply text-white;
+.mobile-sidebar-trigger {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1001;
+  width: 48px;
+  height: 48px;
+  background: var(--fah-dorado);
+  color: var(--fah-azul-naval);
+  border: none;
+  border-radius: 12px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+  transition: all 0.3s ease;
 }
 
-.nav-subtitle {
-  @apply block text-xs text-gray-500 mt-0.5;
+.mobile-sidebar-trigger:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.4);
 }
 
-.navigation-item.active .nav-subtitle {
-  @apply text-blue-100;
+/* SIDEBAR HEADER */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 20px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+  min-height: 70px;
+  background: rgba(0, 0, 0, 0.1);
+  gap: 12px;
 }
 
-.nav-badge {
-  @apply ml-auto;
+.toggle-button {
+  color: white !important;
+  background: rgba(212, 175, 55, 0.1) !important;
+  border: 2px solid rgba(212, 175, 55, 0.2) !important;
+  border-radius: 8px !important;
+  min-width: 40px !important;
+  width: 40px !important;
+  height: 40px !important;
+  padding: 0 !important;
+  transition: all 0.3s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
 }
 
-.nav-arrow {
-  @apply ml-auto text-gray-400;
+.toggle-button:hover {
+  background: rgba(212, 175, 55, 0.3) !important;
+  border-color: rgba(212, 175, 55, 0.4) !important;
+  transform: scale(1.1) !important;
 }
 
-.navigation-item.active .nav-arrow {
-  @apply text-white;
+.mobile-close-button {
+  background: rgba(193, 102, 107, 0.1) !important;
+  border-color: rgba(193, 102, 107, 0.2) !important;
 }
 
-/* Submenu items */
-.submenu-item {
-  @apply flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-900;
-  @apply hover:bg-gray-50 rounded cursor-pointer transition-colors duration-200;
+.mobile-close-button:hover {
+  background: rgba(193, 102, 107, 0.3) !important;
+  border-color: rgba(193, 102, 107, 0.4) !important;
 }
 
-/* Scrollbar personalizado */
-.personal-scrollbar {
+.mobile-sidebar-title {
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+  margin: 0;
+  background: linear-gradient(135deg, var(--fah-dorado), #f0c674);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* SIDEBAR NAVIGATION */
+.sidebar-navigation {
+  padding: 8px 0;
+  overflow-y: auto;
+  flex: 1;
   scrollbar-width: thin;
-  scrollbar-color: #cbd5e0 #f7fafc;
+  scrollbar-color: rgba(212, 175, 55, 0.3) transparent;
 }
 
-.personal-scrollbar::-webkit-scrollbar {
+.sidebar-navigation::-webkit-scrollbar {
   width: 4px;
 }
 
-.personal-scrollbar::-webkit-scrollbar-track {
-  background: #f7fafc;
+.sidebar-navigation::-webkit-scrollbar-track {
+  background: transparent;
 }
 
-.personal-scrollbar::-webkit-scrollbar-thumb {
-  background: #cbd5e0;
+.sidebar-navigation::-webkit-scrollbar-thumb {
+  background: rgba(212, 175, 55, 0.3);
   border-radius: 2px;
 }
 
-.personal-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: #a0aec0;
+/* NAV ITEMS */
+.nav-item {
+  margin: 0 8px 4px 8px;
+  border-radius: 8px;
+  overflow: hidden;
+  transition: all 0.3s ease;
 }
 
-/* Animaciones */
-@keyframes slideIn {
+.nav-item-active {
+  background: linear-gradient(
+    135deg,
+    rgba(212, 175, 55, 0.15) 0%,
+    rgba(14, 165, 233, 0.1) 100%
+  );
+  border-left: 4px solid var(--fah-dorado);
+}
+
+.nav-link {
+  display: flex;
+  align-items: center;
+  padding: 14px 16px;
+  color: white;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border-radius: 6px;
+}
+
+.nav-link:hover {
+  background: rgba(212, 175, 55, 0.1);
+  color: var(--fah-dorado);
+  transform: translateX(2px);
+}
+
+.nav-role-workspace {
+  background: rgba(212, 175, 55, 0.1);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.nav-role-workspace:hover {
+  background: rgba(212, 175, 55, 0.2);
+  border-color: var(--fah-dorado);
+}
+
+.nav-admin-trigger {
+  background: rgba(193, 102, 107, 0.1);
+}
+
+.nav-admin-trigger:hover {
+  background: rgba(193, 102, 107, 0.2);
+}
+
+.nav-icon {
+  font-size: 18px;
+  margin-right: 12px;
+  width: 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.nav-text {
+  font-size: 14px;
+  font-weight: 500;
+  flex: 1;
+}
+
+.role-badge {
+  background: var(--fah-dorado);
+  color: var(--fah-azul-naval);
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-left: 8px;
+}
+
+.admin-level-badge {
+  background: var(--fah-rojo-suave);
+  color: white;
+  font-size: 10px;
+  padding: 3px 8px;
+  border-radius: 12px;
+  font-weight: 600;
+  margin-left: 8px;
+}
+
+/* DROPDOWNS */
+.nav-dropdown-active .nav-dropdown-trigger {
+  background: rgba(212, 175, 55, 0.1);
+  color: var(--fah-dorado);
+}
+
+.nav-chevron {
+  font-size: 12px;
+  margin-left: auto;
+  transition: transform 0.3s ease;
+}
+
+.nav-chevron-rotated {
+  transform: rotate(180deg);
+}
+
+.nav-dropdown-content {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 0 0 8px 8px;
+  padding: 8px 0;
+  margin: 0 8px 0 20px;
+  border-left: 2px solid rgba(212, 175, 55, 0.3);
+}
+
+.dropdown-section-header {
+  color: var(--fah-dorado);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  padding: 8px 16px 4px;
+  margin-bottom: 4px;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 16px;
+  margin: 2px 0;
+  color: rgba(255, 255, 255, 0.9);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 4px;
+}
+
+.dropdown-item:hover {
+  background: rgba(212, 175, 55, 0.1);
+  color: var(--fah-dorado);
+  transform: translateX(4px);
+}
+
+.admin-item {
+  background: rgba(193, 102, 107, 0.05);
+}
+
+.admin-item:hover {
+  background: rgba(193, 102, 107, 0.15);
+}
+
+.dropdown-emoji {
+  font-size: 16px;
+  margin-right: 12px;
+  width: 20px;
+}
+
+.dropdown-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dropdown-title {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.2;
+}
+
+.dropdown-description {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.2;
+}
+
+.dropdown-badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 8px;
+  font-weight: 600;
+  margin-left: 8px;
+  background: rgba(212, 175, 55, 0.2);
+  color: var(--fah-dorado);
+}
+
+/* NESTED DROPDOWNS */
+.nav-dropdown-nested {
+  margin: 0;
+}
+
+.dropdown-trigger-nested {
+  position: relative;
+}
+
+.dropdown-chevron-nested {
+  font-size: 10px;
+  margin-left: 8px;
+  transition: transform 0.3s ease;
+}
+
+.dropdown-chevron-rotated {
+  transform: rotate(180deg);
+}
+
+.dropdown-content-nested {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  padding: 4px 0;
+  margin: 4px 0 0 32px;
+  border-left: 2px solid rgba(212, 175, 55, 0.2);
+}
+
+.dropdown-item-nested {
+  display: flex;
+  align-items: center;
+  padding: 8px 12px;
+  color: rgba(255, 255, 255, 0.8);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border-radius: 3px;
+  margin: 1px 0;
+}
+
+.dropdown-item-nested:hover {
+  background: rgba(212, 175, 55, 0.1);
+  color: var(--fah-dorado);
+}
+
+.nested-emoji {
+  font-size: 14px;
+  margin-right: 8px;
+  width: 16px;
+}
+
+.nested-title {
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* SEPARADOR */
+.nav-separator {
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+  margin: 20px 20px;
+  opacity: 0.5;
+}
+
+/* USER INFO */
+.nav-user-info {
+  margin: 8px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.user-info-compact {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+}
+
+.user-avatar {
+  width: 36px;
+  height: 36px;
+  background: var(--fah-dorado);
+  color: var(--fah-azul-naval);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.user-details {
+  flex: 1;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: white;
+  line-height: 1.2;
+}
+
+.user-role {
+  font-size: 11px;
+  color: var(--fah-dorado);
+  line-height: 1.2;
+}
+
+/* RESPONSIVE */
+@media (max-width: 480px) {
+  .mobile-sidebar-trigger {
+    display: flex;
+  }
+}
+
+@media (min-width: 481px) {
+  .mobile-sidebar-trigger {
+    display: none !important;
+  }
+}
+
+/* ANIMACIONES */
+.sidebar-navigation > .nav-item:nth-child(1) {
+  animation: fadeInLeft 0.5s ease forwards 0.1s both;
+}
+.sidebar-navigation > .nav-item:nth-child(2) {
+  animation: fadeInLeft 0.5s ease forwards 0.15s both;
+}
+.sidebar-navigation > .nav-item:nth-child(3) {
+  animation: fadeInLeft 0.5s ease forwards 0.2s both;
+}
+.sidebar-navigation > .nav-item:nth-child(4) {
+  animation: fadeInLeft 0.5s ease forwards 0.25s both;
+}
+.sidebar-navigation > .nav-item:nth-child(5) {
+  animation: fadeInLeft 0.5s ease forwards 0.3s both;
+}
+
+@keyframes fadeInLeft {
   from {
     opacity: 0;
-    transform: translateX(-10px);
+    transform: translateX(-20px);
   }
   to {
     opacity: 1;
     transform: translateX(0);
-  }
-}
-
-.submenu-item {
-  animation: slideIn 0.2s ease-out;
-}
-
-/* Estados responsivos */
-@media (max-width: 768px) {
-  .navigation-item {
-    @apply py-4;
-  }
-
-  .nav-title {
-    @apply text-base;
   }
 }
 </style>
