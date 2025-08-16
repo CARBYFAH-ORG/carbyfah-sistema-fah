@@ -24,7 +24,7 @@ class DatosPersonales extends Model
         'tercer_apellido',
         'fecha_nacimiento',
 
-        // Lugar de nacimiento
+        // lugar de nacimiento
         'pais_nacimiento_id',
         'departamento_nacimiento_id',
         'municipio_nacimiento_id',
@@ -33,21 +33,21 @@ class DatosPersonales extends Model
 
         'nacionalidad',
 
-        // Residencia actual
+        // residencia actual
         'pais_residencia_id',
         'departamento_residencia_id',
         'municipio_residencia_id',
         'ciudad_residencia_id',
         'direccion_residencia_especifica',
 
-        // Datos personales
+        // datos personales
         'tipo_genero_id',
         'estado_civil',
         'telefono_personal',
         'telefono_emergencia',
         'email_personal',
 
-        // Contacto emergencia
+        // contacto emergencia
         'contacto_emergencia_nombre',
         'contacto_emergencia_telefono',
         'contacto_emergencia_relacion',
@@ -79,7 +79,7 @@ class DatosPersonales extends Model
         'deleted_by' => 'integer',
         'fecha_nacimiento' => 'date',
 
-        // Foreign keys
+        // claves foraneas
         'pais_nacimiento_id' => 'integer',
         'departamento_nacimiento_id' => 'integer',
         'municipio_nacimiento_id' => 'integer',
@@ -91,23 +91,21 @@ class DatosPersonales extends Model
         'tipo_genero_id' => 'integer'
     ];
 
-    // =====================================================
-    // RELACIONES
-    // =====================================================
+    // relaciones
 
-    // Relación 1:1 con perfil militar
+    // relacion uno a uno con perfil militar
     public function perfilMilitar()
     {
         return $this->hasOne(PerfilMilitar::class, 'datos_personales_id', 'id');
     }
 
-    // Relaciones con catálogos
+    // relaciones con catalogos
     public function tipoGenero()
     {
         return $this->belongsTo('App\Models\TipoGenero', 'tipo_genero_id', 'id');
     }
 
-    // Relaciones geográficas - Nacimiento
+    // relaciones geograficas nacimiento
     public function paisNacimiento()
     {
         return $this->belongsTo('App\Models\Pais', 'pais_nacimiento_id', 'id');
@@ -128,7 +126,7 @@ class DatosPersonales extends Model
         return $this->belongsTo('App\Models\Ciudad', 'ciudad_nacimiento_id', 'id');
     }
 
-    // Relaciones geográficas - Residencia
+    // relaciones geograficas residencia
     public function paisResidencia()
     {
         return $this->belongsTo('App\Models\Pais', 'pais_residencia_id', 'id');
@@ -149,9 +147,7 @@ class DatosPersonales extends Model
         return $this->belongsTo('App\Models\Ciudad', 'ciudad_residencia_id', 'id');
     }
 
-    // =====================================================
-    // SCOPES
-    // =====================================================
+    // scopes para consultas
 
     public function scopeActivos($query)
     {
@@ -178,9 +174,7 @@ class DatosPersonales extends Model
         return $query->where('tipo_genero_id', $generoId);
     }
 
-    // =====================================================
-    // ACCESSORS
-    // =====================================================
+    // accessors para atributos calculados
 
     public function getNombreCompletoAttribute()
     {
@@ -218,7 +212,7 @@ class DatosPersonales extends Model
             "{$this->lugar_nacimiento_especifico}, {$lugares}" : $lugares;
     }
 
-    public function getDireccionCompletatAttribute()
+    public function getDireccionCompletaAttribute()
     {
         $lugares = collect([
             $this->ciudadResidencia?->nombre_ciudad,

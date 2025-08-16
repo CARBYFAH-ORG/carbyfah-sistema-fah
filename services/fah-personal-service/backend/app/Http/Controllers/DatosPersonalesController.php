@@ -8,10 +8,8 @@ use Illuminate\Support\Facades\Validator;
 
 class DatosPersonalesController extends Controller
 {
-    /**
-     * Listar todos los datos personales
-     * GET /api/personal/datos-personales
-     */
+    // listar todos los datos personales
+    // get api personal datos-personales
     public function index(Request $request)
     {
         try {
@@ -28,7 +26,7 @@ class DatosPersonalesController extends Controller
                 'perfilMilitar'
             ])->activos();
 
-            // Filtros opcionales
+            // filtros opcionales
             if ($request->has('buscar')) {
                 $query->porNombre($request->buscar);
             }
@@ -57,15 +55,13 @@ class DatosPersonalesController extends Controller
         }
     }
 
-    /**
-     * Crear nuevos datos personales
-     * POST /api/personal/datos-personales
-     */
+    // crear nuevos datos personales
+    // post api personal datos-personales
     public function store(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
-                'numero_identidad' => 'required|string|max:20|unique:personal.datos_personales,numero_identidad',
+                'numero_identidad' => 'required|string|max:20|unique:datos_personales,numero_identidad',
                 'primer_nombre' => 'required|string|max:100',
                 'segundo_nombre' => 'nullable|string|max:100',
                 'tercer_nombre' => 'nullable|string|max:100',
@@ -74,30 +70,30 @@ class DatosPersonalesController extends Controller
                 'tercer_apellido' => 'nullable|string|max:100',
                 'fecha_nacimiento' => 'required|date|before:today',
 
-                // Lugar de nacimiento
-                'pais_nacimiento_id' => 'nullable|integer|exists:catalogos.paises,id',
-                'departamento_nacimiento_id' => 'nullable|integer|exists:organizacion.departamentos,id',
-                'municipio_nacimiento_id' => 'nullable|integer|exists:organizacion.municipios,id',
-                'ciudad_nacimiento_id' => 'nullable|integer|exists:organizacion.ciudades,id',
+                // lugar de nacimiento
+                'pais_nacimiento_id' => 'nullable|integer|exists:paises,id',
+                'departamento_nacimiento_id' => 'nullable|integer|exists:departamentos,id',
+                'municipio_nacimiento_id' => 'nullable|integer|exists:municipios,id',
+                'ciudad_nacimiento_id' => 'nullable|integer|exists:ciudades,id',
                 'lugar_nacimiento_especifico' => 'nullable|string|max:200',
 
                 'nacionalidad' => 'nullable|string|max:100',
 
-                // Residencia actual
-                'pais_residencia_id' => 'nullable|integer|exists:catalogos.paises,id',
-                'departamento_residencia_id' => 'nullable|integer|exists:organizacion.departamentos,id',
-                'municipio_residencia_id' => 'nullable|integer|exists:organizacion.municipios,id',
-                'ciudad_residencia_id' => 'nullable|integer|exists:organizacion.ciudades,id',
+                // residencia actual
+                'pais_residencia_id' => 'nullable|integer|exists:paises,id',
+                'departamento_residencia_id' => 'nullable|integer|exists:departamentos,id',
+                'municipio_residencia_id' => 'nullable|integer|exists:municipios,id',
+                'ciudad_residencia_id' => 'nullable|integer|exists:ciudades,id',
                 'direccion_residencia_especifica' => 'nullable|string|max:500',
 
-                // Datos personales
-                'tipo_genero_id' => 'nullable|integer|exists:catalogos.tipos_genero,id',
+                // datos personales
+                'tipo_genero_id' => 'nullable|integer|exists:tipos_genero,id',
                 'estado_civil' => 'nullable|string|max:50',
                 'telefono_personal' => 'nullable|string|max:20',
                 'telefono_emergencia' => 'nullable|string|max:20',
                 'email_personal' => 'nullable|email|max:200',
 
-                // Contacto emergencia
+                // contacto emergencia
                 'contacto_emergencia_nombre' => 'nullable|string|max:200',
                 'contacto_emergencia_telefono' => 'nullable|string|max:20',
                 'contacto_emergencia_relacion' => 'nullable|string|max:100'
@@ -114,7 +110,7 @@ class DatosPersonalesController extends Controller
             $datosPersonales = DatosPersonales::create(array_merge(
                 $request->all(),
                 [
-                    'created_by' => 1, // TODO: Obtener del usuario autenticado
+                    'created_by' => 1, // obtener del usuario autenticado
                     'updated_by' => 1
                 ]
             ));
@@ -145,10 +141,8 @@ class DatosPersonalesController extends Controller
         }
     }
 
-    /**
-     * Obtener datos personales específicos
-     * GET /api/personal/datos-personales/{id}
-     */
+    // obtener datos personales especificos
+    // get api personal datos-personales id
     public function show($id)
     {
         try {
@@ -186,10 +180,8 @@ class DatosPersonalesController extends Controller
         }
     }
 
-    /**
-     * Actualizar datos personales
-     * PUT /api/personal/datos-personales/{id}
-     */
+    // actualizar datos personales
+    // put api personal datos-personales id
     public function update(Request $request, $id)
     {
         try {
@@ -203,7 +195,7 @@ class DatosPersonalesController extends Controller
             }
 
             $validator = Validator::make($request->all(), [
-                'numero_identidad' => 'required|string|max:20|unique:personal.datos_personales,numero_identidad,' . $id,
+                'numero_identidad' => 'required|string|max:20|unique:datos_personales,numero_identidad,' . $id,
                 'primer_nombre' => 'required|string|max:100',
                 'segundo_nombre' => 'nullable|string|max:100',
                 'tercer_nombre' => 'nullable|string|max:100',
@@ -212,30 +204,30 @@ class DatosPersonalesController extends Controller
                 'tercer_apellido' => 'nullable|string|max:100',
                 'fecha_nacimiento' => 'required|date|before:today',
 
-                // Lugar de nacimiento
-                'pais_nacimiento_id' => 'nullable|integer|exists:catalogos.paises,id',
-                'departamento_nacimiento_id' => 'nullable|integer|exists:organizacion.departamentos,id',
-                'municipio_nacimiento_id' => 'nullable|integer|exists:organizacion.municipios,id',
-                'ciudad_nacimiento_id' => 'nullable|integer|exists:organizacion.ciudades,id',
+                // lugar de nacimiento
+                'pais_nacimiento_id' => 'nullable|integer|exists:paises,id',
+                'departamento_nacimiento_id' => 'nullable|integer|exists:departamentos,id',
+                'municipio_nacimiento_id' => 'nullable|integer|exists:municipios,id',
+                'ciudad_nacimiento_id' => 'nullable|integer|exists:ciudades,id',
                 'lugar_nacimiento_especifico' => 'nullable|string|max:200',
 
                 'nacionalidad' => 'nullable|string|max:100',
 
-                // Residencia actual
-                'pais_residencia_id' => 'nullable|integer|exists:catalogos.paises,id',
-                'departamento_residencia_id' => 'nullable|integer|exists:organizacion.departamentos,id',
-                'municipio_residencia_id' => 'nullable|integer|exists:organizacion.municipios,id',
-                'ciudad_residencia_id' => 'nullable|integer|exists:organizacion.ciudades,id',
+                // residencia actual
+                'pais_residencia_id' => 'nullable|integer|exists:paises,id',
+                'departamento_residencia_id' => 'nullable|integer|exists:departamentos,id',
+                'municipio_residencia_id' => 'nullable|integer|exists:municipios,id',
+                'ciudad_residencia_id' => 'nullable|integer|exists:ciudades,id',
                 'direccion_residencia_especifica' => 'nullable|string|max:500',
 
-                // Datos personales
-                'tipo_genero_id' => 'nullable|integer|exists:catalogos.tipos_genero,id',
+                // datos personales
+                'tipo_genero_id' => 'nullable|integer|exists:tipos_genero,id',
                 'estado_civil' => 'nullable|string|max:50',
                 'telefono_personal' => 'nullable|string|max:20',
                 'telefono_emergencia' => 'nullable|string|max:20',
                 'email_personal' => 'nullable|email|max:200',
 
-                // Contacto emergencia
+                // contacto emergencia
                 'contacto_emergencia_nombre' => 'nullable|string|max:200',
                 'contacto_emergencia_telefono' => 'nullable|string|max:20',
                 'contacto_emergencia_relacion' => 'nullable|string|max:100',
@@ -254,7 +246,7 @@ class DatosPersonalesController extends Controller
             $datosPersonales->update(array_merge(
                 $request->all(),
                 [
-                    'updated_by' => 1, // TODO: Obtener del usuario autenticado
+                    'updated_by' => 1, // obtener del usuario autenticado
                     'version' => $datosPersonales->version + 1
                 ]
             ));
@@ -285,10 +277,8 @@ class DatosPersonalesController extends Controller
         }
     }
 
-    /**
-     * Eliminar datos personales (soft delete)
-     * DELETE /api/personal/datos-personales/{id}
-     */
+    // eliminar datos personales soft delete
+    // delete api personal datos-personales id
     public function destroy($id)
     {
         try {
@@ -301,7 +291,7 @@ class DatosPersonalesController extends Controller
                 ], 404);
             }
 
-            // Verificar si tiene perfil militar asociado
+            // verificar si tiene perfil militar asociado
             if ($datosPersonales->perfilMilitar) {
                 return response()->json([
                     'success' => false,
@@ -310,7 +300,7 @@ class DatosPersonalesController extends Controller
             }
 
             $datosPersonales->update([
-                'deleted_by' => 1, // TODO: Obtener del usuario autenticado
+                'deleted_by' => 1, // obtener del usuario autenticado
             ]);
 
             $datosPersonales->delete();
@@ -328,10 +318,8 @@ class DatosPersonalesController extends Controller
         }
     }
 
-    /**
-     * Buscar por número de identidad
-     * GET /api/personal/datos-personales/por-identidad/{numeroIdentidad}
-     */
+    // buscar por numero de identidad
+    // get api personal datos-personales por-identidad numeroIdentidad
     public function porIdentidad($numeroIdentidad)
     {
         try {
@@ -367,19 +355,17 @@ class DatosPersonalesController extends Controller
         }
     }
 
-    /**
-     * Estadísticas generales
-     * GET /api/personal/datos-personales/estadisticas
-     */
+    // estadisticas generales
+    // get api personal datos-personales estadisticas
     public function estadisticas()
     {
         try {
             $estadisticas = [
                 'total_registros' => DatosPersonales::activos()->count(),
                 'por_genero' => DatosPersonales::activos()
-                    ->join('catalogos.tipos_genero', 'personal.datos_personales.tipo_genero_id', '=', 'catalogos.tipos_genero.id')
-                    ->selectRaw('catalogos.tipos_genero.nombre as genero, COUNT(*) as total')
-                    ->groupBy('catalogos.tipos_genero.nombre')
+                    ->join('tipos_genero', 'datos_personales.tipo_genero_id', '=', 'tipos_genero.id')
+                    ->selectRaw('tipos_genero.nombre as genero, COUNT(*) as total')
+                    ->groupBy('tipos_genero.nombre')
                     ->get(),
                 'rangos_edad' => [
                     '18-25' => DatosPersonales::activos()->whereRaw('EXTRACT(YEAR FROM AGE(fecha_nacimiento)) BETWEEN 18 AND 25')->count(),
