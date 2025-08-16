@@ -17,13 +17,12 @@ class UsuariosSistemaController extends Controller
     public function index(Request $request)
     {
         try {
+            // solo incluir relaciones internas del servicio personal
             $query = UsuarioSistema::with([
-                'perfilMilitar.datosPersonales',
-                'perfilMilitar.gradoActual',
-                'perfilMilitar.asignacionActual.estructuraMilitar'
+                'perfilMilitar.datosPersonales'
             ])->activos();
 
-            // Filtros opcionales
+            // filtros opcionales
             if ($request->has('estado_cuenta')) {
                 switch ($request->estado_cuenta) {
                     case 'BLOQUEADA':
@@ -78,9 +77,9 @@ class UsuariosSistemaController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'perfil_militar_id' => 'required|integer|exists:personal.perfiles_militares,id|unique:personal.usuarios_sistema,perfil_militar_id',
-                'username' => 'required|string|max:100|unique:personal.usuarios_sistema,username',
-                'email_institucional' => 'required|email|max:200|unique:personal.usuarios_sistema,email_institucional',
+                'perfil_militar_id' => 'required|integer|exists:perfiles_militares,id|unique:usuarios_sistema,perfil_militar_id',
+                'username' => 'required|string|max:100|unique:usuarios_sistema,username',
+                'email_institucional' => 'required|email|max:200|unique:usuarios_sistema,email_institucional',
                 'password' => 'required|string|min:8',
                 'requiere_cambio_password' => 'boolean',
                 'configuraciones_usuario' => 'nullable|array'
@@ -94,9 +93,9 @@ class UsuariosSistemaController extends Controller
                 ], 400);
             }
 
-            // Verificar que el perfil militar existe y está activo
+            // verificar que el perfil militar existe y esta activo
             $perfilMilitar = PerfilMilitar::find($request->perfil_militar_id);
-            if (!$perfilMilitar || !$perfilMilitar->esta_activo) {
+            if (!$perfilMilitar || !$perfilMilitar->is_active) {
                 return response()->json([
                     'success' => false,
                     'message' => 'El perfil militar no existe o no está activo'
@@ -107,16 +106,16 @@ class UsuariosSistemaController extends Controller
                 'perfil_militar_id' => $request->perfil_militar_id,
                 'username' => $request->username,
                 'email_institucional' => $request->email_institucional,
-                'password_hash' => $request->password, // Usa el mutator que hace hash automáticamente
+                'password_hash' => $request->password, // usa el mutator que hace hash automaticamente
                 'requiere_cambio_password' => $request->get('requiere_cambio_password', true),
                 'configuraciones_usuario' => $request->configuraciones_usuario ?? [],
-                'created_by' => 1, // TODO: Obtener del usuario autenticado
+                'created_by' => 1,
                 'updated_by' => 1
             ]);
 
+            // solo cargar relaciones internas
             $usuarioSistema->load([
-                'perfilMilitar.datosPersonales',
-                'perfilMilitar.gradoActual'
+                'perfilMilitar.datosPersonales'
             ]);
 
             return response()->json([
@@ -141,12 +140,7 @@ class UsuariosSistemaController extends Controller
     {
         try {
             $usuarioSistema = UsuarioSistema::with([
-                'perfilMilitar.datosPersonales',
-                'perfilMilitar.gradoActual',
-                'perfilMilitar.categoriaPersonal',
-                'perfilMilitar.especialidad',
-                'perfilMilitar.asignacionActual.estructuraMilitar',
-                'perfilMilitar.asignacionActual.cargo'
+                'perfilMilitar.datosPersonales'
             ])->find($id);
 
             if (!$usuarioSistema) {
@@ -156,7 +150,7 @@ class UsuariosSistemaController extends Controller
                 ], 404);
             }
 
-            // Agregar información adicional
+            // agregar informacion adicional
             $data = $usuarioSistema->toArray();
             $data['errores_integridad'] = $usuarioSistema->validarIntegridadCuenta();
             $data['tiempo_sin_acceso'] = $usuarioSistema->tiempoSinAcceso();
@@ -192,9 +186,9 @@ class UsuariosSistemaController extends Controller
             }
 
             $validator = Validator::make($request->all(), [
-                'perfil_militar_id' => 'required|integer|exists:personal.perfiles_militares,id|unique:personal.usuarios_sistema,perfil_militar_id,' . $id,
-                'username' => 'required|string|max:100|unique:personal.usuarios_sistema,username,' . $id,
-                'email_institucional' => 'required|email|max:200|unique:personal.usuarios_sistema,email_institucional,' . $id,
+                'perfil_militar_id' => 'required|integer|exists:perfiles_militares,id|unique:usuarios_sistema,perfil_militar_id,' . $id,
+                'username' => 'required|string|max:100|unique:usuarios_sistema,username,' . $id,
+                'email_institucional' => 'required|email|max:200|unique:usuarios_sistema,email_institucional,' . $id,
                 'configuraciones_usuario' => 'nullable|array',
                 'is_active' => 'boolean'
             ]);
@@ -207,16 +201,16 @@ class UsuariosSistemaController extends Controller
                 ], 400);
             }
 
-            // No permitir cambio de password aquí - usar endpoint específico
+            // no permitir cambio de password aqui usar endpoint específico
             $datosActualizacion = $request->except(['password', 'password_hash']);
-            $datosActualizacion['updated_by'] = 1; // TODO: Obtener del usuario autenticado
+            $datosActualizacion['updated_by'] = 1;
             $datosActualizacion['version'] = $usuarioSistema->version + 1;
 
             $usuarioSistema->update($datosActualizacion);
 
+            // solo cargar relaciones internas
             $usuarioSistema->load([
-                'perfilMilitar.datosPersonales',
-                'perfilMilitar.gradoActual'
+                'perfilMilitar.datosPersonales'
             ]);
 
             return response()->json([
@@ -234,7 +228,7 @@ class UsuariosSistemaController extends Controller
     }
 
     /**
-     * Eliminar usuario del sistema (soft delete)
+     * Eliminar usuario del sistema soft delete
      * DELETE /api/personal/usuarios-sistema/{id}
      */
     public function destroy($id)
@@ -250,7 +244,7 @@ class UsuariosSistemaController extends Controller
             }
 
             $usuarioSistema->update([
-                'deleted_by' => 1, // TODO: Obtener del usuario autenticado
+                'deleted_by' => 1,
             ]);
 
             $usuarioSistema->delete();
@@ -298,7 +292,7 @@ class UsuariosSistemaController extends Controller
                 ], 400);
             }
 
-            // Verificar password actual
+            // verificar password actual
             if (!$usuarioSistema->verificarPassword($request->password_actual)) {
                 return response()->json([
                     'success' => false,
@@ -340,7 +334,7 @@ class UsuariosSistemaController extends Controller
                 ], 404);
             }
 
-            // Generar password temporal
+            // generar password temporal
             $passwordTemporal = Str::random(12);
 
             $usuarioSistema->cambiarPassword($passwordTemporal, true);
@@ -472,14 +466,46 @@ class UsuariosSistemaController extends Controller
     }
 
     /**
-     * Estadísticas de usuarios
-     * GET /api/personal/usuarios-sistema/estadisticas
+     * Buscar por username
+     * GET /api/personal/usuarios-sistema/por-username/{username}
+     */
+    public function porUsername($username)
+    {
+        try {
+            $usuarioSistema = UsuarioSistema::porUsername($username)
+                ->with(['perfilMilitar.datosPersonales'])
+                ->first();
+
+            if (!$usuarioSistema) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No se encontró usuario con ese username'
+                ], 404);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Usuario obtenido correctamente',
+                'data' => $usuarioSistema
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al buscar usuario',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Estadisticas de usuarios
+     * GET /api/personal/usuarios-sistema/estadisticas/generales
      */
     public function estadisticas()
     {
         try {
             $estadisticas = [
-                'total_usuarios' => UsuarioSistema::activos()->count(),
+                'total_registros' => UsuarioSistema::activos()->count(),
                 'por_estado' => [
                     'activos' => UsuarioSistema::activos()->desbloqueados()->count(),
                     'bloqueados' => UsuarioSistema::activos()->bloqueados()->count(),

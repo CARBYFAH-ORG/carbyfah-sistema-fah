@@ -16,13 +16,12 @@ class AsignacionRolesController extends Controller
     public function index(Request $request)
     {
         try {
+            // solo incluir relaciones internas del servicio personal
             $query = AsignacionRol::with([
-                'perfilMilitar.datosPersonales',
-                'perfilMilitar.gradoActual',
-                'rolFuncional'
+                'perfilMilitar.datosPersonales'
             ])->activos();
 
-            // Filtros opcionales
+            // filtros opcionales
             if ($request->has('perfil_militar_id')) {
                 $query->porPersonal($request->perfil_militar_id);
             }
@@ -53,8 +52,7 @@ class AsignacionRolesController extends Controller
                 $query->asignadosEntre($request->fecha_inicio, $request->fecha_fin);
             }
 
-            $asignaciones = $query->ordenadoPorAutoridad()
-                ->paginate($request->get('per_page', 15));
+            $asignaciones = $query->paginate($request->get('per_page', 15));
 
             return response()->json([
                 'success' => true,
@@ -71,15 +69,16 @@ class AsignacionRolesController extends Controller
     }
 
     /**
-     * Crear nueva asignación de rol
+     * Crear nueva asignacion de rol
      * POST /api/personal/asignacion-roles
      */
     public function store(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
-                'perfil_militar_id' => 'required|integer|exists:personal.perfiles_militares,id',
-                'rol_funcional_id' => 'required|integer|exists:organizacion.roles_funcionales,id',
+                'perfil_militar_id' => 'required|integer|exists:perfiles_militares,id',
+                // sin exists microservicios externos
+                'rol_funcional_id' => 'required|integer',
                 'fecha_asignacion' => 'required|date|before_or_equal:today',
                 'fecha_expiracion' => 'nullable|date|after:fecha_asignacion'
             ]);
@@ -92,16 +91,16 @@ class AsignacionRolesController extends Controller
                 ], 400);
             }
 
-            // Verificar que el perfil militar existe y está activo
+            // verificar que el perfil militar existe y esta activo
             $perfilMilitar = PerfilMilitar::find($request->perfil_militar_id);
-            if (!$perfilMilitar || !$perfilMilitar->esta_activo) {
+            if (!$perfilMilitar || !$perfilMilitar->is_active) {
                 return response()->json([
                     'success' => false,
                     'message' => 'El perfil militar no existe o no está activo'
                 ], 400);
             }
 
-            // Verificar conflictos de roles
+            // verificar conflictos de roles
             $nuevaAsignacion = new AsignacionRol($request->all());
             if ($nuevaAsignacion->tieneConflictoRoles($request->fecha_asignacion, $request->fecha_expiracion)) {
                 return response()->json([
@@ -113,15 +112,14 @@ class AsignacionRolesController extends Controller
             $asignacionRol = AsignacionRol::create(array_merge(
                 $request->all(),
                 [
-                    'created_by' => 1, // TODO: Obtener del usuario autenticado
+                    'created_by' => 1,
                     'updated_by' => 1
                 ]
             ));
 
+            // solo cargar relaciones internas
             $asignacionRol->load([
-                'perfilMilitar.datosPersonales',
-                'perfilMilitar.gradoActual',
-                'rolFuncional'
+                'perfilMilitar.datosPersonales'
             ]);
 
             return response()->json([
@@ -139,18 +137,14 @@ class AsignacionRolesController extends Controller
     }
 
     /**
-     * Obtener asignación de rol específica
+     * Obtener asignacion de rol específica
      * GET /api/personal/asignacion-roles/{id}
      */
     public function show($id)
     {
         try {
             $asignacionRol = AsignacionRol::with([
-                'perfilMilitar.datosPersonales',
-                'perfilMilitar.gradoActual',
-                'perfilMilitar.categoriaPersonal',
-                'perfilMilitar.especialidad',
-                'rolFuncional'
+                'perfilMilitar.datosPersonales'
             ])->find($id);
 
             if (!$asignacionRol) {
@@ -160,7 +154,7 @@ class AsignacionRolesController extends Controller
                 ], 404);
             }
 
-            // Agregar información adicional
+            // agregar informacion adicional sin joins externos
             $data = $asignacionRol->toArray();
             $data['historial_roles'] = $asignacionRol->obtenerHistorialRoles()
                 ->take(5)
@@ -183,7 +177,7 @@ class AsignacionRolesController extends Controller
     }
 
     /**
-     * Actualizar asignación de rol
+     * Actualizar asignacion de rol
      * PUT /api/personal/asignacion-roles/{id}
      */
     public function update(Request $request, $id)
@@ -199,8 +193,9 @@ class AsignacionRolesController extends Controller
             }
 
             $validator = Validator::make($request->all(), [
-                'perfil_militar_id' => 'required|integer|exists:personal.perfiles_militares,id',
-                'rol_funcional_id' => 'required|integer|exists:organizacion.roles_funcionales,id',
+                'perfil_militar_id' => 'required|integer|exists:perfiles_militares,id',
+                // sin exists microservicios externos
+                'rol_funcional_id' => 'required|integer',
                 'fecha_asignacion' => 'required|date|before_or_equal:today',
                 'fecha_expiracion' => 'nullable|date|after:fecha_asignacion',
                 'is_active' => 'boolean'
@@ -214,7 +209,7 @@ class AsignacionRolesController extends Controller
                 ], 400);
             }
 
-            // Verificar conflictos de roles si cambiaron las fechas o el rol
+            // verificar conflictos de roles si cambiaron las fechas o el rol
             if ($request->has('fecha_asignacion') || $request->has('fecha_expiracion') || $request->has('rol_funcional_id')) {
                 if ($asignacionRol->tieneConflictoRoles($request->fecha_asignacion, $request->fecha_expiracion)) {
                     return response()->json([
@@ -227,15 +222,14 @@ class AsignacionRolesController extends Controller
             $asignacionRol->update(array_merge(
                 $request->all(),
                 [
-                    'updated_by' => 1, // TODO: Obtener del usuario autenticado
+                    'updated_by' => 1,
                     'version' => $asignacionRol->version + 1
                 ]
             ));
 
+            // solo cargar relaciones internas
             $asignacionRol->load([
-                'perfilMilitar.datosPersonales',
-                'perfilMilitar.gradoActual',
-                'rolFuncional'
+                'perfilMilitar.datosPersonales'
             ]);
 
             return response()->json([
@@ -253,7 +247,7 @@ class AsignacionRolesController extends Controller
     }
 
     /**
-     * Eliminar asignación de rol (soft delete)
+     * Eliminar asignacion de rol soft delete
      * DELETE /api/personal/asignacion-roles/{id}
      */
     public function destroy($id)
@@ -269,7 +263,7 @@ class AsignacionRolesController extends Controller
             }
 
             $asignacionRol->update([
-                'deleted_by' => 1, // TODO: Obtener del usuario autenticado
+                'deleted_by' => 1,
             ]);
 
             $asignacionRol->delete();
@@ -340,7 +334,7 @@ class AsignacionRolesController extends Controller
     }
 
     /**
-     * Extender asignación de rol
+     * Extender asignacion de rol
      * POST /api/personal/asignacion-roles/{id}/extender
      */
     public function extender(Request $request, $id)
@@ -501,7 +495,7 @@ class AsignacionRolesController extends Controller
                 'success' => true,
                 'message' => 'Roles vigentes obtenidos correctamente',
                 'data' => [
-                    'militar' => $perfilMilitar->grado_completo,
+                    'militar' => $perfilMilitar->nombre_completo_militar,
                     'roles' => $rolesVigentes->map(function ($asignacion) {
                         return $asignacion->asignacion_completa;
                     })
@@ -518,7 +512,7 @@ class AsignacionRolesController extends Controller
 
     /**
      * Alertas de vencimiento
-     * GET /api/personal/asignacion-roles/alertas-vencimiento
+     * GET /api/personal/asignacion-roles/alertas-vencimiento/listado
      */
     public function alertasVencimiento(Request $request)
     {
@@ -542,7 +536,7 @@ class AsignacionRolesController extends Controller
 
     /**
      * Reporte de asignaciones
-     * GET /api/personal/asignacion-roles/reporte
+     * GET /api/personal/asignacion-roles/reporte/asignaciones
      */
     public function reporte(Request $request)
     {
@@ -580,34 +574,21 @@ class AsignacionRolesController extends Controller
     }
 
     /**
-     * Estadísticas de asignaciones de roles
-     * GET /api/personal/asignacion-roles/estadisticas
+     * Estadisticas de asignaciones de roles
+     * GET /api/personal/asignacion-roles/estadisticas/generales
      */
     public function estadisticas()
     {
         try {
             $estadisticas = [
-                'total_asignaciones' => AsignacionRol::activos()->count(),
-                'vigentes' => AsignacionRol::activos()->vigentes()->count(),
-                'expiradas' => AsignacionRol::activos()->expirados()->count(),
-                'permanentes' => AsignacionRol::activos()->whereNull('fecha_expiracion')->count(),
-                'temporales' => AsignacionRol::activos()->whereNotNull('fecha_expiracion')->count(),
+                'total_registros' => AsignacionRol::activos()->count(),
+                'por_estado' => [
+                    'vigentes' => AsignacionRol::activos()->vigentes()->count(),
+                    'expiradas' => AsignacionRol::activos()->expirados()->count(),
+                    'permanentes' => AsignacionRol::activos()->whereNull('personal.asignacion_roles.fecha_expiracion')->count(),
+                    'temporales' => AsignacionRol::activos()->whereNotNull('personal.asignacion_roles.fecha_expiracion')->count()
+                ],
                 'por_vencer_30_dias' => AsignacionRol::activos()->porVencer(30)->count(),
-                'por_nivel_autoridad' => AsignacionRol::activos()
-                    ->vigentes()
-                    ->join('organizacion.roles_funcionales', 'personal.asignacion_roles.rol_funcional_id', '=', 'organizacion.roles_funcionales.id')
-                    ->selectRaw('organizacion.roles_funcionales.nivel_autoridad, COUNT(*) as total')
-                    ->groupBy('organizacion.roles_funcionales.nivel_autoridad')
-                    ->orderBy('organizacion.roles_funcionales.nivel_autoridad', 'desc')
-                    ->get(),
-                'roles_mas_asignados' => AsignacionRol::activos()
-                    ->vigentes()
-                    ->join('organizacion.roles_funcionales', 'personal.asignacion_roles.rol_funcional_id', '=', 'organizacion.roles_funcionales.id')
-                    ->selectRaw('organizacion.roles_funcionales.nombre_rol as rol, COUNT(*) as total')
-                    ->groupBy('organizacion.roles_funcionales.nombre_rol')
-                    ->orderBy('total', 'desc')
-                    ->limit(10)
-                    ->get(),
                 'asignaciones_ultimo_mes' => AsignacionRol::activos()
                     ->asignadosEntre(now()->subMonth(), now())
                     ->count()

@@ -48,54 +48,50 @@ class AsignacionRol extends Model
         'fecha_asignacion' => 'date',
         'fecha_expiracion' => 'date',
 
-        // Foreign keys
+        // claves foraneas
         'perfil_militar_id' => 'integer',
         'rol_funcional_id' => 'integer'
     ];
 
-    // =====================================================
-    // RELACIONES
-    // =====================================================
+    // relaciones
 
-    // Relación con perfil militar
+    // relacion con perfil militar
     public function perfilMilitar()
     {
         return $this->belongsTo(PerfilMilitar::class, 'perfil_militar_id', 'id');
     }
 
-    // Relación con rol funcional (organizacion schema)
+    // relacion con rol funcional organizacion schema
     public function rolFuncional()
     {
         return $this->belongsTo('App\Models\RolFuncional', 'rol_funcional_id', 'id');
     }
 
-    // =====================================================
-    // SCOPES
-    // =====================================================
+    // scopes para consultas
 
     public function scopeActivos($query)
     {
-        return $query->where('is_active', true);
+        return $query->where('personal.asignacion_roles.is_active', true);
     }
 
     public function scopeVigentes($query)
     {
         return $query->where(function ($q) {
-            $q->whereNull('fecha_expiracion')
-                ->orWhere('fecha_expiracion', '>=', now());
+            $q->whereNull('personal.asignacion_roles.fecha_expiracion')
+                ->orWhere('personal.asignacion_roles.fecha_expiracion', '>=', now());
         });
     }
 
     public function scopeExpirados($query)
     {
-        return $query->whereNotNull('fecha_expiracion')
-            ->where('fecha_expiracion', '<', now());
+        return $query->whereNotNull('personal.asignacion_roles.fecha_expiracion')
+            ->where('personal.asignacion_roles.fecha_expiracion', '<', now());
     }
 
     public function scopePorVencer($query, $diasAlerta = 30)
     {
-        return $query->whereNotNull('fecha_expiracion')
-            ->whereBetween('fecha_expiracion', [
+        return $query->whereNotNull('personal.asignacion_roles.fecha_expiracion')
+            ->whereBetween('personal.asignacion_roles.fecha_expiracion', [
                 now(),
                 now()->addDays($diasAlerta)
             ]);
@@ -103,23 +99,23 @@ class AsignacionRol extends Model
 
     public function scopePorPersonal($query, $perfilId)
     {
-        return $query->where('perfil_militar_id', $perfilId);
+        return $query->where('personal.asignacion_roles.perfil_militar_id', $perfilId);
     }
 
     public function scopePorRol($query, $rolId)
     {
-        return $query->where('rol_funcional_id', $rolId);
+        return $query->where('personal.asignacion_roles.rol_funcional_id', $rolId);
     }
 
     public function scopeAsignadosEntre($query, $fechaInicio, $fechaFin)
     {
-        return $query->whereBetween('fecha_asignacion', [$fechaInicio, $fechaFin]);
+        return $query->whereBetween('personal.asignacion_roles.fecha_asignacion', [$fechaInicio, $fechaFin]);
     }
 
     public function scopeConNivelAutoridad($query, $nivelMinimo)
     {
         return $query->whereHas('rolFuncional', function ($q) use ($nivelMinimo) {
-            $q->where('nivel_autoridad', '>=', $nivelMinimo);
+            $q->where('organizacion.roles_funcionales.nivel_autoridad', '>=', $nivelMinimo);
         });
     }
 
@@ -135,13 +131,11 @@ class AsignacionRol extends Model
             ->select('personal.asignacion_roles.*');
     }
 
-    // =====================================================
-    // ACCESSORS
-    // =====================================================
+    // accessors para atributos calculados
 
     public function getNombreMilitarAttribute()
     {
-        return $this->perfilMilitar?->grado_completo;
+        return $this->perfilMilitar?->nombre_completo_militar;
     }
 
     public function getRolNombreAttribute()
@@ -163,7 +157,7 @@ class AsignacionRol extends Model
     public function getDiasRestantesAttribute()
     {
         if (!$this->fecha_expiracion) {
-            return null; // Rol permanente
+            return null; // rol permanente
         }
 
         $dias = now()->diffInDays($this->fecha_expiracion, false);
@@ -230,9 +224,7 @@ class AsignacionRol extends Model
         ];
     }
 
-    // =====================================================
-    // MÉTODOS PERSONALIZADOS
-    // =====================================================
+    // metodos personalizados
 
     public function extender($nuevaFechaExpiracion)
     {
@@ -272,7 +264,7 @@ class AsignacionRol extends Model
     public function necesitaRenovacion($diasAnticipacion = 30)
     {
         if (!$this->fecha_expiracion) {
-            return false; // Roles permanentes no necesitan renovación
+            return false; // roles permanentes no necesitan renovacion
         }
 
         return $this->dias_restantes <= $diasAnticipacion;
@@ -286,26 +278,26 @@ class AsignacionRol extends Model
 
     public function tieneConflictoRoles($nuevaFechaInicio, $nuevaFechaFin = null)
     {
-        // Verificar si el mismo militar tiene roles similares en el período
-        $query = self::where('perfil_militar_id', $this->perfil_militar_id)
-            ->where('id', '!=', $this->id)
-            ->where('rol_funcional_id', $this->rol_funcional_id)
-            ->where('is_active', true);
+        // verificar si el mismo militar tiene roles similares en el periodo
+        $query = self::where('personal.asignacion_roles.perfil_militar_id', $this->perfil_militar_id)
+            ->where('personal.asignacion_roles.id', '!=', $this->id)
+            ->where('personal.asignacion_roles.rol_funcional_id', $this->rol_funcional_id)
+            ->where('personal.asignacion_roles.is_active', true);
 
         if ($nuevaFechaFin) {
             $query->where(function ($q) use ($nuevaFechaInicio, $nuevaFechaFin) {
-                $q->where('fecha_asignacion', '<=', $nuevaFechaFin)
+                $q->where('personal.asignacion_roles.fecha_asignacion', '<=', $nuevaFechaFin)
                     ->where(function ($q2) use ($nuevaFechaInicio) {
-                        $q2->whereNull('fecha_expiracion')
-                            ->orWhere('fecha_expiracion', '>=', $nuevaFechaInicio);
+                        $q2->whereNull('personal.asignacion_roles.fecha_expiracion')
+                            ->orWhere('personal.asignacion_roles.fecha_expiracion', '>=', $nuevaFechaInicio);
                     });
             });
         } else {
             $query->where(function ($q) use ($nuevaFechaInicio) {
-                $q->where('fecha_asignacion', '<=', $nuevaFechaInicio)
+                $q->where('personal.asignacion_roles.fecha_asignacion', '<=', $nuevaFechaInicio)
                     ->where(function ($q2) use ($nuevaFechaInicio) {
-                        $q2->whereNull('fecha_expiracion')
-                            ->orWhere('fecha_expiracion', '>=', $nuevaFechaInicio);
+                        $q2->whereNull('personal.asignacion_roles.fecha_expiracion')
+                            ->orWhere('personal.asignacion_roles.fecha_expiracion', '>=', $nuevaFechaInicio);
                     });
             });
         }
@@ -315,9 +307,9 @@ class AsignacionRol extends Model
 
     public function obtenerHistorialRoles()
     {
-        return self::where('perfil_militar_id', $this->perfil_militar_id)
+        return self::where('personal.asignacion_roles.perfil_militar_id', $this->perfil_militar_id)
             ->with('rolFuncional')
-            ->orderBy('fecha_asignacion', 'desc')
+            ->orderBy('personal.asignacion_roles.fecha_asignacion', 'desc')
             ->get();
     }
 

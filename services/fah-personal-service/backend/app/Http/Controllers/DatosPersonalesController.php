@@ -8,25 +8,19 @@ use Illuminate\Support\Facades\Validator;
 
 class DatosPersonalesController extends Controller
 {
-    // listar todos los datos personales
-    // get api personal datos-personales
+    /**
+     * Listar todos los datos personales
+     * GET /api/personal/datos-personales
+     */
     public function index(Request $request)
     {
         try {
+            // Solo incluir relaciones internas del servicio personal
             $query = DatosPersonales::with([
-                'tipoGenero',
-                'paisNacimiento',
-                'departamentoNacimiento',
-                'municipioNacimiento',
-                'ciudadNacimiento',
-                'paisResidencia',
-                'departamentoResidencia',
-                'municipioResidencia',
-                'ciudadResidencia',
                 'perfilMilitar'
             ])->activos();
 
-            // filtros opcionales
+            // Filtros opcionales
             if ($request->has('buscar')) {
                 $query->porNombre($request->buscar);
             }
@@ -55,8 +49,10 @@ class DatosPersonalesController extends Controller
         }
     }
 
-    // crear nuevos datos personales
-    // post api personal datos-personales
+    /**
+     * Crear nuevos datos personales
+     * POST /api/personal/datos-personales
+     */
     public function store(Request $request)
     {
         try {
@@ -70,30 +66,30 @@ class DatosPersonalesController extends Controller
                 'tercer_apellido' => 'nullable|string|max:100',
                 'fecha_nacimiento' => 'required|date|before:today',
 
-                // lugar de nacimiento
-                'pais_nacimiento_id' => 'nullable|integer|exists:paises,id',
-                'departamento_nacimiento_id' => 'nullable|integer|exists:departamentos,id',
-                'municipio_nacimiento_id' => 'nullable|integer|exists:municipios,id',
-                'ciudad_nacimiento_id' => 'nullable|integer|exists:ciudades,id',
+                // Lugar de nacimiento - SIN exists (microservicios externos)
+                'pais_nacimiento_id' => 'nullable|integer',
+                'departamento_nacimiento_id' => 'nullable|integer',
+                'municipio_nacimiento_id' => 'nullable|integer',
+                'ciudad_nacimiento_id' => 'nullable|integer',
                 'lugar_nacimiento_especifico' => 'nullable|string|max:200',
 
                 'nacionalidad' => 'nullable|string|max:100',
 
-                // residencia actual
-                'pais_residencia_id' => 'nullable|integer|exists:paises,id',
-                'departamento_residencia_id' => 'nullable|integer|exists:departamentos,id',
-                'municipio_residencia_id' => 'nullable|integer|exists:municipios,id',
-                'ciudad_residencia_id' => 'nullable|integer|exists:ciudades,id',
+                // Residencia actual - SIN exists (microservicios externos)
+                'pais_residencia_id' => 'nullable|integer',
+                'departamento_residencia_id' => 'nullable|integer',
+                'municipio_residencia_id' => 'nullable|integer',
+                'ciudad_residencia_id' => 'nullable|integer',
                 'direccion_residencia_especifica' => 'nullable|string|max:500',
 
-                // datos personales
-                'tipo_genero_id' => 'nullable|integer|exists:tipos_genero,id',
+                // Datos personales - SIN exists (microservicios externos)
+                'tipo_genero_id' => 'nullable|integer',
                 'estado_civil' => 'nullable|string|max:50',
                 'telefono_personal' => 'nullable|string|max:20',
                 'telefono_emergencia' => 'nullable|string|max:20',
                 'email_personal' => 'nullable|email|max:200',
 
-                // contacto emergencia
+                // Contacto emergencia
                 'contacto_emergencia_nombre' => 'nullable|string|max:200',
                 'contacto_emergencia_telefono' => 'nullable|string|max:20',
                 'contacto_emergencia_relacion' => 'nullable|string|max:100'
@@ -110,22 +106,13 @@ class DatosPersonalesController extends Controller
             $datosPersonales = DatosPersonales::create(array_merge(
                 $request->all(),
                 [
-                    'created_by' => 1, // obtener del usuario autenticado
+                    'created_by' => 1,
                     'updated_by' => 1
                 ]
             ));
 
-            $datosPersonales->load([
-                'tipoGenero',
-                'paisNacimiento',
-                'departamentoNacimiento',
-                'municipioNacimiento',
-                'ciudadNacimiento',
-                'paisResidencia',
-                'departamentoResidencia',
-                'municipioResidencia',
-                'ciudadResidencia'
-            ]);
+            // Solo cargar relaciones internas
+            $datosPersonales->load(['perfilMilitar']);
 
             return response()->json([
                 'success' => true,
@@ -141,21 +128,14 @@ class DatosPersonalesController extends Controller
         }
     }
 
-    // obtener datos personales especificos
-    // get api personal datos-personales id
+    /**
+     * Obtener datos personales específicos
+     * GET /api/personal/datos-personales/{id}
+     */
     public function show($id)
     {
         try {
             $datosPersonales = DatosPersonales::with([
-                'tipoGenero',
-                'paisNacimiento',
-                'departamentoNacimiento',
-                'municipioNacimiento',
-                'ciudadNacimiento',
-                'paisResidencia',
-                'departamentoResidencia',
-                'municipioResidencia',
-                'ciudadResidencia',
                 'perfilMilitar'
             ])->find($id);
 
@@ -180,8 +160,10 @@ class DatosPersonalesController extends Controller
         }
     }
 
-    // actualizar datos personales
-    // put api personal datos-personales id
+    /**
+     * Actualizar datos personales
+     * PUT /api/personal/datos-personales/{id}
+     */
     public function update(Request $request, $id)
     {
         try {
@@ -204,30 +186,30 @@ class DatosPersonalesController extends Controller
                 'tercer_apellido' => 'nullable|string|max:100',
                 'fecha_nacimiento' => 'required|date|before:today',
 
-                // lugar de nacimiento
-                'pais_nacimiento_id' => 'nullable|integer|exists:paises,id',
-                'departamento_nacimiento_id' => 'nullable|integer|exists:departamentos,id',
-                'municipio_nacimiento_id' => 'nullable|integer|exists:municipios,id',
-                'ciudad_nacimiento_id' => 'nullable|integer|exists:ciudades,id',
+                // Lugar de nacimiento - SIN exists (microservicios externos)
+                'pais_nacimiento_id' => 'nullable|integer',
+                'departamento_nacimiento_id' => 'nullable|integer',
+                'municipio_nacimiento_id' => 'nullable|integer',
+                'ciudad_nacimiento_id' => 'nullable|integer',
                 'lugar_nacimiento_especifico' => 'nullable|string|max:200',
 
                 'nacionalidad' => 'nullable|string|max:100',
 
-                // residencia actual
-                'pais_residencia_id' => 'nullable|integer|exists:paises,id',
-                'departamento_residencia_id' => 'nullable|integer|exists:departamentos,id',
-                'municipio_residencia_id' => 'nullable|integer|exists:municipios,id',
-                'ciudad_residencia_id' => 'nullable|integer|exists:ciudades,id',
+                // Residencia actual - SIN exists (microservicios externos)
+                'pais_residencia_id' => 'nullable|integer',
+                'departamento_residencia_id' => 'nullable|integer',
+                'municipio_residencia_id' => 'nullable|integer',
+                'ciudad_residencia_id' => 'nullable|integer',
                 'direccion_residencia_especifica' => 'nullable|string|max:500',
 
-                // datos personales
-                'tipo_genero_id' => 'nullable|integer|exists:tipos_genero,id',
+                // Datos personales - SIN exists (microservicios externos)
+                'tipo_genero_id' => 'nullable|integer',
                 'estado_civil' => 'nullable|string|max:50',
                 'telefono_personal' => 'nullable|string|max:20',
                 'telefono_emergencia' => 'nullable|string|max:20',
                 'email_personal' => 'nullable|email|max:200',
 
-                // contacto emergencia
+                // Contacto emergencia
                 'contacto_emergencia_nombre' => 'nullable|string|max:200',
                 'contacto_emergencia_telefono' => 'nullable|string|max:20',
                 'contacto_emergencia_relacion' => 'nullable|string|max:100',
@@ -246,22 +228,13 @@ class DatosPersonalesController extends Controller
             $datosPersonales->update(array_merge(
                 $request->all(),
                 [
-                    'updated_by' => 1, // obtener del usuario autenticado
+                    'updated_by' => 1,
                     'version' => $datosPersonales->version + 1
                 ]
             ));
 
-            $datosPersonales->load([
-                'tipoGenero',
-                'paisNacimiento',
-                'departamentoNacimiento',
-                'municipioNacimiento',
-                'ciudadNacimiento',
-                'paisResidencia',
-                'departamentoResidencia',
-                'municipioResidencia',
-                'ciudadResidencia'
-            ]);
+            // Solo cargar relaciones internas
+            $datosPersonales->load(['perfilMilitar']);
 
             return response()->json([
                 'success' => true,
@@ -277,8 +250,10 @@ class DatosPersonalesController extends Controller
         }
     }
 
-    // eliminar datos personales soft delete
-    // delete api personal datos-personales id
+    /**
+     * Eliminar datos personales (soft delete)
+     * DELETE /api/personal/datos-personales/{id}
+     */
     public function destroy($id)
     {
         try {
@@ -291,7 +266,7 @@ class DatosPersonalesController extends Controller
                 ], 404);
             }
 
-            // verificar si tiene perfil militar asociado
+            // Verificar si tiene perfil militar asociado
             if ($datosPersonales->perfilMilitar) {
                 return response()->json([
                     'success' => false,
@@ -300,7 +275,7 @@ class DatosPersonalesController extends Controller
             }
 
             $datosPersonales->update([
-                'deleted_by' => 1, // obtener del usuario autenticado
+                'deleted_by' => 1,
             ]);
 
             $datosPersonales->delete();
@@ -318,20 +293,15 @@ class DatosPersonalesController extends Controller
         }
     }
 
-    // buscar por numero de identidad
-    // get api personal datos-personales por-identidad numeroIdentidad
+    /**
+     * Buscar por número de identidad
+     * GET /api/personal/datos-personales/por-identidad/{numeroIdentidad}
+     */
     public function porIdentidad($numeroIdentidad)
     {
         try {
             $datosPersonales = DatosPersonales::porIdentidad($numeroIdentidad)
-                ->with([
-                    'tipoGenero',
-                    'paisNacimiento',
-                    'departamentoNacimiento',
-                    'municipioNacimiento',
-                    'ciudadNacimiento',
-                    'perfilMilitar'
-                ])
+                ->with(['perfilMilitar'])
                 ->first();
 
             if (!$datosPersonales) {
@@ -355,18 +325,15 @@ class DatosPersonalesController extends Controller
         }
     }
 
-    // estadisticas generales
-    // get api personal datos-personales estadisticas
+    /**
+     * Estadísticas generales
+     * GET /api/personal/datos-personales/estadisticas/generales
+     */
     public function estadisticas()
     {
         try {
             $estadisticas = [
                 'total_registros' => DatosPersonales::activos()->count(),
-                'por_genero' => DatosPersonales::activos()
-                    ->join('tipos_genero', 'datos_personales.tipo_genero_id', '=', 'tipos_genero.id')
-                    ->selectRaw('tipos_genero.nombre as genero, COUNT(*) as total')
-                    ->groupBy('tipos_genero.nombre')
-                    ->get(),
                 'rangos_edad' => [
                     '18-25' => DatosPersonales::activos()->whereRaw('EXTRACT(YEAR FROM AGE(fecha_nacimiento)) BETWEEN 18 AND 25')->count(),
                     '26-35' => DatosPersonales::activos()->whereRaw('EXTRACT(YEAR FROM AGE(fecha_nacimiento)) BETWEEN 26 AND 35')->count(),

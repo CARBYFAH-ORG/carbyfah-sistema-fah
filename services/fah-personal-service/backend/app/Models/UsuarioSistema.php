@@ -12,7 +12,6 @@ class UsuarioSistema extends Model
     use HasFactory, SoftDeletes;
 
     protected $table = 'personal.usuarios_sistema';
-    protected $connection = 'pgsql';
     protected $primaryKey = 'id';
 
     protected $fillable = [
@@ -71,19 +70,15 @@ class UsuarioSistema extends Model
         'fecha_expiracion_token' => 'datetime'
     ];
 
-    // =====================================================
-    // RELACIONES
-    // =====================================================
+    // relaciones
 
-    // Relación 1:1 con perfil militar
+    // relacion uno a uno con perfil militar
     public function perfilMilitar()
     {
         return $this->belongsTo(PerfilMilitar::class, 'perfil_militar_id', 'id');
     }
 
-    // =====================================================
-    // SCOPES
-    // =====================================================
+    // scopes para consultas
 
     public function scopeActivos($query)
     {
@@ -134,9 +129,7 @@ class UsuarioSistema extends Model
             ->where('fecha_expiracion_token', '>', now());
     }
 
-    // =====================================================
-    // ACCESSORS
-    // =====================================================
+    // accessors para atributos calculados
 
     public function getNombreCompletoAttribute()
     {
@@ -145,17 +138,17 @@ class UsuarioSistema extends Model
 
     public function getGradoCompletoAttribute()
     {
-        return $this->perfilMilitar?->grado_completo;
+        return $this->perfilMilitar?->nombre_completo_militar;
     }
 
     public function getUnidadActualAttribute()
     {
-        return $this->perfilMilitar?->unidad_actual;
+        return $this->perfilMilitar?->asignacionActual?->unidad_nombre;
     }
 
     public function getCargoActualAttribute()
     {
-        return $this->perfilMilitar?->cargo_actual;
+        return $this->perfilMilitar?->asignacionActual?->cargo_nombre;
     }
 
     public function getDiasUltimoAccesoAttribute()
@@ -185,7 +178,7 @@ class UsuarioSistema extends Model
     {
         return $this->is_active &&
             !$this->cuenta_bloqueada &&
-            $this->perfilMilitar?->esta_activo;
+            $this->perfilMilitar?->is_active;
     }
 
     public function getTieneTokenValidoAttribute()
@@ -195,9 +188,7 @@ class UsuarioSistema extends Model
             $this->fecha_expiracion_token > now();
     }
 
-    // =====================================================
-    // MUTATORS
-    // =====================================================
+    // mutators para transformar datos
 
     public function setPasswordHashAttribute($value)
     {
@@ -206,9 +197,7 @@ class UsuarioSistema extends Model
         $this->attributes['requiere_cambio_password'] = false;
     }
 
-    // =====================================================
-    // MÉTODOS PERSONALIZADOS
-    // =====================================================
+    // metodos personalizados
 
     public function verificarPassword($password)
     {
@@ -226,7 +215,7 @@ class UsuarioSistema extends Model
     {
         $this->intentos_fallidos++;
 
-        // Bloquear después de 5 intentos fallidos
+        // bloquear despues de 5 intentos fallidos
         if ($this->intentos_fallidos >= 5) {
             $this->bloquearCuenta('Máximo de intentos fallidos excedido');
         }
@@ -267,7 +256,7 @@ class UsuarioSistema extends Model
 
     public function cambiarPassword($nuevaPassword, $requiereCambio = false)
     {
-        $this->password_hash = $nuevaPassword; // Usa el mutator
+        $this->password_hash = $nuevaPassword; // usa el mutator
         $this->requiere_cambio_password = $requiereCambio;
         $this->limpiarTokenRecuperacion();
         return $this->save();
@@ -288,7 +277,7 @@ class UsuarioSistema extends Model
 
     public function esPasswordTemporal()
     {
-        // Password temporal si requiere cambio y fue creado hace menos de 24 horas
+        // password temporal si requiere cambio y fue creado hace menos de 24 horas
         return $this->requiere_cambio_password &&
             $this->fecha_cambio_password &&
             $this->fecha_cambio_password->diffInHours(now()) < 24;
@@ -325,7 +314,7 @@ class UsuarioSistema extends Model
             $errores[] = 'Usuario sin perfil militar asociado';
         }
 
-        if (!$this->perfilMilitar?->esta_activo) {
+        if (!$this->perfilMilitar?->is_active) {
             $errores[] = 'Perfil militar inactivo';
         }
 

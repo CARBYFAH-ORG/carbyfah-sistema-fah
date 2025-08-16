@@ -16,14 +16,12 @@ class AsignacionesActualesController extends Controller
     public function index(Request $request)
     {
         try {
+            // solo incluir relaciones internas del servicio personal
             $query = AsignacionActual::with([
-                'perfilMilitar.datosPersonales',
-                'perfilMilitar.gradoActual',
-                'estructuraMilitar',
-                'cargo'
+                'perfilMilitar.datosPersonales'
             ])->activos();
 
-            // Filtros opcionales
+            // filtros opcionales
             if ($request->has('unidad_id')) {
                 $query->porUnidad($request->unidad_id);
             }
@@ -65,16 +63,17 @@ class AsignacionesActualesController extends Controller
     }
 
     /**
-     * Crear nueva asignación actual
+     * Crear nueva asignacion actual
      * POST /api/personal/asignaciones-actuales
      */
     public function store(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
-                'perfil_militar_id' => 'required|integer|exists:personal.perfiles_militares,id',
-                'estructura_militar_id' => 'nullable|integer|exists:organizacion.estructura_militar,id',
-                'cargo_id' => 'nullable|integer|exists:organizacion.cargos,id',
+                'perfil_militar_id' => 'required|integer|exists:perfiles_militares,id',
+                // sin exists microservicios externos
+                'estructura_militar_id' => 'nullable|integer',
+                'cargo_id' => 'nullable|integer',
                 'fecha_inicio_asignacion' => 'required|date|before_or_equal:today',
                 'fecha_fin_asignacion' => 'nullable|date|after:fecha_inicio_asignacion'
             ]);
@@ -87,16 +86,16 @@ class AsignacionesActualesController extends Controller
                 ], 400);
             }
 
-            // Verificar que el perfil militar existe y está activo
+            // verificar que el perfil militar existe y esta activo
             $perfilMilitar = PerfilMilitar::find($request->perfil_militar_id);
-            if (!$perfilMilitar || !$perfilMilitar->esta_activo) {
+            if (!$perfilMilitar || !$perfilMilitar->is_active) {
                 return response()->json([
                     'success' => false,
                     'message' => 'El perfil militar no existe o no está activo'
                 ], 400);
             }
 
-            // Verificar si ya tiene una asignación vigente
+            // verificar si ya tiene una asignacion vigente
             $asignacionExistente = AsignacionActual::porPersonal($request->perfil_militar_id)
                 ->activos()
                 ->vigentes()
@@ -110,7 +109,7 @@ class AsignacionesActualesController extends Controller
                 ], 409);
             }
 
-            // Verificar conflictos de fechas
+            // verificar conflictos de fechas
             $nuevaAsignacion = new AsignacionActual($request->all());
             if ($nuevaAsignacion->tieneConflictosFecha($request->fecha_inicio_asignacion, $request->fecha_fin_asignacion)) {
                 return response()->json([
@@ -122,16 +121,14 @@ class AsignacionesActualesController extends Controller
             $asignacionActual = AsignacionActual::create(array_merge(
                 $request->all(),
                 [
-                    'created_by' => 1, // TODO: Obtener del usuario autenticado
+                    'created_by' => 1,
                     'updated_by' => 1
                 ]
             ));
 
+            // solo cargar relaciones internas
             $asignacionActual->load([
-                'perfilMilitar.datosPersonales',
-                'perfilMilitar.gradoActual',
-                'estructuraMilitar',
-                'cargo'
+                'perfilMilitar.datosPersonales'
             ]);
 
             return response()->json([
@@ -149,19 +146,14 @@ class AsignacionesActualesController extends Controller
     }
 
     /**
-     * Obtener asignación actual específica
+     * Obtener asignacion actual específica
      * GET /api/personal/asignaciones-actuales/{id}
      */
     public function show($id)
     {
         try {
             $asignacionActual = AsignacionActual::with([
-                'perfilMilitar.datosPersonales',
-                'perfilMilitar.gradoActual',
-                'perfilMilitar.categoriaPersonal',
-                'perfilMilitar.especialidad',
-                'estructuraMilitar',
-                'cargo'
+                'perfilMilitar.datosPersonales'
             ])->find($id);
 
             if (!$asignacionActual) {
@@ -186,7 +178,7 @@ class AsignacionesActualesController extends Controller
     }
 
     /**
-     * Actualizar asignación actual
+     * Actualizar asignacion actual
      * PUT /api/personal/asignaciones-actuales/{id}
      */
     public function update(Request $request, $id)
@@ -202,9 +194,10 @@ class AsignacionesActualesController extends Controller
             }
 
             $validator = Validator::make($request->all(), [
-                'perfil_militar_id' => 'required|integer|exists:personal.perfiles_militares,id',
-                'estructura_militar_id' => 'nullable|integer|exists:organizacion.estructura_militar,id',
-                'cargo_id' => 'nullable|integer|exists:organizacion.cargos,id',
+                'perfil_militar_id' => 'required|integer|exists:perfiles_militares,id',
+                // sin exists microservicios externos
+                'estructura_militar_id' => 'nullable|integer',
+                'cargo_id' => 'nullable|integer',
                 'fecha_inicio_asignacion' => 'required|date|before_or_equal:today',
                 'fecha_fin_asignacion' => 'nullable|date|after:fecha_inicio_asignacion',
                 'is_active' => 'boolean'
@@ -218,7 +211,7 @@ class AsignacionesActualesController extends Controller
                 ], 400);
             }
 
-            // Verificar conflictos de fechas si cambiaron
+            // verificar conflictos de fechas si cambiaron
             if ($request->has('fecha_inicio_asignacion') || $request->has('fecha_fin_asignacion')) {
                 if ($asignacionActual->tieneConflictosFecha($request->fecha_inicio_asignacion, $request->fecha_fin_asignacion)) {
                     return response()->json([
@@ -231,16 +224,14 @@ class AsignacionesActualesController extends Controller
             $asignacionActual->update(array_merge(
                 $request->all(),
                 [
-                    'updated_by' => 1, // TODO: Obtener del usuario autenticado
+                    'updated_by' => 1,
                     'version' => $asignacionActual->version + 1
                 ]
             ));
 
+            // solo cargar relaciones internas
             $asignacionActual->load([
-                'perfilMilitar.datosPersonales',
-                'perfilMilitar.gradoActual',
-                'estructuraMilitar',
-                'cargo'
+                'perfilMilitar.datosPersonales'
             ]);
 
             return response()->json([
@@ -258,7 +249,7 @@ class AsignacionesActualesController extends Controller
     }
 
     /**
-     * Eliminar asignación actual (soft delete)
+     * Eliminar asignacion actual soft delete
      * DELETE /api/personal/asignaciones-actuales/{id}
      */
     public function destroy($id)
@@ -274,7 +265,7 @@ class AsignacionesActualesController extends Controller
             }
 
             $asignacionActual->update([
-                'deleted_by' => 1, // TODO: Obtener del usuario autenticado
+                'deleted_by' => 1,
             ]);
 
             $asignacionActual->delete();
@@ -293,7 +284,7 @@ class AsignacionesActualesController extends Controller
     }
 
     /**
-     * Finalizar asignación actual
+     * Finalizar asignacion actual
      * POST /api/personal/asignaciones-actuales/{id}/finalizar
      */
     public function finalizar(Request $request, $id)
@@ -345,7 +336,7 @@ class AsignacionesActualesController extends Controller
     }
 
     /**
-     * Extender asignación actual
+     * Extender asignacion actual
      * POST /api/personal/asignaciones-actuales/{id}/extender
      */
     public function extender(Request $request, $id)
@@ -406,9 +397,7 @@ class AsignacionesActualesController extends Controller
                 ->activos()
                 ->vigentes()
                 ->with([
-                    'perfilMilitar.datosPersonales',
-                    'perfilMilitar.gradoActual',
-                    'cargo'
+                    'perfilMilitar.datosPersonales'
                 ])
                 ->get();
 
@@ -427,7 +416,7 @@ class AsignacionesActualesController extends Controller
     }
 
     /**
-     * Asignaciones próximas a vencer
+     * Asignaciones proximas a vencer
      * GET /api/personal/asignaciones-actuales/por-vencer
      */
     public function porVencer(Request $request)
@@ -440,10 +429,7 @@ class AsignacionesActualesController extends Controller
                 ->whereNotNull('fecha_fin_asignacion')
                 ->where('fecha_fin_asignacion', '<=', now()->addDays($diasAlerta))
                 ->with([
-                    'perfilMilitar.datosPersonales',
-                    'perfilMilitar.gradoActual',
-                    'estructuraMilitar',
-                    'cargo'
+                    'perfilMilitar.datosPersonales'
                 ])
                 ->get()
                 ->map(function ($asignacion) {
@@ -468,34 +454,29 @@ class AsignacionesActualesController extends Controller
     }
 
     /**
-     * Estadísticas de asignaciones
-     * GET /api/personal/asignaciones-actuales/estadisticas
+     * Estadisticas de asignaciones
+     * GET /api/personal/asignaciones-actuales/estadisticas/generales
      */
     public function estadisticas()
     {
         try {
             $estadisticas = [
-                'total_asignaciones' => AsignacionActual::activos()->count(),
-                'vigentes' => AsignacionActual::activos()->vigentes()->count(),
-                'vencidas' => AsignacionActual::activos()->vencidas()->count(),
-                'temporales' => AsignacionActual::activos()->whereNotNull('fecha_fin_asignacion')->count(),
-                'permanentes' => AsignacionActual::activos()->whereNull('fecha_fin_asignacion')->count(),
+                'total_registros' => AsignacionActual::activos()->count(),
+                'por_estado' => [
+                    'vigentes' => AsignacionActual::activos()->vigentes()->count(),
+                    'vencidas' => AsignacionActual::activos()->vencidas()->count(),
+                    'temporales' => AsignacionActual::activos()->whereNotNull('fecha_fin_asignacion')->count(),
+                    'indefinidas' => AsignacionActual::activos()->whereNull('fecha_fin_asignacion')->count()
+                ],
                 'por_vencer_30_dias' => AsignacionActual::activos()
                     ->vigentes()
                     ->whereNotNull('fecha_fin_asignacion')
                     ->where('fecha_fin_asignacion', '<=', now()->addDays(30))
                     ->count(),
-                'por_unidad' => AsignacionActual::activos()
-                    ->vigentes()
-                    ->join('organizacion.estructura_militar', 'personal.asignaciones_actuales.estructura_militar_id', '=', 'organizacion.estructura_militar.id')
-                    ->selectRaw('organizacion.estructura_militar.nombre_unidad as unidad, COUNT(*) as total')
-                    ->groupBy('organizacion.estructura_militar.nombre_unidad')
-                    ->get(),
-                'duracion_promedio_dias' => AsignacionActual::activos()
-                    ->whereNotNull('fecha_fin_asignacion')
-                    ->selectRaw('AVG(DATE_PART(\'day\', fecha_fin_asignacion - fecha_inicio_asignacion)) as promedio')
-                    ->first()
-                    ->promedio ?? 0
+                'creadas_este_mes' => AsignacionActual::activos()
+                    ->whereMonth('created_at', now()->month)
+                    ->whereYear('created_at', now()->year)
+                    ->count()
             ];
 
             return response()->json([

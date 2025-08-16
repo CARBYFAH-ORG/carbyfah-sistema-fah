@@ -27,6 +27,7 @@ class PerfilMilitar extends Model
         'situacion',
         'tiempo_servicio_anos',
         'tiempo_servicio_meses',
+
         'is_active',
         'created_by',
         'updated_by',
@@ -58,24 +59,22 @@ class PerfilMilitar extends Model
         'tiempo_servicio_anos' => 'integer',
         'tiempo_servicio_meses' => 'integer',
 
-        // Foreign keys
+        // claves foraneas
         'datos_personales_id' => 'integer',
         'categoria_personal_id' => 'integer',
         'especialidad_id' => 'integer',
         'grado_actual_id' => 'integer'
     ];
 
-    // =====================================================
-    // RELACIONES
-    // =====================================================
+    // relaciones
 
-    // Relación 1:1 con datos personales
+    // relacion uno a uno con datos personales
     public function datosPersonales()
     {
         return $this->belongsTo(DatosPersonales::class, 'datos_personales_id', 'id');
     }
 
-    // Relaciones con catálogos
+    // relaciones con catalogos
     public function categoriaPersonal()
     {
         return $this->belongsTo('App\Models\CategoriaPersonal', 'categoria_personal_id', 'id');
@@ -91,7 +90,7 @@ class PerfilMilitar extends Model
         return $this->belongsTo('App\Models\Grado', 'grado_actual_id', 'id');
     }
 
-    // Relaciones con otras tablas
+    // relaciones con otras tablas del servicio personal
     public function asignacionActual()
     {
         return $this->hasOne(AsignacionActual::class, 'perfil_militar_id', 'id');
@@ -112,9 +111,7 @@ class PerfilMilitar extends Model
         return $this->hasMany(AsignacionRol::class, 'perfil_militar_id', 'id');
     }
 
-    // =====================================================
-    // SCOPES
-    // =====================================================
+    // scopes para consultas
 
     public function scopeActivos($query)
     {
@@ -129,6 +126,16 @@ class PerfilMilitar extends Model
     public function scopeRetirados($query)
     {
         return $query->where('estado_servicio', 'RETIRADO');
+    }
+
+    public function scopeDisponibles($query)
+    {
+        return $query->where('situacion', 'DISPONIBLE');
+    }
+
+    public function scopePorSerie($query, $serieMilitar)
+    {
+        return $query->where('serie_militar', $serieMilitar);
     }
 
     public function scopePorCategoria($query, $categoriaId)
@@ -146,103 +153,119 @@ class PerfilMilitar extends Model
         return $query->where('grado_actual_id', $gradoId);
     }
 
-    public function scopePorSerie($query, $serieMilitar)
-    {
-        return $query->where('serie_militar', $serieMilitar);
-    }
-
-    public function scopeDisponibles($query)
-    {
-        return $query->where('situacion', 'DISPONIBLE');
-    }
-
     public function scopeConTiempoServicio($query, $anosMinimos)
     {
         return $query->where('tiempo_servicio_anos', '>=', $anosMinimos);
     }
 
-    // =====================================================
-    // ACCESSORS
-    // =====================================================
+    // accessors para atributos calculados
 
-    public function getNombreCompletoAttribute()
+    public function getNombreCompletoMilitarAttribute()
     {
-        return $this->datosPersonales?->nombre_completo;
-    }
-
-    public function getGradoCompletoAttribute()
-    {
-        return $this->gradoActual ?
-            "{$this->gradoActual->abreviatura} {$this->datosPersonales->nombre_completo}" :
-            $this->datosPersonales?->nombre_completo;
+        $nombre = $this->datosPersonales ? $this->datosPersonales->nombre_completo : '';
+        return $this->serie_militar ? "{$this->serie_militar} - {$nombre}" : $nombre;
     }
 
     public function getTiempoServicioCompletoAttribute()
     {
+        if (!$this->tiempo_servicio_anos && !$this->tiempo_servicio_meses) {
+            return null;
+        }
+
         $anos = $this->tiempo_servicio_anos ?? 0;
         $meses = $this->tiempo_servicio_meses ?? 0;
 
         $resultado = [];
-
         if ($anos > 0) {
             $resultado[] = $anos . ($anos == 1 ? ' año' : ' años');
         }
-
         if ($meses > 0) {
             $resultado[] = $meses . ($meses == 1 ? ' mes' : ' meses');
         }
 
-        return implode(' y ', $resultado) ?: '0 años';
+        return implode(' y ', $resultado);
     }
 
-    public function getEstaActivoAttribute()
+    public function getEstaEnServicioAttribute()
     {
-        return $this->estado_servicio === 'ACTIVO' && $this->is_active;
+        return $this->estado_servicio === 'ACTIVO';
     }
 
-    public function getUnidadActualAttribute()
+    public function getEstaDisponibleAttribute()
     {
-        return $this->asignacionActual?->estructuraMilitar?->nombre_unidad;
+        return $this->situacion === 'DISPONIBLE';
     }
 
-    public function getCargoActualAttribute()
+    public function getEsOficcialAttribute()
     {
-        return $this->asignacionActual?->cargo?->nombre_cargo;
+        return $this->categoriaPersonal &&
+            $this->categoriaPersonal->codigo_categoria === 'OFICIAL';
     }
 
-    // =====================================================
-    // MÉTODOS PERSONALIZADOS
-    // =====================================================
+    // metodos para calculo automatico
 
     public function calcularTiempoServicio()
     {
         if (!$this->fecha_ingreso_fah) {
-            return;
+            return $this;
         }
 
-        $fechaFin = $this->fecha_retiro_fah ?? now();
-        $diff = $fechaFin->diffInMonths($this->fecha_ingreso_fah);
+        $fechaCalculo = $this->fecha_retiro_fah ?? now();
+        $diff = $this->fecha_ingreso_fah->diff($fechaCalculo);
 
-        $this->tiempo_servicio_anos = intval($diff / 12);
-        $this->tiempo_servicio_meses = $diff % 12;
+        $this->tiempo_servicio_anos = $diff->y;
+        $this->tiempo_servicio_meses = $diff->m;
 
         return $this;
     }
 
-    public function puedeAccederSistema()
+    public function cambiarEstadoServicio($nuevoEstado, $motivo = null)
     {
-        return $this->esta_activo && $this->usuarioSistema?->is_active;
+        $estadosValidos = ['ACTIVO', 'RETIRADO', 'SUSPENDIDO'];
+
+        if (!in_array($nuevoEstado, $estadosValidos)) {
+            throw new \InvalidArgumentException('Estado de servicio no válido');
+        }
+
+        $this->estado_servicio = $nuevoEstado;
+
+        if ($nuevoEstado === 'RETIRADO') {
+            $this->fecha_retiro_fah = now();
+            $this->motivo_retiro = $motivo;
+            $this->situacion = 'RETIRADO';
+        }
+
+        return $this;
     }
 
-    public function obtenerRolesActivos()
+    public function cambiarSituacion($nuevaSituacion)
     {
-        return $this->asignacionRoles()
-            ->where('is_active', true)
-            ->where(function ($query) {
-                $query->whereNull('fecha_expiracion')
-                    ->orWhere('fecha_expiracion', '>=', now());
-            })
-            ->with('rolFuncional')
-            ->get();
+        $situacionesValidas = [
+            'DISPONIBLE',
+            'COMISION',
+            'PERMISO',
+            'MISION',
+            'CURSO',
+            'VACACIONES',
+            'REPOSO',
+            'RETIRADO'
+        ];
+
+        if (!in_array($nuevaSituacion, $situacionesValidas)) {
+            throw new \InvalidArgumentException('Situación no válida');
+        }
+
+        $this->situacion = $nuevaSituacion;
+
+        return $this;
+    }
+
+    public function promover($nuevoGradoId)
+    {
+        $this->grado_actual_id = $nuevoGradoId;
+        $this->updated_by = 1; // TODO: obtener del usuario autenticado
+        $this->version = $this->version + 1;
+
+        return $this;
     }
 }

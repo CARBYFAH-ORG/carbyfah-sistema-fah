@@ -16,14 +16,12 @@ class HistorialesCargosController extends Controller
     public function index(Request $request)
     {
         try {
+            // solo incluir relaciones internas del servicio personal
             $query = HistorialCargo::with([
-                'perfilMilitar.datosPersonales',
-                'perfilMilitar.gradoActual',
-                'cargo',
-                'estructuraMilitar'
+                'perfilMilitar.datosPersonales'
             ])->activos();
 
-            // Filtros opcionales
+            // filtros opcionales
             if ($request->has('perfil_militar_id')) {
                 $query->porPersonal($request->perfil_militar_id);
             }
@@ -77,9 +75,10 @@ class HistorialesCargosController extends Controller
     {
         try {
             $validator = Validator::make($request->all(), [
-                'perfil_militar_id' => 'required|integer|exists:personal.perfiles_militares,id',
-                'cargo_id' => 'required|integer|exists:organizacion.cargos,id',
-                'estructura_militar_id' => 'required|integer|exists:organizacion.estructura_militar,id',
+                'perfil_militar_id' => 'required|integer|exists:perfiles_militares,id',
+                // sin exists microservicios externos
+                'cargo_id' => 'required|integer',
+                'estructura_militar_id' => 'required|integer',
                 'fecha_inicio' => 'required|date|before_or_equal:today',
                 'fecha_fin' => 'nullable|date|after:fecha_inicio'
             ]);
@@ -92,13 +91,27 @@ class HistorialesCargosController extends Controller
                 ], 400);
             }
 
+            // verificar que el perfil militar existe y esta activo
+            $perfilMilitar = PerfilMilitar::find($request->perfil_militar_id);
+            if (!$perfilMilitar || !$perfilMilitar->is_active) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'El perfil militar no existe o no está activo'
+                ], 400);
+            }
+
             $historialCargo = HistorialCargo::create(array_merge(
                 $request->all(),
                 [
-                    'created_by' => 1, // TODO: Obtener del usuario autenticado
+                    'created_by' => 1,
                     'updated_by' => 1
                 ]
             ));
+
+            // solo cargar relaciones internas
+            $historialCargo->load([
+                'perfilMilitar.datosPersonales'
+            ]);
 
             return response()->json([
                 'success' => true,
@@ -122,10 +135,7 @@ class HistorialesCargosController extends Controller
     {
         try {
             $historialCargo = HistorialCargo::with([
-                'perfilMilitar.datosPersonales',
-                'perfilMilitar.gradoActual',
-                'cargo',
-                'estructuraMilitar'
+                'perfilMilitar.datosPersonales'
             ])->find($id);
 
             if (!$historialCargo) {
@@ -166,9 +176,10 @@ class HistorialesCargosController extends Controller
             }
 
             $validator = Validator::make($request->all(), [
-                'perfil_militar_id' => 'required|integer|exists:personal.perfiles_militares,id',
-                'cargo_id' => 'required|integer|exists:organizacion.cargos,id',
-                'estructura_militar_id' => 'required|integer|exists:organizacion.estructura_militar,id',
+                'perfil_militar_id' => 'required|integer|exists:perfiles_militares,id',
+                // sin exists microservicios externos
+                'cargo_id' => 'required|integer',
+                'estructura_militar_id' => 'required|integer',
                 'fecha_inicio' => 'required|date|before_or_equal:today',
                 'fecha_fin' => 'nullable|date|after:fecha_inicio',
                 'is_active' => 'boolean'
@@ -190,6 +201,11 @@ class HistorialesCargosController extends Controller
                 ]
             ));
 
+            // solo cargar relaciones internas
+            $historialCargo->load([
+                'perfilMilitar.datosPersonales'
+            ]);
+
             return response()->json([
                 'success' => true,
                 'message' => 'Historial de cargo actualizado correctamente',
@@ -205,7 +221,7 @@ class HistorialesCargosController extends Controller
     }
 
     /**
-     * Eliminar historial de cargo (soft delete)
+     * Eliminar historial de cargo soft delete
      * DELETE /api/personal/historiales-cargos/{id}
      */
     public function destroy($id)
@@ -219,6 +235,10 @@ class HistorialesCargosController extends Controller
                     'message' => 'Historial de cargo no encontrado'
                 ], 404);
             }
+
+            $historialCargo->update([
+                'deleted_by' => 1,
+            ]);
 
             $historialCargo->delete();
 
@@ -236,16 +256,65 @@ class HistorialesCargosController extends Controller
     }
 
     /**
-     * Estadísticas de historiales de cargos
+     * Historiales por militar
+     * GET /api/personal/historiales-cargos/por-militar/{perfilMilitarId}
+     */
+    public function porMilitar($perfilMilitarId)
+    {
+        try {
+            $perfilMilitar = PerfilMilitar::find($perfilMilitarId);
+
+            if (!$perfilMilitar) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Perfil militar no encontrado'
+                ], 404);
+            }
+
+            $historiales = HistorialCargo::porPersonal($perfilMilitarId)
+                ->with(['perfilMilitar.datosPersonales'])
+                ->ordenadoCronologicamente()
+                ->get();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Historiales por militar obtenidos correctamente',
+                'data' => [
+                    'militar' => $perfilMilitar->nombre_completo_militar,
+                    'historiales' => $historiales
+                ]
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al obtener historiales por militar',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Estadisticas de historiales de cargos
      * GET /api/personal/historiales-cargos/estadisticas/generales
      */
     public function estadisticas()
     {
         try {
             $estadisticas = [
-                'total_registros' => 0, // Placeholder
-                'cargos_vigentes' => 0,
-                'cargos_finalizados' => 0
+                'total_registros' => HistorialCargo::activos()->count(),
+                'por_estado' => [
+                    'vigentes' => HistorialCargo::activos()->vigentes()->count(),
+                    'finalizados' => HistorialCargo::activos()->finalizados()->count()
+                ],
+                'duracion_promedio_meses' => HistorialCargo::activos()
+                    ->finalizados()
+                    ->selectRaw('AVG(EXTRACT(MONTH FROM AGE(fecha_fin, fecha_inicio))) as promedio')
+                    ->first()
+                    ->promedio ?? 0,
+                'creados_este_mes' => HistorialCargo::activos()
+                    ->whereMonth('created_at', now()->month)
+                    ->whereYear('created_at', now()->year)
+                    ->count()
             ];
 
             return response()->json([
