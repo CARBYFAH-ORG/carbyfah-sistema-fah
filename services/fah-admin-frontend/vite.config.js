@@ -12,9 +12,18 @@ export default defineConfig({
     server: {
         host: '0.0.0.0',
         port: 5173,
+        // ← SOLO LAS OPCIONES NECESARIAS PARA HMR SIN SOBRECARGAR
+        hmr: {
+            overlay: true        // Solo mostrar errores, sin clientPort forzado
+        },
+        // ← WATCH MÁS CONSERVADOR (solo si es necesario)
+        watch: {
+            usePolling: false,   // Usar eventos nativos primero
+            ignored: ['**/node_modules/**', '**/dist/**']  // Ignorar carpetas pesadas
+        },
         proxy: {
             '/api/catalogos': {
-                target: 'http://localhost:8008',  // ✅ Correcto
+                target: 'http://localhost:8008',
                 changeOrigin: true,
                 secure: false,
                 configure: (proxy, options) => {
@@ -22,7 +31,7 @@ export default defineConfig({
                 }
             },
             '/api/organizacion': {
-                target: 'http://localhost:8010',  // ← NUEVO
+                target: 'http://localhost:8010',
                 changeOrigin: true,
                 secure: false,
                 configure: (proxy, options) => {
@@ -30,12 +39,12 @@ export default defineConfig({
                 }
             },
             '/api/auth': {
-                target: 'http://localhost:8000',  // ✅ Correcto (puerto externo)
+                target: 'http://localhost:8000',
                 changeOrigin: true,
                 secure: false
             },
             '/api': {
-                target: 'http://localhost:8008',  // ✅ CAMBIAR de 8000 a 8008
+                target: 'http://localhost:8008',
                 changeOrigin: true,
                 secure: false
             }
@@ -45,4 +54,5 @@ export default defineConfig({
         outDir: 'dist',
         assetsDir: 'assets'
     }
+    // ← SIN optimizeDeps.force para evitar rebuilds constantes
 })

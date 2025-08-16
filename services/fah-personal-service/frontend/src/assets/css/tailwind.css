@@ -2,25 +2,279 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Estilos personalizados FAH */
+/* Estilos personalizados FAH - COLORES AUTORIZADOS ÚNICAMENTE */
 @layer base {
   :root {
-    --primary-color: #1e40af;
-    --secondary-color: #059669;
-    --accent-color: #dc2626;
+    /* Colores Primarios FAH Autorizados */
+    --fah-naval: #1e3a5f; /* Azul Naval FAH */
+    --fah-dorado: #d4af37; /* Dorado Institucional */
+    --fah-blanco: #ffffff; /* Blanco Pureza */
+
+    /* Colores CRUD Autorizados */
+    --fah-agregar: #0ea5e9; /* Azul Celeste Patrio */
+    --fah-actualizar: #5a9bd4; /* Azul Medio */
+    --fah-eliminar: #c1666b; /* Rojo Suave */
+    --fah-cancelar: #6c757d; /* Gris Neutro */
+
+    /* Estados Autorizados */
+    --fah-exito: #28a745; /* Verde Éxito */
+    --fah-advertencia: #ffc107; /* Amarillo Advertencia */
+    --fah-error: #dc3545; /* Rojo Error */
+    --fah-info: #17a2b8; /* Azul Información */
+
+    /* Grises Complementarios Autorizados */
+    --fah-gris-fondo: #f8f9fa; /* Gris Claro Fondo */
+    --fah-gris-bordes: #e9ecef; /* Gris Bordes */
+    --fah-gris-texto: #495057; /* Gris Texto Secundario */
+    --fah-gris-oscuro: #343a40; /* Gris Oscuro Headers */
   }
 }
 
 @layer components {
-  .fah-gradient {
-    background: linear-gradient(135deg, #1e40af 0%, #059669 100%);
+  /* Gradientes FAH Autorizados */
+  .fah-gradient-principal {
+    background: linear-gradient(135deg, var(--fah-naval) 0%, #2a4a6f 100%);
   }
 
+  .fah-gradient-dorado {
+    background: linear-gradient(135deg, var(--fah-dorado) 0%, #b8941f 100%);
+  }
+
+  .fah-gradient-agregar {
+    background: linear-gradient(135deg, var(--fah-agregar) 0%, #0284c7 100%);
+  }
+
+  .fah-gradient-exito {
+    background: linear-gradient(135deg, var(--fah-exito) 0%, #1e7e34 100%);
+  }
+
+  /* Cards FAH */
   .fah-card {
-    @apply bg-white rounded-lg shadow-md border border-gray-200;
+    @apply bg-white rounded-lg shadow-md border border-gray-200 transition-all duration-300;
   }
 
-  .fah-button-primary {
-    @apply bg-blue-700 hover:bg-blue-800 text-white font-semibold py-2 px-4 rounded;
+  .fah-card:hover {
+    @apply shadow-lg transform -translate-y-1;
+  }
+
+  .fah-card-naval {
+    @apply bg-white rounded-lg shadow-md;
+    border: 1px solid var(--fah-naval);
+  }
+
+  /* Botones FAH con colores autorizados */
+  .fah-button-agregar {
+    background-color: var(--fah-agregar);
+    @apply text-white font-semibold py-2 px-4 rounded transition-all duration-300;
+  }
+
+  .fah-button-agregar:hover {
+    background-color: #0284c7;
+    @apply shadow-lg transform -translate-y-0.5;
+  }
+
+  .fah-button-actualizar {
+    background-color: var(--fah-actualizar);
+    @apply text-white font-semibold py-2 px-4 rounded transition-all duration-300;
+  }
+
+  .fah-button-actualizar:hover {
+    background-color: #4f8bc0;
+    @apply shadow-lg transform -translate-y-0.5;
+  }
+
+  .fah-button-eliminar {
+    background-color: var(--fah-eliminar);
+    @apply text-white font-semibold py-2 px-4 rounded transition-all duration-300;
+  }
+
+  .fah-button-eliminar:hover {
+    background-color: #b85459;
+    @apply shadow-lg transform -translate-y-0.5;
+  }
+
+  .fah-button-cancelar {
+    background-color: var(--fah-cancelar);
+    @apply text-white font-semibold py-2 px-4 rounded transition-all duration-300;
+  }
+
+  .fah-button-cancelar:hover {
+    background-color: #5a6268;
+    @apply shadow-lg transform -translate-y-0.5;
+  }
+
+  .fah-button-naval {
+    background-color: var(--fah-naval);
+    @apply text-white font-semibold py-2 px-4 rounded transition-all duration-300;
+  }
+
+  .fah-button-naval:hover {
+    background-color: #152a47;
+    @apply shadow-lg transform -translate-y-0.5;
+  }
+
+  .fah-button-dorado {
+    background-color: var(--fah-dorado);
+    color: var(--fah-naval);
+    @apply font-semibold py-2 px-4 rounded transition-all duration-300;
+  }
+
+  .fah-button-dorado:hover {
+    background-color: #b8941f;
+    @apply shadow-lg transform -translate-y-0.5;
+  }
+
+  /* Estados de Personal FAH */
+  .fah-estado-activo {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: var(--fah-exito);
+    @apply px-2 py-1 rounded-full text-xs font-semibold;
+    border: 1px solid rgba(40, 167, 69, 0.2);
+  }
+
+  .fah-estado-mision {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: var(--fah-advertencia);
+    @apply px-2 py-1 rounded-full text-xs font-semibold;
+    border: 1px solid rgba(255, 193, 7, 0.2);
+  }
+
+  .fah-estado-licencia {
+    background-color: rgba(23, 162, 184, 0.1);
+    color: var(--fah-info);
+    @apply px-2 py-1 rounded-full text-xs font-semibold;
+    border: 1px solid rgba(23, 162, 184, 0.2);
+  }
+
+  .fah-estado-baja {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: var(--fah-error);
+    @apply px-2 py-1 rounded-full text-xs font-semibold;
+    border: 1px solid rgba(220, 53, 69, 0.2);
+  }
+
+  /* Badges FAH */
+  .fah-badge-naval {
+    background-color: var(--fah-naval);
+    @apply text-white px-2 py-1 rounded-full text-xs font-semibold;
+  }
+
+  .fah-badge-dorado {
+    background-color: var(--fah-dorado);
+    color: var(--fah-naval);
+    @apply px-2 py-1 rounded-full text-xs font-semibold;
+  }
+
+  .fah-badge-agregar {
+    background-color: var(--fah-agregar);
+    @apply text-white px-2 py-1 rounded-full text-xs font-semibold;
+  }
+
+  /* Inputs FAH */
+  .fah-input {
+    @apply w-full px-3 py-2 border rounded-lg transition-all duration-300;
+    border-color: var(--fah-gris-bordes);
+  }
+
+  .fah-input:focus {
+    outline: none;
+    border-color: var(--fah-naval);
+    box-shadow: 0 0 0 2px rgba(30, 58, 95, 0.1);
+  }
+
+  .fah-input-error {
+    @apply w-full px-3 py-2 border rounded-lg;
+    border-color: var(--fah-error);
+  }
+
+  .fah-input-error:focus {
+    outline: none;
+    border-color: var(--fah-error);
+    box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.1);
+  }
+
+  /* Alertas FAH */
+  .fah-alert-exito {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: var(--fah-exito);
+    @apply p-4 rounded-lg border;
+    border-color: rgba(40, 167, 69, 0.2);
+  }
+
+  .fah-alert-advertencia {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: #856404;
+    @apply p-4 rounded-lg border;
+    border-color: rgba(255, 193, 7, 0.2);
+  }
+
+  .fah-alert-error {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: var(--fah-error);
+    @apply p-4 rounded-lg border;
+    border-color: rgba(220, 53, 69, 0.2);
+  }
+
+  .fah-alert-info {
+    background-color: rgba(23, 162, 184, 0.1);
+    color: var(--fah-info);
+    @apply p-4 rounded-lg border;
+    border-color: rgba(23, 162, 184, 0.2);
+  }
+
+  /* Navegación FAH */
+  .fah-nav-active {
+    background: linear-gradient(135deg, var(--fah-agregar) 0%, #0284c7 100%);
+    @apply text-white shadow-md;
+  }
+
+  .fah-nav-item {
+    @apply transition-all duration-300 hover:bg-gray-50;
+  }
+
+  /* Tablas FAH */
+  .fah-table {
+    @apply w-full border-collapse bg-white rounded-lg overflow-hidden shadow-md;
+  }
+
+  .fah-table th {
+    background-color: var(--fah-naval);
+    @apply text-white p-3 text-left font-semibold;
+  }
+
+  .fah-table td {
+    @apply p-3 border-b;
+    border-color: var(--fah-gris-bordes);
+  }
+
+  .fah-table tr:nth-child(even) {
+    background-color: var(--fah-gris-fondo);
+  }
+
+  .fah-table tr:hover {
+    background-color: rgba(30, 58, 95, 0.05);
+  }
+
+  /* Scrollbar personalizado FAH */
+  .fah-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--fah-naval) var(--fah-gris-fondo);
+  }
+
+  .fah-scrollbar::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .fah-scrollbar::-webkit-scrollbar-track {
+    background: var(--fah-gris-fondo);
+  }
+
+  .fah-scrollbar::-webkit-scrollbar-thumb {
+    background: var(--fah-naval);
+    border-radius: 3px;
+  }
+
+  .fah-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: #152a47;
   }
 }

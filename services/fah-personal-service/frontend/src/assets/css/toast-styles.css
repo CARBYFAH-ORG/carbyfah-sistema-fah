@@ -1,0 +1,235 @@
+/* Toast Styles FAH Personal Service - PALETA AUTORIZADA */
+/* COLORES AUTORIZADOS: #1e3a5f, #d4af37, #0ea5e9, #5a9bd4, #c1666b, #6c757d */
+/* ESTADOS: #28a745, #ffc107, #dc3545, #17a2b8 */
+
+/* Contenedor principal de toasts */
+.p-toast {
+  position: fixed !important;
+  top: 20px !important;
+  right: 20px !important;
+  z-index: 9999 !important;
+  max-width: 400px !important;
+}
+
+/* Toast individual */
+.p-toast .p-toast-message {
+  margin-bottom: 12px !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 25px rgba(30, 58, 95, 0.15) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  transition: all 0.3s ease !important;
+}
+
+.p-toast .p-toast-message:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 35px rgba(30, 58, 95, 0.2) !important;
+}
+
+/* Toast Success - Verde Autorizado */
+.p-toast .p-toast-message.p-toast-message-success {
+  background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%) !important;
+  color: white !important;
+}
+
+.p-toast .p-toast-message-success .p-toast-message-icon {
+  color: white !important;
+  font-size: 1.2rem !important;
+}
+
+.p-toast .p-toast-message-success .p-toast-summary {
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+}
+
+.p-toast .p-toast-message-success .p-toast-detail {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 0.85rem !important;
+}
+
+/* Toast Info - Azul Información Autorizado */
+.p-toast .p-toast-message.p-toast-message-info {
+  background: linear-gradient(135deg, #17a2b8 0%, #138496 100%) !important;
+  color: white !important;
+}
+
+.p-toast .p-toast-message-info .p-toast-message-icon {
+  color: white !important;
+  font-size: 1.2rem !important;
+}
+
+.p-toast .p-toast-message-info .p-toast-summary {
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+}
+
+.p-toast .p-toast-message-info .p-toast-detail {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 0.85rem !important;
+}
+
+/* Toast Warning - Amarillo Autorizado */
+.p-toast .p-toast-message.p-toast-message-warn {
+  background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%) !important;
+  color: #1e3a5f !important;
+}
+
+.p-toast .p-toast-message-warn .p-toast-message-icon {
+  color: #1e3a5f !important;
+  font-size: 1.2rem !important;
+}
+
+.p-toast .p-toast-message-warn .p-toast-summary {
+  color: #1e3a5f !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+}
+
+.p-toast .p-toast-message-warn .p-toast-detail {
+  color: rgba(30, 58, 95, 0.8) !important;
+  font-size: 0.85rem !important;
+}
+
+/* Toast Error - Rojo Autorizado */
+.p-toast .p-toast-message.p-toast-message-error {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%) !important;
+  color: white !important;
+}
+
+.p-toast .p-toast-message-error .p-toast-message-icon {
+  color: white !important;
+  font-size: 1.2rem !important;
+}
+
+.p-toast .p-toast-message-error .p-toast-summary {
+  color: white !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem !important;
+}
+
+.p-toast .p-toast-message-error .p-toast-detail {
+  color: rgba(255, 255, 255, 0.9) !important;
+  font-size: 0.85rem !important;
+}
+
+/* Icono de cerrar */
+.p-toast .p-toast-message .p-toast-icon-close {
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-size: 1rem !important;
+  transition: all 0.2s ease !important;
+}
+
+.p-toast .p-toast-message .p-toast-icon-close:hover {
+  color: white !important;
+  transform: scale(1.1) !important;
+}
+
+/* Icono de cerrar para warning (texto oscuro) */
+.p-toast .p-toast-message-warn .p-toast-icon-close {
+  color: rgba(30, 58, 95, 0.7) !important;
+}
+
+.p-toast .p-toast-message-warn .p-toast-icon-close:hover {
+  color: #1e3a5f !important;
+}
+
+/* Contenido del toast */
+.p-toast .p-toast-message-content {
+  padding: 16px 20px !important;
+  display: flex !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+}
+
+.p-toast .p-toast-message-text {
+  flex: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 4px !important;
+}
+
+/* Animaciones específicas para Personal */
+@keyframes personalToastSlideIn {
+  from {
+    transform: translateX(100%) scale(0.8);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes personalToastSlideOut {
+  from {
+    transform: translateX(0) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%) scale(0.8);
+    opacity: 0;
+  }
+}
+
+.p-toast .p-toast-message {
+  animation: personalToastSlideIn 0.3s ease-out !important;
+}
+
+.p-toast .p-toast-message.p-toast-message-leave {
+  animation: personalToastSlideOut 0.3s ease-out !important;
+}
+
+/* Responsive para móviles */
+@media (max-width: 768px) {
+  .p-toast {
+    top: 10px !important;
+    right: 10px !important;
+    left: 10px !important;
+    max-width: none !important;
+  }
+
+  .p-toast .p-toast-message-content {
+    padding: 14px 16px !important;
+  }
+
+  .p-toast .p-toast-summary {
+    font-size: 0.9rem !important;
+  }
+
+  .p-toast .p-toast-detail {
+    font-size: 0.8rem !important;
+  }
+}
+
+/* Toasts específicos para Personal FA-1 con colores autorizados */
+.toast-personal-activo {
+  background: linear-gradient(135deg, #28a745 0%, #1e7e34 100%) !important;
+}
+
+.toast-personal-agregar {
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%) !important;
+}
+
+.toast-personal-actualizar {
+  background: linear-gradient(135deg, #5a9bd4 0%, #4f8bc0 100%) !important;
+}
+
+.toast-personal-eliminar {
+  background: linear-gradient(135deg, #c1666b 0%, #b85459 100%) !important;
+}
+
+.toast-personal-cancelar {
+  background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%) !important;
+}
+
+.toast-fah-dorado {
+  background: linear-gradient(135deg, #d4af37 0%, #b8941f 100%) !important;
+  color: #1e3a5f !important;
+}
+
+.toast-fah-naval {
+  background: linear-gradient(135deg, #1e3a5f 0%, #152a47 100%) !important;
+  color: white !important;
+}

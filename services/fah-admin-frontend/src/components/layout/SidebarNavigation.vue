@@ -117,15 +117,10 @@
           v-if="(!collapsed || isMobile) && activeDropdown === 'jemga'"
           class="nav-dropdown-content"
         >
-          <!-- FA-1: ACTIVO - CORREGIDO FINAL -->
+          <!-- FA-1: ACTIVO - Microservicio Independiente -->
           <div
-            @click="navigateToPersonalService"
-            :class="[
-              'dropdown-item featured-item',
-              {
-                'featured-item-active': currentRoute === 'fa1',
-              },
-            ]"
+            @click="navigateTo('fa1')"
+            :class="['dropdown-item featured-item']"
           >
             <span class="dropdown-emoji featured-emoji">👥</span>
             <div class="dropdown-info">
@@ -135,6 +130,7 @@
             <span class="featured-badge">ACTIVO</span>
           </div>
 
+          <!-- FA-2: Próximamente -->
           <div @click="navigateTo('fa2')" class="dropdown-item">
             <span class="dropdown-emoji">📊</span>
             <div class="dropdown-info">
@@ -143,6 +139,7 @@
             <span class="dropdown-badge">Próximamente</span>
           </div>
 
+          <!-- FA-3: Próximamente -->
           <div @click="navigateTo('fa3')" class="dropdown-item">
             <span class="dropdown-emoji">⚡</span>
             <div class="dropdown-info">
@@ -153,6 +150,7 @@
             <span class="dropdown-badge">Próximamente</span>
           </div>
 
+          <!-- FA-4: Próximamente -->
           <div @click="navigateTo('fa4')" class="dropdown-item">
             <span class="dropdown-emoji">📦</span>
             <div class="dropdown-info">
@@ -161,6 +159,7 @@
             <span class="dropdown-badge">Próximamente</span>
           </div>
 
+          <!-- FA-5: Próximamente -->
           <div @click="navigateTo('fa5')" class="dropdown-item">
             <span class="dropdown-emoji">📋</span>
             <div class="dropdown-info">
@@ -171,6 +170,7 @@
             <span class="dropdown-badge">Próximamente</span>
           </div>
 
+          <!-- FA-6: Próximamente -->
           <div @click="navigateTo('fa6')" class="dropdown-item">
             <span class="dropdown-emoji">💻</span>
             <div class="dropdown-info">
@@ -480,7 +480,7 @@
               <span class="dropdown-title">Catálogos</span>
               <span class="dropdown-subtitle">Gestión de datos maestros</span>
             </div>
-            <span class="featured-badge">ACTIVO</span>
+            <span class="featured-badge">PERRO</span>
           </div>
 
           <!-- Separador -->
@@ -690,40 +690,21 @@ export default {
       }
     };
 
-    const navigateToPersonalService = async () => {
-      try {
-        console.log("👥 Navegando a Personal Service FA-1...");
-
-        toast.add({
-          severity: "success",
-          summary: "Navegación FAH",
-          detail: "Abriendo módulo Personal FA-1...",
-          life: 2000,
-        });
-
-        // Abrir personal service en nueva pestaña
-        window.open("http://localhost:5174", "_blank");
-
-        activeDropdown.value = null;
-        emit("navigate", "fa1");
-        handleNavigation();
-
-        console.log("✅ Navegación a Personal Service FA-1 exitosa");
-      } catch (error) {
-        console.error("❌ Error navegando a Personal Service:", error);
-
-        toast.add({
-          severity: "error",
-          summary: "Error de Navegación",
-          detail: "No se pudo acceder al módulo Personal FA-1",
-          life: 4000,
-        });
-      }
-    };
-
     const navigateTo = (section) => {
-      const availableSections = ["catalogos", "organizacion", "fa1"];
+      // Secciones disponibles DENTRO del admin-frontend
+      const availableSections = ["catalogos", "organizacion"];
 
+      // Microservicios externos (abrir en nueva ventana)
+      const externalMicroservices = {
+        fa1: "http://localhost:5174", // fah-personal-service frontend
+        fa2: "http://localhost:5175", // fah-inteligencia-service frontend (futuro)
+        fa3: "http://localhost:5176", // fah-operaciones-service frontend (futuro)
+        fa4: "http://localhost:5177", // fah-logistica-service frontend (futuro)
+        fa5: "http://localhost:5178", // fah-asuntos-civiles-service frontend (futuro)
+        fa6: "http://localhost:5179", // fah-comunicaciones-service frontend (futuro)
+      };
+
+      // Si es sección interna disponible
       if (availableSections.includes(section)) {
         switch (section) {
           case "catalogos":
@@ -734,16 +715,36 @@ export default {
             navigateToEstructuraOrganizacional();
             return;
 
-          case "fa1":
-            navigateToPersonalService();
-            return;
-
           default:
             console.warn(`Sección disponible pero no implementada: ${section}`);
             break;
         }
       }
 
+      // Si es microservicio externo
+      if (externalMicroservices[section]) {
+        const serviceUrl = externalMicroservices[section];
+
+        toast.add({
+          severity: "info",
+          summary: "Accediendo a Microservicio",
+          detail: `Abriendo ${section.toUpperCase()} en nueva ventana...`,
+          life: 3000,
+        });
+
+        // Abrir en nueva ventana
+        window.open(serviceUrl, "_blank", "noopener,noreferrer");
+
+        activeDropdown.value = null;
+        emit("navigate", section);
+        handleNavigation();
+        console.log(
+          `🚀 Navegando a microservicio externo: ${section} (${serviceUrl})`
+        );
+        return;
+      }
+
+      // Para secciones no disponibles aún
       toast.add({
         severity: "warn",
         summary: "Función no disponible",
@@ -770,7 +771,6 @@ export default {
       navigateTo,
       navigateToCatalogos,
       navigateToEstructuraOrganizacional,
-      navigateToPersonalService, // ← CRÍTICO: AGREGADO AL RETURN
     };
   },
 };
