@@ -1,0 +1,729 @@
+/* =====================================
+   ESTILOS PARA CAMPO FORMULARIO UNIVERSAL - CARBYFAH
+   Extraído de CampoFormulario.vue y organizado por secciones
+   ===================================== */
+
+/* =====================================
+   CONTENEDOR PRINCIPAL DEL CAMPO
+   ===================================== */
+.contenedor-campo {
+  @apply mb-4;
+  position: relative;
+}
+
+.grupo-campo {
+  @apply flex flex-col;
+}
+
+.col-span-6 {
+  @apply w-full;
+  padding-right: 0;
+  margin-bottom: 1rem;
+}
+
+.col-span-12 {
+  @apply w-full;
+}
+
+/* =====================================
+   ETIQUETAS Y MARCADORES
+   ===================================== */
+.etiqueta-campo {
+  @apply block text-sm font-semibold mb-2;
+  color: white !important;
+  letter-spacing: 0.025em;
+  transition: color 0.2s ease;
+}
+
+.marcador-requerido {
+  color: red !important;
+  margin-left: 4px;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.campo-con-error .etiqueta-campo {
+  color: var(--fah-rojo-error);
+}
+
+/* =====================================
+   CAMPOS DE SWITCH BOOLEANO
+   ===================================== */
+.grupo-switch {
+  @apply mt-2;
+}
+
+.contenedor-switch {
+  @apply flex items-center gap-4 p-4 bg-white rounded border-2;
+  border-color: var(--fah-gris-medio);
+  transition: all 0.3s ease;
+  min-height: 60px;
+}
+
+.contenedor-switch:hover {
+  border-color: var(--fah-azul-claro);
+  box-shadow: 0 2px 8px rgba(27, 54, 93, 0.1);
+}
+
+.fah-form-switch {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fah-form-switch:focus {
+  box-shadow: 0 0 0 3px rgba(27, 54, 93, 0.15);
+}
+
+.fah-form-switch-error {
+  border-color: var(--fah-rojo-error) !important;
+}
+
+.fah-form-switch-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.texto-switch {
+  @apply font-semibold text-base;
+  color: var(--fah-azul-principal);
+  transition: color 0.2s ease;
+}
+
+/* =====================================
+   CONTROLES DE FORMULARIO BASE
+   ===================================== */
+.fah-form-control {
+  @apply w-full px-6 py-6 text-base bg-white border-2 rounded;
+  border-color: var(--fah-gris-medio);
+  color: var(--fah-azul-principal);
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(27, 54, 93, 0.1);
+}
+
+.fah-form-control:focus {
+  outline: none;
+  border-color: var(--fah-azul-claro);
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15),
+    0 4px 12px rgba(27, 54, 93, 0.15);
+  transform: translateY(-1px);
+}
+
+.fah-form-control:hover:not(:disabled) {
+  border-color: var(--fah-azul-claro);
+  box-shadow: 0 2px 8px rgba(27, 54, 93, 0.12);
+}
+
+.fah-form-control::placeholder {
+  color: var(--fah-gris-oscuro);
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.fah-form-control:focus-within {
+  transform: translateY(-1px);
+}
+
+/* =====================================
+   ESTADOS DE ERROR Y DESHABILITADO
+   ===================================== */
+.fah-form-control-error {
+  border-color: var(--fah-rojo-error) !important;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15) !important;
+  background-color: rgba(220, 53, 69, 0.02);
+}
+
+.fah-form-control-error:focus {
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.25),
+    0 4px 12px rgba(220, 53, 69, 0.15) !important;
+}
+
+.fah-form-control-disabled {
+  background-color: var(--fah-gris-claro) !important;
+  color: var(--fah-gris-oscuro) !important;
+  border-color: var(--fah-gris-medio) !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* =====================================
+   CAMPOS NUMÉRICOS (TRANSPARENTES)
+   ===================================== */
+.fah-form-control-number {
+  @apply w-full rounded;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.fah-form-control-number :deep(.p-inputnumber) {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+.fah-form-control-number :deep(.p-inputnumber .p-inputtext) {
+  @apply w-full px-6 py-6 text-base border-2 rounded;
+  background: transparent !important;
+  color: white !important;
+  border-color: transparent !important;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-style: normal !important;
+  min-height: 66px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  text-align: right !important;
+  font-variant-numeric: tabular-nums !important;
+  font-weight: 600 !important;
+}
+
+.fah-form-control-number :deep(.p-inputnumber .p-inputnumber-button-group) {
+  display: none !important;
+}
+
+.fah-form-control-number :deep(.p-inputnumber .p-inputtext::placeholder) {
+  color: rgba(255, 255, 255, 0.7) !important;
+  font-style: italic !important;
+}
+
+/* =====================================
+   CAMPOS DE SELECCIÓN
+   ===================================== */
+.fah-form-control-select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%231B365D' viewBox='0 0 16 16'%3e%3cpath d='m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px 12px;
+  padding-right: 40px;
+}
+
+/* =====================================
+   ÁREA DE TEXTO
+   ===================================== */
+.fah-form-control-textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.5;
+}
+
+/* =====================================
+   CAMPOS DE FECHA
+   ===================================== */
+.fah-form-control-date {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%231B365D' viewBox='0 0 16 16'%3e%3cpath d='M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z'/%3e%3cpath d='M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px 16px;
+  padding-right: 40px;
+}
+
+/* =====================================
+   AUTOCOMPLETADO FORÁNEO (AZUL MILITAR)
+   ===================================== */
+.fah-form-control-foraneo-autocompletado {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.fah-form-control-foraneo-autocompletado :deep(.p-autocomplete-input) {
+  @apply w-full px-6 py-6 text-base border-2 rounded;
+  background: linear-gradient(135deg, #1e3a8a, #1d4ed8) !important;
+  color: white !important;
+  border-color: #3b82f6 !important;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-style: normal !important;
+  min-height: 66px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  box-shadow: 0 2px 8px rgba(30, 58, 138, 0.15) !important;
+}
+
+.fah-form-control-foraneo-autocompletado
+  :deep(.p-autocomplete-input::placeholder) {
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-style: italic !important;
+}
+
+.fah-form-control-foraneo-autocompletado :deep(.p-autocomplete-input:focus) {
+  outline: none !important;
+  border-color: #60a5fa !important;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25),
+    0 4px 12px rgba(30, 58, 138, 0.2) !important;
+  transform: translateY(-1px) !important;
+  background: linear-gradient(135deg, #1d4ed8, #2563eb) !important;
+}
+
+.fah-form-control-foraneo-autocompletado
+  :deep(.p-autocomplete-input:hover:not(:disabled)) {
+  border-color: #60a5fa !important;
+  box-shadow: 0 3px 12px rgba(30, 58, 138, 0.18) !important;
+  background: linear-gradient(135deg, #1d4ed8, #1e40af) !important;
+}
+
+.fah-form-control-foraneo-autocompletado :deep(.p-autocomplete) {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+.fah-form-control-foraneo-autocompletado :deep(.p-inputwrapper) {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* =====================================
+   🎯 DROPDOWN PROFESIONAL - ESTILO VERDE CLARO ELEGANTE
+   ===================================== */
+
+/* Panel principal del dropdown */
+.fah-form-control-foraneo-autocompletado :deep(.p-autocomplete-panel) {
+  background: linear-gradient(145deg, #f0fdf4, #ecfdf5) !important;
+  border: 2px solid #22c55e !important;
+  border-radius: 12px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(34, 197, 94, 0.1) !important;
+  z-index: 9999 !important;
+  overflow: hidden !important;
+  backdrop-filter: blur(8px) !important;
+  transform: translateY(4px) !important;
+  animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Lista de opciones */
+.fah-form-control-foraneo-autocompletado :deep(.p-autocomplete-items) {
+  padding: 8px !important;
+  background: transparent !important;
+  border: none !important;
+  max-height: 240px !important;
+  overflow-y: auto !important;
+}
+
+/* Cada opción individual - ESTADO NORMAL (Verde claro bonito) */
+.fah-form-control-foraneo-autocompletado :deep(.p-autocomplete-item) {
+  padding: 14px 16px !important;
+  margin-bottom: 4px !important;
+  border-radius: 8px !important;
+  border: 1px solid transparent !important;
+  background: linear-gradient(135deg, #f7fee7, #ecfdf5) !important;
+  color: #166534 !important;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Estado HOVER - Cambio de color cuando el mouse pasa encima */
+.fah-form-control-foraneo-autocompletado :deep(.p-autocomplete-item:hover) {
+  background: linear-gradient(135deg, #16a34a, #15803d) !important;
+  color: white !important;
+  border-color: #22c55e !important;
+  transform: translateX(4px) scale(1.02) !important;
+  box-shadow: 0 8px 25px -8px rgba(22, 163, 74, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset !important;
+}
+
+/* Opción seleccionada/activa */
+.fah-form-control-foraneo-autocompletado
+  :deep(.p-autocomplete-item.p-highlight) {
+  background: linear-gradient(135deg, #059669, #047857) !important;
+  color: white !important;
+  border-color: #10b981 !important;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3) !important;
+}
+
+/* Texto del código pequeño */
+.fah-form-control-foraneo-autocompletado :deep(.codigo-categoria) {
+  font-size: 12px !important;
+  margin-top: 4px !important;
+  font-style: italic !important;
+  opacity: 0.8 !important;
+  font-weight: 400 !important;
+}
+
+/* En hover, el código se vuelve blanco */
+.fah-form-control-foraneo-autocompletado
+  :deep(.p-autocomplete-item:hover .codigo-categoria) {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Scrollbar personalizado para el dropdown */
+.fah-form-control-foraneo-autocompletado
+  :deep(.p-autocomplete-items::-webkit-scrollbar) {
+  width: 6px !important;
+}
+
+.fah-form-control-foraneo-autocompletado
+  :deep(.p-autocomplete-items::-webkit-scrollbar-track) {
+  background: rgba(34, 197, 94, 0.1) !important;
+  border-radius: 3px !important;
+}
+
+.fah-form-control-foraneo-autocompletado
+  :deep(.p-autocomplete-items::-webkit-scrollbar-thumb) {
+  background: linear-gradient(180deg, #22c55e, #16a34a) !important;
+  border-radius: 3px !important;
+}
+
+.fah-form-control-foraneo-autocompletado
+  :deep(.p-autocomplete-items::-webkit-scrollbar-thumb:hover) {
+  background: linear-gradient(180deg, #16a34a, #15803d) !important;
+}
+
+/* =====================================
+   AUTOCOMPLETADO API (VERDE PAÍSES)
+   ===================================== */
+.fah-form-control-autocompletado-api {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.fah-form-control-autocompletado-api :deep(.p-autocomplete-input) {
+  @apply w-full px-6 py-6 text-base border-2 rounded;
+  background: linear-gradient(135deg, #16a34a, #15803d) !important;
+  color: white !important;
+  border-color: #22c55e !important;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-style: normal !important;
+  min-height: 66px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  box-shadow: 0 2px 8px rgba(22, 163, 74, 0.15) !important;
+}
+
+.fah-form-control-autocompletado-api :deep(.p-autocomplete-input::placeholder) {
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-style: italic !important;
+}
+
+.fah-form-control-autocompletado-api :deep(.p-autocomplete-input:focus) {
+  outline: none !important;
+  border-color: #4ade80 !important;
+  box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.25),
+    0 4px 12px rgba(22, 163, 74, 0.2) !important;
+  transform: translateY(-1px) !important;
+  background: linear-gradient(135deg, #15803d, #16a34a) !important;
+}
+
+.fah-form-control-autocompletado-api
+  :deep(.p-autocomplete-input:hover:not(:disabled)) {
+  border-color: #4ade80 !important;
+  box-shadow: 0 3px 12px rgba(22, 163, 74, 0.18) !important;
+  background: linear-gradient(135deg, #16a34a, #059669) !important;
+}
+
+.fah-form-control-autocompletado-api :deep(.p-autocomplete) {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+.fah-form-control-autocompletado-api :deep(.p-inputwrapper) {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* =====================================
+   🎯 DROPDOWN API PAÍSES - ESTILO VERDE BONITO
+   ===================================== */
+
+/* Panel principal del dropdown para países API */
+.fah-form-control-autocompletado-api :deep(.p-autocomplete-panel) {
+  background: linear-gradient(145deg, #f0fdf4, #ecfdf5) !important;
+  border: 2px solid #22c55e !important;
+  border-radius: 12px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(34, 197, 94, 0.1) !important;
+  z-index: 9999 !important;
+  overflow: hidden !important;
+  backdrop-filter: blur(8px) !important;
+  transform: translateY(4px) !important;
+  animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Lista de opciones para países */
+.fah-form-control-autocompletado-api :deep(.p-autocomplete-items) {
+  padding: 8px !important;
+  background: transparent !important;
+  border: none !important;
+  max-height: 240px !important;
+  overflow-y: auto !important;
+}
+
+/* Cada opción de país - ESTADO NORMAL */
+.fah-form-control-autocompletado-api :deep(.p-autocomplete-item) {
+  padding: 14px 16px !important;
+  margin-bottom: 4px !important;
+  border-radius: 8px !important;
+  border: 1px solid transparent !important;
+  background: linear-gradient(135deg, #f7fee7, #ecfdf5) !important;
+  color: #166534 !important;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Estado HOVER para países */
+.fah-form-control-autocompletado-api :deep(.p-autocomplete-item:hover) {
+  background: linear-gradient(135deg, #16a34a, #15803d) !important;
+  color: white !important;
+  border-color: #22c55e !important;
+  transform: translateX(4px) scale(1.02) !important;
+  box-shadow: 0 8px 25px -8px rgba(22, 163, 74, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset !important;
+}
+
+/* Opción seleccionada para países */
+.fah-form-control-autocompletado-api :deep(.p-autocomplete-item.p-highlight) {
+  background: linear-gradient(135deg, #059669, #047857) !important;
+  color: white !important;
+  border-color: #10b981 !important;
+  box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3) !important;
+}
+
+/* Scrollbar para países API */
+.fah-form-control-autocompletado-api
+  :deep(.p-autocomplete-items::-webkit-scrollbar) {
+  width: 6px !important;
+}
+
+.fah-form-control-autocompletado-api
+  :deep(.p-autocomplete-items::-webkit-scrollbar-track) {
+  background: rgba(34, 197, 94, 0.1) !important;
+  border-radius: 3px !important;
+}
+
+.fah-form-control-autocompletado-api
+  :deep(.p-autocomplete-items::-webkit-scrollbar-thumb) {
+  background: linear-gradient(180deg, #22c55e, #16a34a) !important;
+  border-radius: 3px !important;
+}
+
+.fah-form-control-autocompletado-api
+  :deep(.p-autocomplete-items::-webkit-scrollbar-thumb:hover) {
+  background: linear-gradient(180deg, #16a34a, #15803d) !important;
+}
+
+/* =====================================
+   OPCIONES DE DROPDOWN ORIGINALES (FALLBACK)
+   ===================================== */
+.opcion-foranea-autocompletado {
+  @apply p-3 text-base flex flex-col;
+  color: var(--fah-azul-principal);
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.opcion-foranea-autocompletado:hover {
+  background-color: var(--fah-gris-claro);
+}
+
+.codigo-categoria {
+  @apply text-xs text-gray-500 mt-1;
+  font-style: italic;
+}
+
+.opcion-pais-api {
+  @apply p-3 text-base flex items-center gap-3;
+  color: var(--fah-azul-principal);
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.opcion-pais-api:hover {
+  background-color: var(--fah-gris-claro);
+}
+
+.bandera-pais {
+  @apply text-2xl;
+  min-width: 32px;
+}
+
+.info-pais {
+  @apply flex flex-col;
+}
+
+.codigo-pais {
+  @apply text-xs text-gray-500 mt-1;
+  font-style: italic;
+}
+
+/* =====================================
+   INDICADORES DE CARGA
+   ===================================== */
+.cargando-datos,
+.cargando-api {
+  @apply flex items-center mt-2 px-2;
+}
+
+/* =====================================
+   CAMPOS CHECKBOX
+   ===================================== */
+.grupo-checkbox {
+  @apply mt-2;
+}
+
+.contenedor-checkbox {
+  @apply flex items-center gap-3 p-4 bg-white rounded border-2;
+  border-color: var(--fah-gris-medio);
+  transition: all 0.3s ease;
+  min-height: 60px;
+}
+
+.contenedor-checkbox:hover {
+  border-color: var(--fah-azul-claro);
+  box-shadow: 0 2px 8px rgba(27, 54, 93, 0.1);
+}
+
+.fah-form-check-input {
+  @apply w-5 h-5 rounded border-2;
+  border-color: var(--fah-azul-principal);
+  accent-color: var(--fah-azul-principal);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fah-form-check-input:checked {
+  background-color: var(--fah-azul-principal);
+  border-color: var(--fah-azul-principal);
+}
+
+.fah-form-check-input:focus {
+  box-shadow: 0 0 0 3px rgba(27, 54, 93, 0.15);
+}
+
+.etiqueta-checkbox {
+  @apply font-medium text-base cursor-pointer select-none;
+  color: var(--fah-azul-principal);
+  margin: 0;
+}
+
+/* =====================================
+   🎯 ANIMACIONES PROFESIONALES
+   ===================================== */
+.contenedor-campo {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animación para dropdown */
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(4px) scale(1);
+  }
+}
+
+/* =====================================
+   RESPONSIVE DESIGN
+   ===================================== */
+@media (max-width: 768px) {
+  .col-span-6 {
+    @apply w-full;
+    padding-right: 0;
+  }
+
+  .fah-form-control {
+    @apply py-5 text-base;
+  }
+
+  .etiqueta-campo {
+    @apply text-sm;
+  }
+
+  .contenedor-checkbox {
+    @apply px-3 py-3;
+  }
+
+  /* Dropdown móvil más pequeño */
+  .fah-form-control-foraneo-autocompletado :deep(.p-autocomplete-item),
+  .fah-form-control-autocompletado-api :deep(.p-autocomplete-item) {
+    padding: 12px 14px !important;
+    font-size: 14px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .fah-form-control {
+    @apply py-4 px-6 text-sm;
+  }
+
+  .etiqueta-campo {
+    @apply text-xs;
+  }
+}
+
+/* =====================================
+   ACCESIBILIDAD
+   ===================================== */
+@media (prefers-reduced-motion: reduce) {
+  .fah-form-control,
+  .contenedor-checkbox,
+  .contenedor-campo {
+    transition: none;
+    animation: none;
+  }
+
+  .fah-form-control-foraneo-autocompletado :deep(.p-autocomplete-panel),
+  .fah-form-control-autocompletado-api :deep(.p-autocomplete-panel) {
+    animation: none !important;
+  }
+
+  .fah-form-control-foraneo-autocompletado :deep(.p-autocomplete-item),
+  .fah-form-control-autocompletado-api :deep(.p-autocomplete-item) {
+    transition: none !important;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .fah-form-control {
+    border-width: 3px;
+  }
+
+  .fah-form-control:focus {
+    box-shadow: 0 0 0 4px rgba(27, 54, 93, 0.3);
+  }
+
+  .fah-form-control-foraneo-autocompletado :deep(.p-autocomplete-panel),
+  .fah-form-control-autocompletado-api :deep(.p-autocomplete-panel) {
+    border-width: 3px !important;
+  }
+}

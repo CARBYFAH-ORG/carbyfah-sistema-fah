@@ -1,0 +1,11 @@
+{
+  "name": "fah-archivos-service",
+  "version": "1.0.0",
+  "description": "FAH - Microservicio API de Gestión de Archivos Digitales",
+  "scripts": {
+    "serve": "php -S 0.0.0.0:8012 -t backend/public",
+    "install-backend": "cd backend && composer install",
+    "migrate": "cd backend && php artisan migrate",
+    "seed": "cd backend && php artisan db:seed"
+  }
+}

@@ -1,0 +1,817 @@
+# =====================================
+# DOCKER COMPOSE ENTERPRISE - SISTEMA FAH COMPLETO
+# Stack completo con PostgreSQL + PostGIS + MinIO + Redis + Nginx + Frontend
+# Versión: Enterprise v1.0 - CON FRONTEND INTEGRADO
+# =====================================
+
+version: "3.8"
+
+services:
+  # =====================================
+  # POSTGRESQL + POSTGIS - BASE DE DATOS PRINCIPAL
+  # =====================================
+  postgres:
+    image: postgis/postgis:15-3.4
+    container_name: fah_postgres_enterprise
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-fah_system_db}
+      POSTGRES_USER: ${POSTGRES_USER:-fah_laravel_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-fah_laravel_secure_2025}
+      POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --locale=C"
+      # PostGIS específico
+      POSTGIS_VERSION: "3.4"
+      POSTGIS_GDAL_ENABLED_DRIVERS: "ENABLE_ALL"
+    ports:
+      - "${POSTGRES_EXTERNAL_PORT:-5432}:5432"
+    volumes:
+      - postgres_enterprise_data:/var/lib/postgresql/data
+      - ./sql/init:/docker-entrypoint-initdb.d
+      - ./config/postgres.conf:/etc/postgresql/postgresql.conf:ro
+    networks:
+      - fah_enterprise_network
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-fah_admin} -d ${POSTGRES_DB:-fah_system_db}",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: "1.0"
+        reservations:
+          memory: 512M
+          cpus: "0.5"
+
+  # =====================================
+  # MINIO - SERVIDOR DE ARCHIVOS (S3-COMPATIBLE)
+  # =====================================
+  minio:
+    image: minio/minio:latest
+    container_name: fah_minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-fah_minio_admin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-fah_minio_secret_2024}
+      MINIO_REGION_NAME: ${MINIO_REGION:-honduras-central}
+      MINIO_BROWSER_REDIRECT_URL: ${MINIO_BROWSER_URL:-http://localhost:9001}
+    ports:
+      - "${MINIO_API_PORT:-9000}:9000" # API S3
+      - "${MINIO_CONSOLE_PORT:-9001}:9001" # Web Console
+    volumes:
+      - minio_data:/data
+      - ./minio/policies:/policies:ro
+    networks:
+      - fah_enterprise_network
+    command: server /data --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "0.5"
+
+  # =====================================
+  # REDIS - CACHE Y SESIONES
+  # =====================================
+  redis:
+    image: redis:7.2-alpine
+    container_name: fah_redis
+    restart: unless-stopped
+    environment:
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-fah_redis_2024}
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+      - ./config/redis.conf:/usr/local/etc/redis/redis.conf:ro
+    networks:
+      - fah_enterprise_network
+    command: redis-server --requirepass ${REDIS_PASSWORD:-fah_redis_2024} --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.3"
+
+  # =====================================
+  # NGINX - PROXY REVERSO Y LOAD BALANCER
+  # =====================================
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: fah_nginx
+    restart: unless-stopped
+    ports:
+      - "${NGINX_HTTP_PORT:-80}:80"
+      - "${NGINX_HTTPS_PORT:-443}:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl:/etc/nginx/ssl:ro
+      - nginx_logs:/var/log/nginx
+    networks:
+      - fah_enterprise_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost/health",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.2"
+
+  # =====================================
+  # PGADMIN - INTERFAZ DE ADMINISTRACIÓN
+  # =====================================
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: fah_pgadmin_enterprise
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_EMAIL:-admin@fah.mil.hn}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD:-admin123}
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+      PGADMIN_CONFIG_UPGRADE_CHECK_ENABLED: "False"
+    ports:
+      - "${PGADMIN_EXTERNAL_PORT:-5050}:80"
+    volumes:
+      - pgadmin_enterprise_data:/var/lib/pgadmin
+      - ./config/pgadmin_servers.json:/pgadmin4/servers.json:ro
+    networks:
+      - fah_enterprise_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:80/misc/ping",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.3"
+
+  # =====================================
+  # PROMETHEUS - MONITOREO DE MÉTRICAS
+  # =====================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: fah_prometheus
+    restart: unless-stopped
+    ports:
+      - "${PROMETHEUS_PORT:-9090}:9090"
+    volumes:
+      - prometheus_data:/prometheus
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    networks:
+      - fah_enterprise_network
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/etc/prometheus/console_libraries"
+      - "--web.console.templates=/etc/prometheus/consoles"
+      - "--storage.tsdb.retention.time=30d"
+      - "--web.enable-lifecycle"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:9090/-/healthy",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "0.5"
+
+  # =====================================
+  # GRAFANA - DASHBOARDS Y VISUALIZACIÓN
+  # =====================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: fah_grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_PASSWORD:-fah_grafana_2024}
+      GF_INSTALL_PLUGINS: grafana-clock-panel,grafana-simple-json-datasource
+      GF_USERS_ALLOW_SIGN_UP: "false"
+    ports:
+      - "${GRAFANA_PORT:-3000}:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    networks:
+      - fah_enterprise_network
+    depends_on:
+      - prometheus
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: "0.3"
+
+  # =====================================
+  # ELASTICSEARCH - BÚSQUEDAS AVANZADAS (OPCIONAL)
+  # =====================================
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.11.0
+    container_name: fah_elasticsearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - bootstrap.memory_lock=true
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    ports:
+      - "${ELASTICSEARCH_PORT:-9200}:9200"
+    volumes:
+      - elasticsearch_data:/usr/share/elasticsearch/data
+    networks:
+      - fah_enterprise_network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: "0.5"
+
+  # =====================================
+  # MONGODB - DOCUMENTOS Y LOGS
+  # =====================================
+  mongodb:
+    image: mongo:7.0
+    container_name: fah_mongodb
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_ROOT_USER:-fah_mongo_admin}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_ROOT_PASSWORD:-fah_mongo_2024}
+      MONGO_INITDB_DATABASE: ${MONGO_DB:-fah_documents_db}
+    ports:
+      - "${MONGO_PORT:-27017}:27017"
+    volumes:
+      - ./data/mongodb:/data/db
+      - ./config/mongodb.conf:/etc/mongod.conf:ro
+    networks:
+      - fah_enterprise_network
+    command: mongod --config /etc/mongod.conf
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # =====================================
+  # MONGO EXPRESS - INTERFAZ MONGODB
+  # =====================================
+  mongo-express:
+    image: mongo-express:1.0.2-20
+    container_name: fah_mongo_express
+    restart: unless-stopped
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_ROOT_USER:-fah_mongo_admin}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_ROOT_PASSWORD:-fah_mongo_2024}
+      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_ROOT_USER:-fah_mongo_admin}:${MONGO_ROOT_PASSWORD:-fah_mongo_2024}@mongodb:27017/
+      ME_CONFIG_BASICAUTH_USERNAME: ${MONGO_EXPRESS_USER:-admin}
+      ME_CONFIG_BASICAUTH_PASSWORD: ${MONGO_EXPRESS_PASSWORD:-admin123}
+    ports:
+      - "${MONGO_EXPRESS_PORT:-8081}:8081"
+    networks:
+      - fah_enterprise_network
+    depends_on:
+      - mongodb
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8081",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # =====================================
+  # INFLUXDB - TIME SERIES Y MÉTRICAS IOT
+  # =====================================
+  influxdb:
+    image: influxdb:2.7
+    container_name: fah_influxdb
+    restart: unless-stopped
+    environment:
+      DOCKER_INFLUXDB_INIT_MODE: setup
+      DOCKER_INFLUXDB_INIT_USERNAME: ${INFLUX_USERNAME:-fah_influx_admin}
+      DOCKER_INFLUXDB_INIT_PASSWORD: ${INFLUX_PASSWORD:-fah_influx_secure_2025}
+      DOCKER_INFLUXDB_INIT_ORG: ${INFLUX_ORG:-FAH}
+      DOCKER_INFLUXDB_INIT_BUCKET: ${INFLUX_BUCKET:-fah_metrics}
+      DOCKER_INFLUXDB_INIT_ADMIN_TOKEN: ${INFLUX_TOKEN:-fah_influx_token_2024}
+    ports:
+      - "${INFLUX_PORT:-8086}:8086"
+    volumes:
+      - ./data/influxdb:/var/lib/influxdb2
+      - ./config/influxdb.conf:/etc/influxdb/influxdb.conf:ro
+    networks:
+      - fah_enterprise_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8086/ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  # =====================================
+  # CLICKHOUSE - ANALYTICS OLAP
+  # =====================================
+  clickhouse:
+    image: clickhouse/clickhouse-server:24.1
+    container_name: fah_clickhouse
+    restart: unless-stopped
+    environment:
+      CLICKHOUSE_DB: ${CLICKHOUSE_DB:-fah_analytics}
+      CLICKHOUSE_USER: ${CLICKHOUSE_USER:-fah_analytics}
+      CLICKHOUSE_DEFAULT_ACCESS_MANAGEMENT: 1
+      CLICKHOUSE_PASSWORD: ${CLICKHOUSE_PASSWORD:-fah_clickhouse_2024}
+    ports:
+      - "${CLICKHOUSE_HTTP_PORT:-8123}:8123"
+      - "${CLICKHOUSE_TCP_PORT:-9002}:9000"
+    volumes:
+      - ./data/clickhouse:/var/lib/clickhouse
+    networks:
+      - fah_enterprise_network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:8123/ping",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # =====================================
+  # RABBITMQ - COLAS DE MENSAJES
+  # =====================================
+  rabbitmq:
+    image: rabbitmq:3.12-management-alpine
+    container_name: fah_rabbitmq
+    restart: unless-stopped
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-fah_rabbit_admin}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-fah_rabbit_2024}
+      RABBITMQ_DEFAULT_VHOST: ${RABBITMQ_VHOST:-fah_vhost}
+    ports:
+      - "${RABBITMQ_PORT:-5672}:5672"
+      - "${RABBITMQ_MANAGEMENT_PORT:-15672}:15672"
+    volumes:
+      - ./data/rabbitmq:/var/lib/rabbitmq
+      - ./config/rabbitmq.conf:/etc/rabbitmq/rabbitmq.conf:ro
+    networks:
+      - fah_enterprise_network
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # =====================================
+  # ZOOKEEPER - PARA KAFKA
+  # =====================================
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.6.0
+    container_name: fah_zookeeper
+    restart: unless-stopped
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2181:2181"
+    volumes:
+      - ./data/zookeeper:/var/lib/zookeeper/data
+      # - ./config/zookeeper.conf:/etc/zookeeper/zoo.cfg:ro # ← AGREGAR ESTA LÍNEA
+    networks:
+      - fah_enterprise_network
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo 'ruok' | nc localhost 2181"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # =====================================
+  # KAFKA - EVENT STREAMING
+  # =====================================
+  kafka:
+    image: confluentinc/cp-kafka:7.6.0
+    container_name: fah_kafka
+    restart: unless-stopped
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+    ports:
+      - "${KAFKA_PORT:-9092}:9092"
+    volumes:
+      - ./data/kafka:/var/lib/kafka/data
+      # - ./config/kafka.properties:/etc/kafka/server.properties:ro # ← AGREGAR ESTA LÍNEA
+    networks:
+      - fah_enterprise_network
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "kafka-broker-api-versions",
+          "--bootstrap-server",
+          "localhost:9092",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # =====================================
+  # VAULT - GESTIÓN DE SECRETOS
+  # =====================================
+  vault:
+    image: hashicorp/vault:1.15
+    container_name: fah_vault
+    restart: unless-stopped
+    environment:
+      VAULT_DEV_ROOT_TOKEN_ID: ${VAULT_ROOT_TOKEN:-fah_vault_root_token_2024}
+      VAULT_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+    ports:
+      - "${VAULT_PORT:-8200}:8200"
+    volumes:
+      - ./data/vault:/vault/data
+      - ./config/vault.hcl:/vault/config/vault.hcl:ro
+    networks:
+      - fah_enterprise_network
+    cap_add:
+      - IPC_LOCK
+    command: vault server -dev -dev-root-token-id=${VAULT_ROOT_TOKEN:-fah_vault_root_token_2024}
+    healthcheck:
+      test: ["CMD", "vault", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # =====================================
+  # CONSUL - SERVICE DISCOVERY
+  # =====================================
+  consul:
+    image: hashicorp/consul:1.17
+    container_name: fah_consul
+    restart: unless-stopped
+    environment:
+      CONSUL_BIND_INTERFACE: eth0
+    ports:
+      - "${CONSUL_PORT:-8500}:8500"
+      - "8600:8600/udp"
+    volumes:
+      - ./data/consul:/consul/data
+      - ./config/consul.hcl:/consul/config/consul.hcl:ro
+    networks:
+      - fah_enterprise_network
+    command: agent -server -ui -node=server-1 -bootstrap-expect=1 -client=0.0.0.0
+    healthcheck:
+      test: ["CMD", "consul", "members"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # =====================================
+  # KIBANA - VISUALIZACIÓN DE LOGS
+  # =====================================
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.11.0
+    container_name: fah_kibana
+    restart: unless-stopped
+    environment:
+      ELASTICSEARCH_HOSTS: http://elasticsearch:9200
+      SERVER_NAME: kibana.fah.local
+      SERVER_HOST: 0.0.0.0
+    ports:
+      - "${KIBANA_PORT:-5601}:5601"
+    networks:
+      - fah_enterprise_network
+    depends_on:
+      - elasticsearch
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+
+  # =====================================
+  # FAH AUTH SERVICE - MICROSERVICIO DE AUTENTICACIÓN
+  # =====================================
+  fah-auth-service:
+    build:
+      context: ./services/fah-auth-service
+      dockerfile: Dockerfile
+    container_name: fah_auth_service
+    restart: unless-stopped
+    working_dir: /var/www/html
+    ports:
+      - "8000:8080"
+    volumes:
+      - ./services/fah-auth-service:/var/www/html
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=fah_postgres_enterprise
+      - DB_PORT=5432
+      - DB_DATABASE=fah_system_db
+      - DB_USERNAME=fah_laravel_user
+      - DB_PASSWORD=fah_laravel_secure_2025
+      - REDIS_HOST=redis
+      - REDIS_PASSWORD=fah_redis_2024
+      - REDIS_PORT=6379
+    networks:
+      - fah_enterprise_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # =====================================
+  # FAH CATALOGOS SERVICE - MICROSERVICIO DE CATÁLOGOS
+  # =====================================
+  fah-catalogos-service:
+    build:
+      context: ./services/fah-catalogos-service
+      dockerfile: Dockerfile
+    container_name: fah_catalogos_service
+    restart: unless-stopped
+    working_dir: /var/www/html
+    ports:
+      - "8008:8008"
+    volumes:
+      - ./services/fah-catalogos-service:/var/www/html
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=fah_postgres_enterprise
+      - DB_PORT=5432
+      - DB_DATABASE=fah_system_db
+      - DB_USERNAME=fah_laravel_user
+      - DB_PASSWORD=fah_laravel_secure_2025
+      - REDIS_HOST=fah_redis
+      - REDIS_PASSWORD=fah_redis_2024
+      - REDIS_PORT=6379
+    networks:
+      - fah_enterprise_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  # =====================================
+  # ✅ FAH ADMIN FRONTEND - INTERFAZ WEB ENTERPRISE
+  # =====================================
+  fah-admin-frontend:
+    build:
+      context: ./services/fah-admin-frontend
+      dockerfile: Dockerfile
+      target: production
+    container_name: fah_admin_frontend
+    restart: unless-stopped
+    ports:
+      - "5173:5173"
+    networks:
+      - fah_enterprise_network
+    depends_on:
+      - fah-auth-service
+      - fah-catalogos-service
+    environment:
+      - NODE_ENV=production
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--quiet",
+          "--tries=1",
+          "--spider",
+          "http://localhost:5173",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          memory: 256M
+          cpus: "0.2"
+
+  # =====================================================
+  # FAH ARCHIVOS SERVICE - GESTIÓN DE ARCHIVOS DIGITALES
+  # =====================================================
+  fah-archivos-service:
+    build:
+      context: ./services/fah-archivos-service
+      dockerfile: Dockerfile
+    container_name: fah_archivos_service
+    hostname: fah-archivos-service
+    networks:
+      - fah_enterprise_network
+    ports:
+      - "8012:8012"
+    volumes:
+      - ./services/fah-archivos-service/backend:/var/www/html
+      - ./data/archivos-service/storage:/var/www/html/storage
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - DB_CONNECTION=pgsql
+      - DB_HOST=fah_postgres_enterprise
+      - DB_PORT=5432
+      - DB_DATABASE=fah_system_db
+      - DB_USERNAME=fah_laravel_user
+      - DB_PASSWORD=fah_laravel_secure_2025
+      - REDIS_HOST=fah_redis
+      - REDIS_PASSWORD=fah_redis_2024
+      - REDIS_PORT=6379
+      - MINIO_ENDPOINT=http://fah_minio:9000
+      - MINIO_KEY=fah_minio_admin
+      - MINIO_SECRET=fah_minio_secret_2024
+      - MINIO_REGION=honduras-central
+      - MINIO_BUCKET=fah-archivos
+    depends_on:
+      - postgres
+      - redis
+      - minio
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8012/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.fah-archivos.rule=Host(`archivos.fah.local`)"
+      - "traefik.http.services.fah-archivos.loadbalancer.server.port=8012"
+
+  # =====================================
+  # FAH ORGANIZACION SERVICE - MICROSERVICIO DE ORGANIZACIÓN MILITAR
+  # =====================================
+  fah-organizacion-service:
+    build:
+      context: ./services/fah-organizacion-service
+      dockerfile: Dockerfile
+    container_name: fah_organizacion_service
+    restart: unless-stopped
+    working_dir: /var/www/html
+    ports:
+      - "8010:8010"
+    volumes:
+      - ./services/fah-organizacion-service:/var/www/html
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=fah_postgres_enterprise
+      - DB_PORT=5432
+      - DB_DATABASE=fah_system_db
+      - DB_USERNAME=fah_laravel_user
+      - DB_PASSWORD=fah_laravel_secure_2025
+      - REDIS_HOST=fah_redis
+      - REDIS_PASSWORD=fah_redis_2024
+      - REDIS_PORT=6379
+    networks:
+      - fah_enterprise_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+# =====================================
+# VOLÚMENES PERSISTENTES
+# =====================================
+volumes:
+  # Base de datos
+  postgres_enterprise_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/postgres
+
+  # Archivos y documentos
+  minio_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: ./data/minio
+
+  # Cache y sesiones
+  redis_data:
+    driver: local
+
+  # Administración
+  pgadmin_enterprise_data:
+    driver: local
+
+  # Monitoreo
+  prometheus_data:
+    driver: local
+  grafana_data:
+    driver: local
+
+  # Búsquedas
+  elasticsearch_data:
+    driver: local
+
+  # Logs
+  nginx_logs:
+    driver: local
+
+# =====================================
+# REDES
+# =====================================
+networks:
+  fah_enterprise_network:
+    driver: bridge

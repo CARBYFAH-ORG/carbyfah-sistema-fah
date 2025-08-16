@@ -1,0 +1,370 @@
+/* ===============================================
+   CARBYFAH - VARIABLES CSS GLOBALES UNIFICADAS
+   Centro Automatizado de Recursos para FAH
+   =============================================== */
+
+:root {
+  /* ===== COLORES PRINCIPALES FAH (UNIFICADOS) ===== */
+  --fah-azul-principal: #1b365d; /* TU COLOR FORMULARIOS - PRIORITARIO */
+  --fah-azul-claro: #3498db; /* TU COLOR FORMULARIOS - PRIORITARIO */
+  --fah-dorado: #f4d03f; /* TU COLOR FORMULARIOS */
+  --fah-blanco: #ffffff; /* TU COLOR FORMULARIOS */
+  --fah-gris-claro: #f8f9fa; /* TU COLOR FORMULARIOS */
+  --fah-gris-medio: #e9ecef; /* TU COLOR FORMULARIOS */
+  --fah-gris-oscuro: #6c757d; /* TU COLOR FORMULARIOS */
+  --fah-rojo-error: #dc3545; /* TU COLOR FORMULARIOS */
+  --fah-verde-exito: #28a745; /* TU COLOR FORMULARIOS */
+
+  /* ===== ALIASES PARA COMPATIBILIDAD ===== */
+  --fah-primary: var(--fah-azul-principal); /* Alias para variables legacy */
+  --fah-primary-light: #2a5298; /* Variables legacy */
+  --fah-primary-dark: #1a2f5a; /* Variables legacy */
+  --fah-secondary: var(--fah-azul-claro); /* Alias para variables legacy */
+  --fah-accent: #e74c3c; /* Variables legacy */
+
+  /* ===== COLORES MILITARES ===== */
+  --fah-military-green: #27ae60; /* Verde militar */
+  --fah-military-gold: #f39c12; /* Dorado militar */
+  --fah-military-silver: #95a5a6; /* Plateado militar */
+  --fah-military-bronze: #d68910; /* Bronce militar */
+
+  /* ===== COLORES DE ESTADO ===== */
+  --fah-success: var(--fah-verde-exito); /* Verde éxito - UNIFICADO */
+  --fah-warning: #ffc107; /* Amarillo advertencia */
+  --fah-danger: var(--fah-rojo-error); /* Rojo peligro - UNIFICADO */
+  --fah-info: #17a2b8; /* Azul información */
+
+  /* ===== GRISES Y NEUTROS (UNIFICADOS) ===== */
+  --fah-dark: #2c3e50; /* Gris oscuro principal */
+  --fah-dark-light: #34495e; /* Gris oscuro claro */
+  --fah-gray: var(--fah-gris-oscuro); /* Gris medio - UNIFICADO */
+  --fah-gray-light: #95a5a6; /* Gris claro */
+  --fah-light: var(--fah-gris-claro); /* Gris muy claro - UNIFICADO */
+  --fah-white: var(--fah-blanco); /* Blanco - UNIFICADO */
+
+  /* ===== COLORES DE SIDEBAR ===== */
+  --fah-sidebar-bg: var(--fah-dark);
+  --fah-sidebar-header-bg: linear-gradient(
+    145deg,
+    var(--fah-dark-light) 0%,
+    var(--fah-dark) 100%
+  );
+  --fah-sidebar-hover: rgba(52, 152, 219, 0.1);
+  --fah-sidebar-active: rgba(231, 76, 60, 0.15);
+  --fah-sidebar-text: #ecf0f1;
+  --fah-sidebar-icon-bg: rgba(52, 152, 219, 0.2);
+
+  /* ===== COLORES DE HEADER ===== */
+  --fah-header-bg: linear-gradient(
+    135deg,
+    var(--fah-azul-principal) 0%,
+    var(--fah-azul-claro) 100%
+  );
+  --fah-header-text: var(--fah-white);
+  --fah-header-search-bg: rgba(255, 255, 255, 0.95);
+  --fah-header-button-hover: rgba(255, 255, 255, 0.15);
+
+  /* ===== COLORES DE CONTENIDO ===== */
+  --fah-content-bg: var(--fah-light);
+  --fah-card-bg: var(--fah-white);
+  --fah-card-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  --fah-border: #dee2e6;
+  --fah-border-light: #e9ecef;
+
+  /* ===== TIPOGRAFÍA ===== */
+  --fah-font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  --fah-font-family-mono: 'Courier New', monospace;
+
+  /* Tamaños de fuente */
+  --fah-font-size-xs: 0.75rem; /* 12px */
+  --fah-font-size-sm: 0.875rem; /* 14px */
+  --fah-font-size-base: 1rem; /* 16px */
+  --fah-font-size-lg: 1.125rem; /* 18px */
+  --fah-font-size-xl: 1.25rem; /* 20px */
+  --fah-font-size-2xl: 1.5rem; /* 24px */
+  --fah-font-size-3xl: 1.875rem; /* 30px */
+
+  /* Pesos de fuente */
+  --fah-font-weight-light: 300;
+  --fah-font-weight-normal: 400;
+  --fah-font-weight-medium: 500;
+  --fah-font-weight-semibold: 600;
+  --fah-font-weight-bold: 700;
+
+  /* ===== ESPACIADOS ===== */
+  --fah-spacing-xs: 0.25rem; /* 4px */
+  --fah-spacing-sm: 0.5rem; /* 8px */
+  --fah-spacing-md: 1rem; /* 16px */
+  --fah-spacing-lg: 1.5rem; /* 24px */
+  --fah-spacing-xl: 2rem; /* 32px */
+  --fah-spacing-2xl: 3rem; /* 48px */
+  --fah-spacing-3xl: 4rem; /* 64px */
+
+  /* ===== RADIOS DE BORDE ===== */
+  --fah-radius-sm: 4px;
+  --fah-radius-md: 6px;
+  --fah-radius-lg: 8px;
+  --fah-radius-xl: 12px;
+  --fah-radius-full: 50%;
+
+  /* ===== SOMBRAS ===== */
+  --fah-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --fah-shadow-md: 0 2px 6px rgba(0, 0, 0, 0.1);
+  --fah-shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
+  --fah-shadow-xl: 0 8px 25px rgba(0, 0, 0, 0.15);
+
+  /* ===== TRANSICIONES ===== */
+  --fah-transition-fast: 0.15s ease;
+  --fah-transition-normal: 0.3s ease;
+  --fah-transition-slow: 0.5s ease;
+
+  /* ===== DIMENSIONES DE LAYOUT ===== */
+  --fah-header-height: 70px;
+  --fah-sidebar-width: 280px;
+  --fah-sidebar-collapsed-width: 70px;
+  --fah-content-padding: 30px;
+
+  /* ===== BREAKPOINTS ===== */
+  --fah-breakpoint-sm: 576px;
+  --fah-breakpoint-md: 768px;
+  --fah-breakpoint-lg: 992px;
+  --fah-breakpoint-xl: 1200px;
+
+  /* ===== Z-INDEX ===== */
+  --fah-z-dropdown: 1000;
+  --fah-z-header: 1010;
+  --fah-z-sidebar: 1020;
+  --fah-z-modal: 1030;
+  --fah-z-tooltip: 1040;
+}
+
+/* ===== TEMA OSCURO FAH ===== */
+[data-theme='dark'] {
+  --fah-content-bg: #1a1a1a;
+  --fah-card-bg: #2d2d2d;
+  --fah-border: #404040;
+  --fah-border-light: #353535;
+  --fah-gray: #a0a0a0;
+  --fah-gray-light: #808080;
+}
+
+/* ===== UTILIDADES DE COLORES ===== */
+.fah-bg-primary {
+  background-color: var(--fah-azul-principal) !important;
+}
+.fah-bg-secondary {
+  background-color: var(--fah-azul-claro) !important;
+}
+.fah-bg-success {
+  background-color: var(--fah-verde-exito) !important;
+}
+.fah-bg-warning {
+  background-color: var(--fah-warning) !important;
+}
+.fah-bg-danger {
+  background-color: var(--fah-rojo-error) !important;
+}
+.fah-bg-info {
+  background-color: var(--fah-info) !important;
+}
+
+.fah-text-primary {
+  color: var(--fah-azul-principal) !important;
+}
+.fah-text-secondary {
+  color: var(--fah-azul-claro) !important;
+}
+.fah-text-success {
+  color: var(--fah-verde-exito) !important;
+}
+.fah-text-warning {
+  color: var(--fah-warning) !important;
+}
+.fah-text-danger {
+  color: var(--fah-rojo-error) !important;
+}
+.fah-text-info {
+  color: var(--fah-info) !important;
+}
+.fah-text-white {
+  color: var(--fah-white) !important;
+}
+.fah-text-muted {
+  color: var(--fah-gray) !important;
+}
+
+/* ===== UTILIDADES DE ESPACIADO ===== */
+.fah-p-xs {
+  padding: var(--fah-spacing-xs) !important;
+}
+.fah-p-sm {
+  padding: var(--fah-spacing-sm) !important;
+}
+.fah-p-md {
+  padding: var(--fah-spacing-md) !important;
+}
+.fah-p-lg {
+  padding: var(--fah-spacing-lg) !important;
+}
+.fah-p-xl {
+  padding: var(--fah-spacing-xl) !important;
+}
+
+.fah-m-xs {
+  margin: var(--fah-spacing-xs) !important;
+}
+.fah-m-sm {
+  margin: var(--fah-spacing-sm) !important;
+}
+.fah-m-md {
+  margin: var(--fah-spacing-md) !important;
+}
+.fah-m-lg {
+  margin: var(--fah-spacing-lg) !important;
+}
+.fah-m-xl {
+  margin: var(--fah-spacing-xl) !important;
+}
+
+/* ===== UTILIDADES DE TIPOGRAFÍA ===== */
+.fah-font-xs {
+  font-size: var(--fah-font-size-xs) !important;
+}
+.fah-font-sm {
+  font-size: var(--fah-font-size-sm) !important;
+}
+.fah-font-base {
+  font-size: var(--fah-font-size-base) !important;
+}
+.fah-font-lg {
+  font-size: var(--fah-font-size-lg) !important;
+}
+.fah-font-xl {
+  font-size: var(--fah-font-size-xl) !important;
+}
+
+.fah-font-light {
+  font-weight: var(--fah-font-weight-light) !important;
+}
+.fah-font-normal {
+  font-weight: var(--fah-font-weight-normal) !important;
+}
+.fah-font-medium {
+  font-weight: var(--fah-font-weight-medium) !important;
+}
+.fah-font-semibold {
+  font-weight: var(--fah-font-weight-semibold) !important;
+}
+.fah-font-bold {
+  font-weight: var(--fah-font-weight-bold) !important;
+}
+
+/* ===== UTILIDADES DE BORDES ===== */
+.fah-rounded-sm {
+  border-radius: var(--fah-radius-sm) !important;
+}
+.fah-rounded-md {
+  border-radius: var(--fah-radius-md) !important;
+}
+.fah-rounded-lg {
+  border-radius: var(--fah-radius-lg) !important;
+}
+.fah-rounded-xl {
+  border-radius: var(--fah-radius-xl) !important;
+}
+.fah-rounded-full {
+  border-radius: var(--fah-radius-full) !important;
+}
+
+/* ===== UTILIDADES DE SOMBRAS ===== */
+.fah-shadow-sm {
+  box-shadow: var(--fah-shadow-sm) !important;
+}
+.fah-shadow-md {
+  box-shadow: var(--fah-shadow-md) !important;
+}
+.fah-shadow-lg {
+  box-shadow: var(--fah-shadow-lg) !important;
+}
+.fah-shadow-xl {
+  box-shadow: var(--fah-shadow-xl) !important;
+}
+.fah-shadow-none {
+  box-shadow: none !important;
+}
+
+/* ===== UTILIDADES DE TRANSICIONES ===== */
+.fah-transition-fast {
+  transition: all var(--fah-transition-fast) !important;
+}
+.fah-transition-normal {
+  transition: all var(--fah-transition-normal) !important;
+}
+.fah-transition-slow {
+  transition: all var(--fah-transition-slow) !important;
+}
+
+/* ===== CLASES ESPECÍFICAS FAH ===== */
+.fah-gradient-primary {
+  background: linear-gradient(
+    135deg,
+    var(--fah-azul-principal) 0%,
+    var(--fah-azul-claro) 100%
+  );
+}
+
+.fah-gradient-military {
+  background: linear-gradient(
+    135deg,
+    var(--fah-military-green) 0%,
+    var(--fah-azul-principal) 100%
+  );
+}
+
+.fah-card-military {
+  background: var(--fah-card-bg);
+  border: 1px solid var(--fah-border);
+  border-radius: var(--fah-radius-lg);
+  box-shadow: var(--fah-shadow-md);
+  padding: var(--fah-spacing-lg);
+  transition: var(--fah-transition-normal);
+}
+
+.fah-card-military:hover {
+  box-shadow: var(--fah-shadow-lg);
+  transform: translateY(-2px);
+}
+
+.fah-badge-rank {
+  background: var(--fah-military-gold);
+  color: var(--fah-white);
+  padding: var(--fah-spacing-xs) var(--fah-spacing-sm);
+  border-radius: var(--fah-radius-sm);
+  font-size: var(--fah-font-size-xs);
+  font-weight: var(--fah-font-weight-bold);
+  text-transform: uppercase;
+}
+
+.fah-status-active {
+  background: var(--fah-verde-exito);
+  color: var(--fah-white);
+  padding: var(--fah-spacing-xs) var(--fah-spacing-sm);
+  border-radius: var(--fah-radius-full);
+  font-size: var(--fah-font-size-xs);
+  font-weight: var(--fah-font-weight-medium);
+}
+
+/* ===== RESPONSIVE UTILITIES ===== */
+@media (max-width: 768px) {
+  :root {
+    --fah-content-padding: 20px;
+    --fah-sidebar-width: 70px;
+  }
+}
+
+@media (max-width: 480px) {
+  :root {
+    --fah-content-padding: 15px;
+    --fah-header-height: 60px;
+  }
+}

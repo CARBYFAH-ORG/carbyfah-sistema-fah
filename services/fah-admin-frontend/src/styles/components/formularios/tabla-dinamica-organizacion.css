@@ -1,0 +1,552 @@
+/* =====================================
+   ESTILOS PROFESIONALES TABLA ORGANIZACIÓN FAH
+   DISEÑO SOBRIO Y FUNCIONAL PARA FUERZAS ARMADAS
+   TEXTO NEGRO PARA MÁXIMO CONTRASTE
+   ===================================== */
+
+/* =====================================
+   CONTENEDOR PRINCIPAL LIMPIO
+   ===================================== */
+.tabla-dinamica-contenedor {
+  @apply rounded-lg overflow-hidden transition-all duration-200;
+  @apply bg-white shadow-md;
+  border: 2px solid #7c3aed; /* Púrpura organización en lugar de azul FAH */
+}
+
+/* =====================================
+   CONTROLES SUPERIORES PROFESIONALES
+   ===================================== */
+.tabla-controles-superiores {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  gap: 20px;
+}
+
+.controles-izquierda {
+  display: flex;
+  gap: 12px;
+}
+
+.controles-centro {
+  flex: 1;
+  max-width: 400px;
+  margin: 0 20px;
+}
+
+.controles-derecha {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  white-space: nowrap;
+}
+
+/* =====================================
+   BOTONES ORGANIZACIÓN PROFESIONALES
+   ===================================== */
+.btn-fah {
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-fah-agregar {
+  background: #7c3aed; /* Púrpura organización en lugar de azul FAH */
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.btn-fah-agregar:hover {
+  background: #6d28d9;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(124, 58, 237, 0.2);
+}
+
+.btn-fah-actualizar {
+  background: #10b981; /* Verde simple */
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.btn-fah-actualizar:hover {
+  background: #059669;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(16, 185, 129, 0.2);
+}
+
+.btn-fah-editar {
+  background: #fbbf24; /* Dorado FAH */
+  color: #1f2937; /* Texto oscuro para contraste */
+  font-weight: 600;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.btn-fah-editar:hover {
+  background: #f59e0b;
+  transform: translateY(-1px);
+}
+
+.btn-fah-eliminar {
+  background: #dc2626; /* Rojo simple */
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.btn-fah-eliminar:hover {
+  background: #b91c1c;
+  transform: translateY(-1px);
+}
+
+/* =====================================
+   BUSCADOR PROFESIONAL
+   ===================================== */
+.busqueda-container {
+  position: relative;
+  width: 100%;
+}
+
+.input-busqueda {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #374151;
+  background-color: #ffffff;
+  transition: border-color 0.2s ease;
+}
+
+.input-busqueda:focus {
+  outline: none;
+  border-color: #7c3aed; /* Púrpura organización */
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.input-busqueda::placeholder {
+  color: #9ca3af;
+}
+
+.busqueda-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6b7280;
+  pointer-events: none;
+}
+
+/* =====================================
+   SELECTOR DE REGISTROS
+   ===================================== */
+.label-registros {
+  color: #374151;
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.select-registros {
+  padding: 10px 15px;
+  border: 2px solid #e2e8f0;
+  border-radius: 6px;
+  font-size: 14px;
+  color: #374151;
+  background-color: #ffffff;
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+  min-width: 80px;
+}
+
+.select-registros:focus {
+  outline: none;
+  border-color: #7c3aed;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+/* =====================================
+   TABLA ORGANIZACIÓN LIMPIA Y PROFESIONAL
+   ===================================== */
+.tabla-fah {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  background: #ffffff;
+}
+
+.tabla-fah thead {
+  background: #7c3aed; /* Púrpura sólido organización - SIN GRADIENTES */
+}
+
+.tabla-fah th {
+  padding: 15px 12px;
+  text-align: left;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); /* Sombra sutil para legibilidad */
+  border-bottom: 2px solid #fbbf24; /* Línea dorada sutil */
+}
+
+.tabla-fah td {
+  padding: 12px;
+  border-bottom: 1px solid #e2e8f0;
+  color: #000000; /* NEGRO para máximo contraste */
+  font-weight: 600; /* Más bold para que se note bien */
+  vertical-align: middle;
+}
+
+.tabla-fah tbody tr:nth-child(even) {
+  background-color: #f8fafc; /* Gris muy claro */
+}
+
+.tabla-fah tbody tr:nth-child(odd) {
+  background-color: #ffffff; /* Blanco */
+}
+
+.tabla-fah tbody tr:hover {
+  background-color: #f3e8ff !important; /* Púrpura muy claro al hover */
+  transition: background-color 0.15s ease;
+}
+
+/* =====================================
+   CONTROLES INFERIORES SIMPLES
+   ===================================== */
+.tabla-controles-inferiores {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+}
+
+.info-registros {
+  color: #6b7280;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.info-registros span {
+  color: #7c3aed; /* Púrpura para números */
+  font-weight: 700;
+}
+
+.paginacion {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-paginacion {
+  padding: 8px 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #374151;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.btn-paginacion:hover:not(:disabled) {
+  background: #7c3aed; /* Púrpura al hover */
+  border-color: #7c3aed;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.btn-paginacion:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  background: #f9fafb;
+}
+
+.numeros-pagina {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.btn-pagina {
+  width: 40px;
+  height: 40px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #374151;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.btn-pagina:hover {
+  background: #f3f4f6;
+  border-color: #7c3aed;
+  color: #7c3aed;
+}
+
+.btn-pagina.activa {
+  background: #7c3aed; /* Púrpura sólido */
+  border-color: #7c3aed;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.dots {
+  color: #9ca3af;
+  padding: 0 8px;
+  font-weight: bold;
+}
+
+/* =====================================
+   ESTADOS PROFESIONALES
+   ===================================== */
+.badge-success {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold;
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #22c55e;
+}
+
+.badge-inactive {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold;
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #ef4444;
+}
+
+.badge-licencia {
+  @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold;
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fbbf24;
+}
+
+/* =====================================
+   RELACIONES FORÁNEAS LIMPIAS
+   ===================================== */
+.contenido-relacion {
+  @apply w-full;
+}
+
+.relacion-datos {
+  @apply flex flex-col;
+}
+
+.nombre-relacion {
+  @apply text-sm font-bold;
+  color: #000000 !important; /* Negro forzado para contraste */
+}
+
+.codigo-relacion {
+  @apply text-xs font-mono;
+  color: #6b7280; /* Gris para el código */
+  background: #f1f5f9;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 2px;
+  display: inline-block;
+}
+
+/* =====================================
+   CONTENIDO LEGIBLE - TEXTO NEGRO
+   ===================================== */
+.contenido-numero {
+  @apply text-right font-mono text-sm font-bold;
+  color: #000000 !important; /* Negro forzado */
+}
+
+.contenido-fecha {
+  @apply text-sm font-bold;
+  color: #000000 !important; /* Negro forzado */
+}
+
+.contenido-texto {
+  @apply text-sm font-semibold;
+  color: #000000 !important; /* Negro forzado */
+}
+
+.contenido-url {
+  @apply text-sm;
+}
+
+.link-url {
+  color: #7c3aed; /* Púrpura organización */
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.link-url:hover {
+  color: #6d28d9;
+  text-decoration: underline;
+}
+
+/* =====================================
+   ESTADO VACÍO PROFESIONAL
+   ===================================== */
+.estado-vacio {
+  text-align: center;
+  padding: 60px 20px;
+  background: #f8fafc;
+  border: 2px dashed #cbd5e1;
+  border-radius: 8px;
+  margin: 20px;
+}
+
+.estado-vacio-icono {
+  font-size: 3rem;
+  opacity: 0.4;
+  margin-bottom: 20px;
+  color: #64748b;
+}
+
+.estado-vacio-titulo {
+  color: #7c3aed; /* Púrpura organización */
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.estado-vacio-descripcion {
+  color: #64748b;
+  font-size: 1rem;
+  margin-bottom: 30px;
+}
+
+/* =====================================
+   LOADING PROFESIONAL
+   ===================================== */
+.loading-overlay {
+  @apply absolute inset-0 bg-white bg-opacity-90;
+  @apply flex items-center justify-center;
+  @apply z-20;
+  backdrop-filter: blur(1px);
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.1);
+  border: 1px solid #e2e8f0;
+}
+
+.loading-text {
+  color: #7c3aed;
+  font-weight: 600;
+  font-size: 16px;
+}
+
+/* =====================================
+   RESPONSIVE LIMPIO
+   ===================================== */
+@media (max-width: 768px) {
+  .tabla-controles-superiores {
+    flex-direction: column;
+    gap: 15px;
+    align-items: stretch;
+  }
+
+  .controles-centro {
+    margin: 0;
+    max-width: none;
+  }
+
+  .controles-derecha {
+    justify-content: center;
+  }
+
+  .tabla-controles-inferiores {
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+  }
+
+  .paginacion {
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-fah {
+    padding: 8px 12px;
+    font-size: 12px;
+  }
+
+  .tabla-fah {
+    font-size: 12px;
+  }
+
+  .tabla-fah th,
+  .tabla-fah td {
+    padding: 8px 6px;
+  }
+}
+
+/* =====================================
+   ANIMACIÓN SUTIL
+   ===================================== */
+.tabla-dinamica-contenedor tbody tr {
+  animation: fadeInRow 0.3s ease-out;
+}
+
+@keyframes fadeInRow {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* =====================================
+   CORRECCIONES FINALES PARA CONTRASTE
+   ===================================== */
+
+/* Asegurar que TODO el texto de las celdas sea negro */
+.tabla-fah tbody td * {
+  color: #000000 !important;
+}
+
+/* Excepto los badges que tienen sus propios colores */
+.tabla-fah tbody td .badge-success,
+.tabla-fah tbody td .badge-inactive,
+.tabla-fah tbody td .badge-licencia {
+  color: inherit !important;
+}
+
+/* Y los links que deben ser púrpura */
+.tabla-fah tbody td .link-url {
+  color: #7c3aed !important;
+}
+
+/* Código de relaciones puede ser gris */
+.tabla-fah tbody td .codigo-relacion {
+  color: #6b7280 !important;
+}

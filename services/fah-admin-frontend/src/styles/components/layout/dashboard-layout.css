@@ -1,0 +1,58 @@
+/* Clases Tailwind personalizadas */
+.font-sans {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Breadcrumb más compacto */
+.breadcrumb-compact {
+  @apply bg-white px-7 py-1 border-b border-gray-300 shadow-sm backdrop-blur-md flex-shrink-0;
+}
+
+/* Scrollbar personalizado con Tailwind */
+.scrollbar-thin::-webkit-scrollbar {
+  @apply w-2;
+}
+
+.scrollbar-track-gray-100::-webkit-scrollbar-track {
+  @apply bg-gray-100 rounded;
+}
+
+.scrollbar-thumb-blue-300\/30::-webkit-scrollbar-thumb {
+  @apply bg-blue-300/30 rounded;
+}
+
+.scrollbar-thumb-blue-300\/30:hover::-webkit-scrollbar-thumb {
+  @apply bg-blue-400/50;
+}
+
+/* Animación de entrada */
+.dashboard-layout {
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Clase para contenido expandido (cuando sidebar está colapsado) */
+.content-expanded {
+  /* Estilos adicionales cuando sidebar está colapsado si los necesitas */
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .flex-1.p-7 {
+    @apply p-5;
+  }
+}
+
+@media (max-width: 480px) {
+  .flex-1.p-7 {
+    @apply p-4;
+  }
+}

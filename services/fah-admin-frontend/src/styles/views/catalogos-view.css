@@ -1,0 +1,54 @@
+/* Animación para transiciones de pestañas */
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Keyframes para animación suave */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive para pestañas en móviles */
+@media (max-width: 768px) {
+  .flex-wrap {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+}
+
+/* Mejoras adicionales para todos los catálogos */
+.transition-all {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efectos hover para botones de pestañas */
+button:hover {
+  transform: translateY(-1px);
+}
+
+/* Scrollbar personalizado para tablas largas */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.5);
+}

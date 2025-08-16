@@ -1,0 +1,601 @@
+/* =====================================
+   ESTILOS PARA CAMPO FORMULARIO ORGANIZACIÓN - CARBYFAH
+   Versión específica para módulos de organización con tema PURPLE
+   Basado en campo-formulario.css pero especializado
+   ===================================== */
+
+/* =====================================
+   VARIABLES CSS ESPECÍFICAS ORGANIZACIÓN
+   ===================================== */
+:root {
+  --fah-org-purple-50: #faf5ff;
+  --fah-org-purple-100: #f3e8ff;
+  --fah-org-purple-200: #e9d5ff;
+  --fah-org-purple-300: #d8b4fe;
+  --fah-org-purple-400: #c084fc;
+  --fah-org-purple-500: #a855f7;
+  --fah-org-purple-600: #9333ea;
+  --fah-org-purple-700: #7c3aed;
+  --fah-org-purple-800: #6b21a8;
+  --fah-org-purple-900: #581c87;
+  --fah-org-amber-accent: #f59e0b;
+  --fah-org-red-danger: #ef4444;
+}
+
+/* =====================================
+   CONTENEDOR PRINCIPAL DEL CAMPO ORGANIZACIÓN
+   ===================================== */
+.contenedor-campo-organizacion {
+  @apply mb-4;
+  position: relative;
+}
+
+.grupo-campo-org {
+  @apply flex flex-col;
+}
+
+.col-span-6 {
+  @apply w-full;
+  padding-right: 0;
+  margin-bottom: 1rem;
+}
+
+.col-span-12 {
+  @apply w-full;
+}
+
+/* =====================================
+   ETIQUETAS Y MARCADORES ORGANIZACIÓN - ✅ TÍTULOS BLANCOS
+   ===================================== */
+.etiqueta-campo-org {
+  @apply block text-sm font-semibold mb-2;
+  color: white !important;
+  letter-spacing: 0.025em;
+  transition: color 0.2s ease;
+}
+
+.marcador-requerido-org {
+  color: var(--fah-org-red-danger) !important;
+  margin-left: 4px;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+
+.campo-con-error .etiqueta-campo-org {
+  color: var(--fah-org-red-danger);
+}
+
+/* =====================================
+   CAMPOS DE SWITCH BOOLEANO ORGANIZACIÓN
+   ===================================== */
+.grupo-switch-org {
+  @apply mt-2;
+}
+
+.contenedor-switch-org {
+  @apply flex items-center gap-4 p-4 rounded border-2;
+  background: var(--fah-org-purple-50);
+  border-color: var(--fah-org-purple-200);
+  transition: all 0.3s ease;
+  min-height: 60px;
+}
+
+.contenedor-switch-org:hover {
+  border-color: var(--fah-org-purple-400);
+  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.1);
+}
+
+.fah-form-switch-org {
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fah-form-switch-org:focus {
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
+}
+
+.fah-form-switch-org-error {
+  border-color: var(--fah-org-red-danger) !important;
+}
+
+.fah-form-switch-org-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.texto-switch-org {
+  @apply font-semibold text-base;
+  color: var(--fah-org-purple-700);
+  transition: color 0.2s ease;
+}
+
+/* =====================================
+   CONTROLES DE FORMULARIO BASE ORGANIZACIÓN
+   ===================================== */
+.fah-form-control-org {
+  @apply w-full px-6 py-6 text-base border-2 rounded;
+  background: var(--fah-org-purple-50);
+  border-color: var(--fah-org-purple-200);
+  color: var(--fah-org-purple-800);
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 1px 3px rgba(168, 85, 247, 0.1);
+}
+
+.fah-form-control-org:focus {
+  outline: none;
+  border-color: var(--fah-org-purple-500);
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15),
+    0 4px 12px rgba(168, 85, 247, 0.15);
+  transform: translateY(-1px);
+  background: white;
+}
+
+.fah-form-control-org:hover:not(:disabled) {
+  border-color: var(--fah-org-purple-400);
+  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.12);
+}
+
+.fah-form-control-org::placeholder {
+  color: var(--fah-org-purple-400);
+  opacity: 0.7;
+  font-style: italic;
+}
+
+.fah-form-control-org:focus-within {
+  transform: translateY(-1px);
+}
+
+/* =====================================
+   ESTADOS DE ERROR Y DESHABILITADO ORGANIZACIÓN
+   ===================================== */
+.fah-form-control-org-error {
+  border-color: var(--fah-org-red-danger) !important;
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+  background-color: rgba(239, 68, 68, 0.02);
+}
+
+.fah-form-control-org-error:focus {
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.25),
+    0 4px 12px rgba(239, 68, 68, 0.15) !important;
+}
+
+.fah-form-control-org-disabled {
+  background-color: var(--fah-org-purple-100) !important;
+  color: var(--fah-org-purple-400) !important;
+  border-color: var(--fah-org-purple-200) !important;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* =====================================
+   CAMPOS NUMÉRICOS ORGANIZACIÓN (TRANSPARENTES)
+   ===================================== */
+.fah-form-control-org-numero {
+  @apply w-full rounded;
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.fah-form-control-org-numero :deep(.p-inputnumber) {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+.fah-form-control-org-numero :deep(.p-inputnumber .p-inputtext) {
+  @apply w-full px-6 py-6 text-base border-2 rounded;
+  background: var(--fah-org-purple-50) !important;
+  color: var(--fah-org-purple-800) !important;
+  border-color: var(--fah-org-purple-200) !important;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-style: normal !important;
+  min-height: 66px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  text-align: right !important;
+  font-variant-numeric: tabular-nums !important;
+  font-weight: 600 !important;
+}
+
+.fah-form-control-org-numero :deep(.p-inputnumber .p-inputnumber-button-group) {
+  display: none !important;
+}
+
+.fah-form-control-org-numero :deep(.p-inputnumber .p-inputtext::placeholder) {
+  color: var(--fah-org-purple-400) !important;
+  font-style: italic !important;
+}
+
+/* =====================================
+   CAMPOS DE SELECCIÓN ORGANIZACIÓN
+   ===================================== */
+.fah-form-control-org-select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23a855f7' viewBox='0 0 16 16'%3e%3cpath d='m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px 12px;
+  padding-right: 40px;
+}
+
+/* =====================================
+   ÁREA DE TEXTO ORGANIZACIÓN
+   ===================================== */
+.fah-form-control-org-textarea {
+  resize: vertical;
+  min-height: 120px;
+  line-height: 1.5;
+}
+
+/* =====================================
+   CAMPOS DE FECHA ORGANIZACIÓN
+   ===================================== */
+.fah-form-control-org-fecha {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%23a855f7' viewBox='0 0 16 16'%3e%3cpath d='M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z'/%3e%3cpath d='M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 16px 16px;
+  padding-right: 40px;
+}
+
+/* =====================================
+   AUTOCOMPLETADO FORÁNEO ORGANIZACIÓN (PURPLE MILITAR)
+   ===================================== */
+.fah-form-control-org-foraneo {
+  border: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.fah-form-control-org-foraneo :deep(.p-autocomplete-input) {
+  @apply w-full px-6 py-6 text-base border-2 rounded;
+  background: linear-gradient(135deg, #7c3aed, #8b5cf6) !important;
+  color: white !important;
+  border-color: var(--fah-org-purple-400) !important;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-style: normal !important;
+  min-height: 66px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.15) !important;
+}
+
+.fah-form-control-org-foraneo :deep(.p-autocomplete-input::placeholder) {
+  color: rgba(255, 255, 255, 0.8) !important;
+  font-style: italic !important;
+}
+
+.fah-form-control-org-foraneo :deep(.p-autocomplete-input:focus) {
+  outline: none !important;
+  border-color: var(--fah-org-purple-300) !important;
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.25),
+    0 4px 12px rgba(124, 58, 237, 0.2) !important;
+  transform: translateY(-1px) !important;
+  background: linear-gradient(135deg, #8b5cf6, #a855f7) !important;
+}
+
+.fah-form-control-org-foraneo
+  :deep(.p-autocomplete-input:hover:not(:disabled)) {
+  border-color: var(--fah-org-purple-300) !important;
+  box-shadow: 0 3px 12px rgba(124, 58, 237, 0.18) !important;
+  background: linear-gradient(135deg, #8b5cf6, #7c3aed) !important;
+}
+
+.fah-form-control-org-foraneo :deep(.p-autocomplete) {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  width: 100% !important;
+}
+
+.fah-form-control-org-foraneo :deep(.p-inputwrapper) {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* =====================================
+   🎯 DROPDOWN PROFESIONAL ORGANIZACIÓN - ESTILO PURPLE ELEGANTE
+   ===================================== */
+
+/* Panel principal del dropdown organización */
+.fah-form-control-org-foraneo :deep(.p-autocomplete-panel) {
+  background: linear-gradient(
+    145deg,
+    var(--fah-org-purple-50),
+    var(--fah-org-purple-100)
+  ) !important;
+  border: 2px solid var(--fah-org-purple-400) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(168, 85, 247, 0.1) !important;
+  z-index: 9999 !important;
+  overflow: hidden !important;
+  backdrop-filter: blur(8px) !important;
+  transform: translateY(4px) !important;
+  animation: dropdownFadeInOrg 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+/* Lista de opciones organización */
+.fah-form-control-org-foraneo :deep(.p-autocomplete-items) {
+  padding: 8px !important;
+  background: transparent !important;
+  border: none !important;
+  max-height: 240px !important;
+  overflow-y: auto !important;
+}
+
+/* Cada opción individual organización - ESTADO NORMAL (Purple claro bonito) */
+.fah-form-control-org-foraneo :deep(.p-autocomplete-item) {
+  padding: 14px 16px !important;
+  margin-bottom: 4px !important;
+  border-radius: 8px !important;
+  border: 1px solid transparent !important;
+  background: linear-gradient(
+    135deg,
+    var(--fah-org-purple-50),
+    var(--fah-org-purple-100)
+  ) !important;
+  color: var(--fah-org-purple-800) !important;
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 15px !important;
+  font-weight: 500 !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* Estado HOVER organización - Cambio de color cuando el mouse pasa encima */
+.fah-form-control-org-foraneo :deep(.p-autocomplete-item:hover) {
+  background: linear-gradient(
+    135deg,
+    var(--fah-org-purple-500),
+    var(--fah-org-purple-600)
+  ) !important;
+  color: white !important;
+  border-color: var(--fah-org-purple-400) !important;
+  transform: translateX(4px) scale(1.02) !important;
+  box-shadow: 0 8px 25px -8px rgba(168, 85, 247, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset !important;
+}
+
+/* Opción seleccionada/activa organización */
+.fah-form-control-org-foraneo :deep(.p-autocomplete-item.p-highlight) {
+  background: linear-gradient(
+    135deg,
+    var(--fah-org-purple-600),
+    var(--fah-org-purple-700)
+  ) !important;
+  color: white !important;
+  border-color: var(--fah-org-purple-500) !important;
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3) !important;
+}
+
+/* Texto del código pequeño organización */
+.fah-form-control-org-foraneo :deep(.codigo-organizacion) {
+  font-size: 12px !important;
+  margin-top: 4px !important;
+  font-style: italic !important;
+  opacity: 0.8 !important;
+  font-weight: 400 !important;
+}
+
+/* En hover, el código se vuelve blanco */
+.fah-form-control-org-foraneo
+  :deep(.p-autocomplete-item:hover .codigo-organizacion) {
+  color: rgba(255, 255, 255, 0.9) !important;
+}
+
+/* Scrollbar personalizado para el dropdown organización */
+.fah-form-control-org-foraneo :deep(.p-autocomplete-items::-webkit-scrollbar) {
+  width: 6px !important;
+}
+
+.fah-form-control-org-foraneo
+  :deep(.p-autocomplete-items::-webkit-scrollbar-track) {
+  background: rgba(168, 85, 247, 0.1) !important;
+  border-radius: 3px !important;
+}
+
+.fah-form-control-org-foraneo
+  :deep(.p-autocomplete-items::-webkit-scrollbar-thumb) {
+  background: linear-gradient(
+    180deg,
+    var(--fah-org-purple-400),
+    var(--fah-org-purple-500)
+  ) !important;
+  border-radius: 3px !important;
+}
+
+.fah-form-control-org-foraneo
+  :deep(.p-autocomplete-items::-webkit-scrollbar-thumb:hover) {
+  background: linear-gradient(
+    180deg,
+    var(--fah-org-purple-500),
+    var(--fah-org-purple-600)
+  ) !important;
+}
+
+/* =====================================
+   OPCIONES DE DROPDOWN ORGANIZACIÓN (FALLBACK)
+   ===================================== */
+.opcion-foranea-organizacion {
+  @apply p-3 text-base flex flex-col;
+  color: var(--fah-org-purple-800);
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.opcion-foranea-organizacion:hover {
+  background-color: var(--fah-org-purple-100);
+}
+
+.codigo-organizacion {
+  @apply text-xs mt-1;
+  color: var(--fah-org-purple-600);
+  font-style: italic;
+  font-family: 'Courier New', monospace;
+}
+
+/* =====================================
+   INDICADORES DE CARGA ORGANIZACIÓN
+   ===================================== */
+.cargando-datos-org {
+  @apply flex items-center mt-2 px-2;
+  color: var(--fah-org-purple-600);
+}
+
+/* =====================================
+   CAMPOS CHECKBOX ORGANIZACIÓN
+   ===================================== */
+.grupo-checkbox-org {
+  @apply mt-2;
+}
+
+.contenedor-checkbox-org {
+  @apply flex items-center gap-3 p-4 rounded border-2;
+  background: var(--fah-org-purple-50);
+  border-color: var(--fah-org-purple-200);
+  transition: all 0.3s ease;
+  min-height: 60px;
+}
+
+.contenedor-checkbox-org:hover {
+  border-color: var(--fah-org-purple-400);
+  box-shadow: 0 2px 8px rgba(168, 85, 247, 0.1);
+}
+
+.fah-form-check-input-org {
+  @apply w-5 h-5 rounded border-2;
+  border-color: var(--fah-org-purple-500);
+  accent-color: var(--fah-org-purple-500);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.fah-form-check-input-org:checked {
+  background-color: var(--fah-org-purple-500);
+  border-color: var(--fah-org-purple-500);
+}
+
+.fah-form-check-input-org:focus {
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.15);
+}
+
+.etiqueta-checkbox-org {
+  @apply font-medium text-base cursor-pointer select-none;
+  color: var(--fah-org-purple-800);
+  margin: 0;
+}
+
+/* =====================================
+   🎯 ANIMACIONES PROFESIONALES ORGANIZACIÓN
+   ===================================== */
+.contenedor-campo-organizacion {
+  animation: fadeInUpOrg 0.4s ease-out;
+}
+
+@keyframes fadeInUpOrg {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animación para dropdown organización */
+@keyframes dropdownFadeInOrg {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(4px) scale(1);
+  }
+}
+
+/* =====================================
+   RESPONSIVE DESIGN ORGANIZACIÓN
+   ===================================== */
+@media (max-width: 768px) {
+  .col-span-6 {
+    @apply w-full;
+    padding-right: 0;
+  }
+
+  .fah-form-control-org {
+    @apply py-5 text-base;
+  }
+
+  .etiqueta-campo-org {
+    @apply text-sm;
+  }
+
+  .contenedor-checkbox-org {
+    @apply px-3 py-3;
+  }
+
+  /* Dropdown móvil más pequeño organización */
+  .fah-form-control-org-foraneo :deep(.p-autocomplete-item) {
+    padding: 12px 14px !important;
+    font-size: 14px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .fah-form-control-org {
+    @apply py-4 px-6 text-sm;
+  }
+
+  .etiqueta-campo-org {
+    @apply text-xs;
+  }
+}
+
+/* =====================================
+   ACCESIBILIDAD ORGANIZACIÓN
+   ===================================== */
+@media (prefers-reduced-motion: reduce) {
+  .fah-form-control-org,
+  .contenedor-checkbox-org,
+  .contenedor-campo-organizacion {
+    transition: none;
+    animation: none;
+  }
+
+  .fah-form-control-org-foraneo :deep(.p-autocomplete-panel) {
+    animation: none !important;
+  }
+
+  .fah-form-control-org-foraneo :deep(.p-autocomplete-item) {
+    transition: none !important;
+  }
+}
+
+@media (prefers-contrast: high) {
+  .fah-form-control-org {
+    border-width: 3px;
+  }
+
+  .fah-form-control-org:focus {
+    box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.3);
+  }
+
+  .fah-form-control-org-foraneo :deep(.p-autocomplete-panel) {
+    border-width: 3px !important;
+  }
+}
