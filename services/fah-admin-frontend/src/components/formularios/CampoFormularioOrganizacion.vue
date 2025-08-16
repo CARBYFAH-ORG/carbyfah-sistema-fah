@@ -103,7 +103,6 @@
         :disabled="deshabilitado"
         :class="clasesCampoForaneoOrg"
         option-label="etiqueta"
-        option-value="valor"
         force-selection
         complete-on-focus
         :min-length="0"

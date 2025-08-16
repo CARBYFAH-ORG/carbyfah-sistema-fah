@@ -55,23 +55,6 @@
         </div>
       </form>
     </div>
-
-    <!-- Error de configuración -->
-    <div v-else-if="!cargando" class="p-5 text-center">
-      <Message severity="warn" :closable="false">
-        <div>
-          <strong>Configuración no encontrada</strong>
-          <p class="mt-2.5 text-purple-300">
-            No hay configuración disponible para el esquema:
-            <code
-              class="bg-purple-800 px-1.5 py-0.5 rounded font-semibold text-red-500"
-            >
-              {{ nombreEsquema }}
-            </code>
-          </p>
-        </div>
-      </Message>
-    </div>
   </div>
 </template>
 
@@ -566,22 +549,20 @@ export default {
       erroresValidacion.value = {};
 
       try {
-        // ✅ USAR IMPORT DINÁMICO (temporal hasta resolver el estático)
-        // Ya está importado al inicio del archivo, usar directamente
-        // const { obtenerEsquema } = await import("@/config/esquemaOrganizacion");
+        // Usar import estático que ya existe arriba
         const configuracion = obtenerEsquema(props.esquema);
 
         if (!configuracion) {
           console.error(
-            `❌ Esquema de organización no encontrado: ${props.esquema}`
+            `Esquema de organización no encontrado: ${props.esquema}`
           );
           return;
         }
 
-        console.log(`✅ Configuración encontrada:`, configuracion);
+        console.log(`Configuración encontrada:`, configuracion);
         configuracionEsquema.value = configuracion;
 
-        // 🔥 CARGA INTELIGENTE POR ESQUEMA - MEJORADA
+        // Cargar dependencias
         await cargarDependenciasEsquema(props.esquema);
 
         camposConfigurados.value = configuracion.campos
@@ -595,7 +576,7 @@ export default {
         } else {
           datosFormulario.value = { ...props.datosIniciales };
 
-          // 🎯 INICIALIZAR FILTROS PARA MODO EDITAR
+          // Inicializar filtros para modo editar
           if (props.modo === "editar") {
             paisSeleccionado.value = datosFormulario.value.pais_id || null;
             departamentoSeleccionado.value =
@@ -606,11 +587,9 @@ export default {
           }
         }
 
-        console.log(
-          `✅ Formulario organización inicializado: ${props.esquema}`
-        );
+        console.log(`Formulario organización inicializado: ${props.esquema}`);
       } catch (error) {
-        console.error("❌ Error inicializando formulario organización:", error);
+        console.error("Error inicializando formulario organización:", error);
         mostrarNotificacion("errorConexion");
       } finally {
         cargando.value = false;
