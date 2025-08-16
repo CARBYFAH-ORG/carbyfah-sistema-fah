@@ -117,12 +117,22 @@
           v-if="(!collapsed || isMobile) && activeDropdown === 'jemga'"
           class="nav-dropdown-content"
         >
-          <div @click="navigateTo('fa1')" class="dropdown-item">
-            <span class="dropdown-emoji">👥</span>
+          <!-- FA-1: ACTIVO - CORREGIDO FINAL -->
+          <div
+            @click="navigateToPersonalService"
+            :class="[
+              'dropdown-item featured-item',
+              {
+                'featured-item-active': currentRoute === 'fa1',
+              },
+            ]"
+          >
+            <span class="dropdown-emoji featured-emoji">👥</span>
             <div class="dropdown-info">
               <span class="dropdown-title">FA-1: Recursos Humanos</span>
+              <span class="dropdown-subtitle">Gestión de personal FAH</span>
             </div>
-            <span class="dropdown-badge">Próximamente</span>
+            <span class="featured-badge">ACTIVO</span>
           </div>
 
           <div @click="navigateTo('fa2')" class="dropdown-item">
@@ -607,7 +617,6 @@ export default {
     };
 
     const toggleDropdown = (dropdownName) => {
-      // En móvil o cuando está expandido
       if (isMobile.value || !props.collapsed) {
         if (activeDropdown.value === dropdownName) {
           activeDropdown.value = null;
@@ -617,9 +626,7 @@ export default {
         return;
       }
 
-      // Si está colapsado en desktop, expandir primero
       emit("toggle-collapse");
-      // Después abrir el dropdown
       setTimeout(() => {
         activeDropdown.value = dropdownName;
       }, 300);
@@ -683,8 +690,39 @@ export default {
       }
     };
 
+    const navigateToPersonalService = async () => {
+      try {
+        console.log("👥 Navegando a Personal Service FA-1...");
+
+        toast.add({
+          severity: "success",
+          summary: "Navegación FAH",
+          detail: "Abriendo módulo Personal FA-1...",
+          life: 2000,
+        });
+
+        // Abrir personal service en nueva pestaña
+        window.open("http://localhost:5174", "_blank");
+
+        activeDropdown.value = null;
+        emit("navigate", "fa1");
+        handleNavigation();
+
+        console.log("✅ Navegación a Personal Service FA-1 exitosa");
+      } catch (error) {
+        console.error("❌ Error navegando a Personal Service:", error);
+
+        toast.add({
+          severity: "error",
+          summary: "Error de Navegación",
+          detail: "No se pudo acceder al módulo Personal FA-1",
+          life: 4000,
+        });
+      }
+    };
+
     const navigateTo = (section) => {
-      const availableSections = ["catalogos", "organizacion"];
+      const availableSections = ["catalogos", "organizacion", "fa1"];
 
       if (availableSections.includes(section)) {
         switch (section) {
@@ -696,13 +734,16 @@ export default {
             navigateToEstructuraOrganizacional();
             return;
 
+          case "fa1":
+            navigateToPersonalService();
+            return;
+
           default:
             console.warn(`Sección disponible pero no implementada: ${section}`);
             break;
         }
       }
 
-      // Para secciones no disponibles
       toast.add({
         severity: "warn",
         summary: "Función no disponible",
@@ -729,6 +770,7 @@ export default {
       navigateTo,
       navigateToCatalogos,
       navigateToEstructuraOrganizacional,
+      navigateToPersonalService, // ← CRÍTICO: AGREGADO AL RETURN
     };
   },
 };
