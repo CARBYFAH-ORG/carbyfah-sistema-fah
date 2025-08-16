@@ -767,6 +767,38 @@ services:
       redis:
         condition: service_healthy
 
+  # =====================================
+  # FAH PERSONAL SERVICE - MICROSERVICIO DE PERSONAL MILITAR
+  # =====================================
+  fah-personal-service:
+    build:
+      context: ./services/fah-personal-service/backend
+      dockerfile: Dockerfile
+    container_name: fah_personal_service
+    restart: unless-stopped
+    working_dir: /var/www/html
+    ports:
+      - "8009:8009"
+    volumes:
+      - ./services/fah-personal-service/backend:/var/www/html
+    environment:
+      - DB_CONNECTION=pgsql
+      - DB_HOST=fah_postgres_enterprise
+      - DB_PORT=5432
+      - DB_DATABASE=fah_system_db
+      - DB_USERNAME=fah_laravel_user
+      - DB_PASSWORD=fah_laravel_secure_2025
+      - REDIS_HOST=fah_redis
+      - REDIS_PASSWORD=fah_redis_2024
+      - REDIS_PORT=6379
+    networks:
+      - fah_enterprise_network
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
 # =====================================
 # VOLÚMENES PERSISTENTES
 # =====================================
