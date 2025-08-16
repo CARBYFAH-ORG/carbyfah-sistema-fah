@@ -1,12 +1,7 @@
 <template>
-  <!-- ============================================ -->
-  <!-- TABLA DINÁMICA ORGANIZACIÓN FAH - VERSIÓN COMPLETA -->
-  <!-- ✅ CONTROLES SUPERIORES E INFERIORES + PALETA FAH + ORDENAMIENTO -->
-  <!-- ============================================ -->
+  <!-- Tabla de microservicio estructura organizacional -->
   <div class="tabla-dinamica-contenedor">
-    <!-- =====================================
-         HEADER DE LA TABLA FAH
-         ===================================== -->
+    <!-- Header de la tabla -->
     <div
       class="flex justify-between items-center px-6 py-5 bg-gradient-to-r from-slate-50 to-slate-100 border-b-2"
       style="border-bottom-color: #7c3aed"
@@ -29,11 +24,9 @@
       </div>
     </div>
 
-    <!-- =====================================
-         CONTROLES SUPERIORES FAH CON ORDENAMIENTO
-         ===================================== -->
+    <!-- Controles superiores con ordenamiento -->
     <div class="tabla-controles-superiores tabla-controles-con-ordenamiento">
-      <!-- BOTONES IZQUIERDA -->
+      <!-- Botones izquierda -->
       <div class="controles-izquierda">
         <button
           @click="abrirModalCrear"
@@ -54,7 +47,7 @@
         </button>
       </div>
 
-      <!-- BUSCADOR CENTRO -->
+      <!-- Buscador centro -->
       <div class="controles-centro">
         <div class="busqueda-container">
           <input
@@ -68,7 +61,7 @@
         </div>
       </div>
 
-      <!-- SELECTOR REGISTROS DERECHA -->
+      <!-- Selector registros derecha -->
       <div class="controles-derecha">
         <label for="registrosPorPagina" class="label-registros">Mostrar:</label>
         <select
@@ -85,7 +78,7 @@
         <span class="label-registros">registros</span>
       </div>
 
-      <!-- 🆕 SELECTORES DE ORDENAMIENTO ORGANIZACIÓN -->
+      <!-- Selectores de ordenamiento -->
       <div class="controles-ordenamiento">
         <label class="label-ordenamiento">Ordenar por:</label>
         <select
@@ -118,11 +111,9 @@
       </div>
     </div>
 
-    <!-- =====================================
-         CONTENIDO PRINCIPAL
-         ===================================== -->
+    <!-- Contenido principal -->
     <div class="p-6 bg-gray-100 relative">
-      <!-- OVERLAY DE CARGA -->
+      <!-- Overlay de carga -->
       <div v-if="cargando" class="loading-overlay">
         <div class="loading-content">
           <ProgressSpinner size="50" strokeWidth="4" />
@@ -130,11 +121,11 @@
         </div>
       </div>
 
-      <!-- ESTADO DE ERROR -->
+      <!-- Estado de error -->
       <div v-else-if="error" class="text-center py-12">
         <Message severity="error" :closable="false">
           <div>
-            <strong>⚠️ Error al cargar datos</strong>
+            <strong>Error al cargar datos</strong>
             <p class="mt-2">{{ error }}</p>
             <Button
               label="Reintentar"
@@ -146,14 +137,14 @@
         </Message>
       </div>
 
-      <!-- TABLA CON DATOS -->
+      <!-- Tabla con datos -->
       <div
         v-else-if="registrosFiltrados?.length > 0"
         class="overflow-x-auto rounded-lg border-2"
         style="border-color: #7c3aed"
       >
         <table class="tabla-fah">
-          <!-- ENCABEZADOS DINÁMICOS -->
+          <!-- Encabezados dinámicos -->
           <thead>
             <tr>
               <th
@@ -167,15 +158,15 @@
             </tr>
           </thead>
 
-          <!-- FILAS DINÁMICAS -->
+          <!-- Filas dinámicas -->
           <tbody>
             <tr
               v-for="registro in registrosPaginados"
               :key="registro.id || registro.codigo"
             >
-              <!-- CELDAS DINÁMICAS -->
+              <!-- Celdas dinámicas -->
               <td v-for="campo in camposMostrar" :key="campo.nombre">
-                <!-- 🔗 RELACIÓN FORÁNEA -->
+                <!-- Relación foránea -->
                 <div v-if="esRelacionForanea(campo)" class="contenido-relacion">
                   <div
                     v-if="cargandoRelaciones"
@@ -198,7 +189,7 @@
                   </div>
                 </div>
 
-                <!-- ✅ BOOLEANO -->
+                <!-- Booleano -->
                 <div
                   v-else-if="esBooleano(campo, registro)"
                   class="contenido-booleano"
@@ -209,7 +200,7 @@
                   </span>
                 </div>
 
-                <!-- 📅 FECHA -->
+                <!-- Fecha -->
                 <div
                   v-else-if="esFecha(campo, registro)"
                   class="contenido-fecha"
@@ -217,7 +208,7 @@
                   {{ formatearFecha(registro[campo.nombre]) }}
                 </div>
 
-                <!-- 🔢 NÚMERO -->
+                <!-- Número -->
                 <div
                   v-else-if="esNumero(campo, registro)"
                   class="contenido-numero"
@@ -225,7 +216,7 @@
                   {{ formatearNumero(registro[campo.nombre]) }}
                 </div>
 
-                <!-- 🌐 URL -->
+                <!-- URL -->
                 <div v-else-if="esUrl(campo, registro)" class="contenido-url">
                   <a
                     :href="registro[campo.nombre]"
@@ -238,13 +229,13 @@
                   </a>
                 </div>
 
-                <!-- 📝 TEXTO -->
+                <!-- Texto -->
                 <div v-else class="contenido-texto">
                   {{ obtenerValorMostrar(registro[campo.nombre]) }}
                 </div>
               </td>
 
-              <!-- CELDA DE ACCIONES -->
+              <!-- Celda de acciones -->
               <td class="whitespace-nowrap">
                 <div class="flex gap-1">
                   <button
@@ -273,7 +264,7 @@
         </table>
       </div>
 
-      <!-- ESTADO VACÍO -->
+      <!-- Estado vacío -->
       <div v-else class="estado-vacio">
         <div class="estado-vacio-icono">
           {{ configuracionEsquema?.icono || "🏛️" }}
@@ -301,14 +292,12 @@
       </div>
     </div>
 
-    <!-- =====================================
-         CONTROLES INFERIORES DE PAGINACIÓN
-         ===================================== -->
+    <!-- Controles inferiores de paginación -->
     <div
       v-if="registrosFiltrados?.length > 0"
       class="tabla-controles-inferiores"
     >
-      <!-- INFO DE REGISTROS -->
+      <!-- Info de registros -->
       <div class="info-registros">
         Mostrando <span>{{ registroInicio }}</span> a
         <span>{{ registroFin }}</span> de
@@ -318,7 +307,7 @@
         </span>
       </div>
 
-      <!-- PAGINACIÓN -->
+      <!-- Paginación -->
       <div class="paginacion" v-if="totalPaginas > 1">
         <button
           class="btn-paginacion"
@@ -375,7 +364,7 @@
       </div>
     </div>
 
-    <!-- MODAL ESPECIALIZADO PARA ORGANIZACIÓN -->
+    <!-- Modal especializado para organización -->
     <ModalFormularioOrganizacion
       v-model:visible="modalVisible"
       :esquema="esquema"
@@ -446,9 +435,7 @@ export default {
   emits: ["recargar", "creado", "actualizado", "eliminado", "error"],
 
   setup(props, { emit }) {
-    // =====================================
-    // COMPOSABLES Y STORES
-    // =====================================
+    // Composables y stores
     const toast = useToast();
 
     const {
@@ -461,9 +448,7 @@ export default {
 
     const { analizarConfiguracionCampo } = usarFormularioDinamico();
 
-    // =====================================
-    // ESTADO REACTIVO
-    // =====================================
+    // Estado reactivo
     const modalVisible = ref(false);
     const modalModo = ref("crear");
     const modalDatos = ref({});
@@ -474,20 +459,18 @@ export default {
     const registrosPorPagina = ref(10);
     const paginaActual = ref(1);
 
-    // 🔄 NUEVAS VARIABLES PARA ORDENAMIENTO ORGANIZACIÓN
+    // Variables para ordenamiento
     const campoOrdenamiento = ref("default");
     const tipoOrdenamiento = ref("asc");
 
-    // =====================================
-    // COMPUTED PROPERTIES
-    // =====================================
+    // Computed properties
 
     // Configuración del esquema
     const configuracionEsquema = computed(() => {
       return obtenerEsquema(props.esquema);
     });
 
-    // 🎯 OPCIONES DE ORDENAMIENTO DINÁMICAS POR TABLA ORGANIZACIÓN
+    // Opciones de ordenamiento dinámicas por tabla
     const opcionesOrdenamiento = computed(() => {
       const tabla = configuracionEsquema.value?.tabla;
 
@@ -497,7 +480,7 @@ export default {
         { label: "Alfabético por nombre", value: "alfabetico" },
       ];
 
-      // 🏛️ OPCIONES ESPECÍFICAS POR TABLA ORGANIZACIÓN
+      // Opciones específicas por tabla
       switch (tabla) {
         case "departamentos":
           return [
@@ -558,13 +541,13 @@ export default {
       }
     });
 
-    // 🎯 OPCIONES DE TIPO DE ORDENAMIENTO
+    // Opciones de tipo de ordenamiento
     const tiposOrdenamiento = ref([
       { label: "Menor a Mayor (A-Z, 1-9)", value: "asc" },
       { label: "Mayor a Menor (Z-A, 9-1)", value: "desc" },
     ]);
 
-    // 🚀 FUNCIÓN DE ORDENAMIENTO INTELIGENTE ORGANIZACIÓN
+    // Función de ordenamiento inteligente
     const aplicarOrdenamiento = (registros, campo, tipo) => {
       if (campo === "default") {
         // Usar ordenamiento por defecto del esquema
@@ -598,21 +581,21 @@ export default {
         const valorA = a[campo];
         const valorB = b[campo];
 
-        // 🔢 ORDENAMIENTO NUMÉRICO
+        // Ordenamiento numérico
         if (!isNaN(valorA) && !isNaN(valorB)) {
           return tipo === "asc"
             ? Number(valorA) - Number(valorB)
             : Number(valorB) - Number(valorA);
         }
 
-        // 📅 ORDENAMIENTO DE FECHAS
+        // Ordenamiento de fechas
         if (campo.includes("fecha") || campo.includes("_at")) {
           const fechaA = new Date(valorA);
           const fechaB = new Date(valorB);
           return tipo === "asc" ? fechaA - fechaB : fechaB - fechaA;
         }
 
-        // 📝 ORDENAMIENTO DE TEXTO
+        // Ordenamiento de texto
         return tipo === "asc"
           ? String(valorA || "").localeCompare(String(valorB || ""))
           : String(valorB || "").localeCompare(String(valorA || ""));
@@ -651,7 +634,7 @@ export default {
       return props.datos || registros.value || [];
     });
 
-    // 🔍 FILTROS Y BÚSQUEDA
+    // Filtros y búsqueda
     const registrosFiltrados = computed(() => {
       if (!filtroTexto.value.trim()) {
         return registrosActuales.value;
@@ -680,7 +663,7 @@ export default {
       });
     });
 
-    // 🔄 COMPUTED PARA REGISTROS ORDENADOS ORGANIZACIÓN
+    // Registros ordenados
     const registrosOrdenados = computed(() => {
       if (!registrosFiltrados.value?.length) return [];
 
@@ -691,7 +674,7 @@ export default {
       );
     });
 
-    // 📄 PAGINACIÓN ACTUALIZADA PARA USAR REGISTROS ORDENADOS
+    // Paginación con registros ordenados
     const totalRegistrosFiltrados = computed(() => {
       return registrosOrdenados.value?.length || 0;
     });
@@ -711,7 +694,6 @@ export default {
       )
     );
 
-    // 🎯 USAR registrosOrdenados EN LUGAR DE registrosFiltrados
     const registrosPaginados = computed(() => {
       const inicio = (paginaActual.value - 1) * registrosPorPagina.value;
       const fin = inicio + registrosPorPagina.value;
@@ -756,9 +738,7 @@ export default {
       return `${cantidad} ${plural.toLowerCase()}`;
     });
 
-    // =====================================
-    // MÉTODOS DE FILTROS Y PAGINACIÓN
-    // =====================================
+    // Métodos de filtros y paginación
     const filtrarRegistros = () => {
       paginaActual.value = 1; // Resetear a primera página al filtrar
     };
@@ -778,19 +758,17 @@ export default {
       }
     };
 
-    // ⚡ FUNCIÓN PARA CAMBIAR ORDENAMIENTO ORGANIZACIÓN
+    // Función para cambiar ordenamiento
     const cambiarOrdenamiento = () => {
       // Resetear paginación al cambiar ordenamiento
       paginaActual.value = 1;
 
       console.log(
-        `🔄 Ordenamiento organización cambiado: ${campoOrdenamiento.value} - ${tipoOrdenamiento.value}`
+        `Ordenamiento organización cambiado: ${campoOrdenamiento.value} - ${tipoOrdenamiento.value}`
       );
     };
 
-    // =====================================
-    // MÉTODOS PARA RELACIONES (COPIADOS DE CATÁLOGOS)
-    // =====================================
+    // Métodos para relaciones
     const esRelacionForanea = (campo) => {
       return campo.nombre.endsWith("_id") && campo.tipo !== "numero";
     };
@@ -849,9 +827,7 @@ export default {
       return null;
     };
 
-    // =====================================
-    // MÉTODOS PARA FORMATEO (COPIADOS DE CATÁLOGOS)
-    // =====================================
+    // Métodos para formateo
     const esBooleano = (campo, registro) => {
       return typeof registro[campo.nombre] === "boolean";
     };
@@ -914,9 +890,7 @@ export default {
       return valor;
     };
 
-    // =====================================
-    // MÉTODOS PRINCIPALES
-    // =====================================
+    // Métodos principales
     const abrirModalCrear = async () => {
       modalVisible.value = false;
 
@@ -942,12 +916,9 @@ export default {
       modalVisible.value = true;
     };
 
-    // Método para recargar datos - FUNCIÓN COMPLETA ORGANIZACIÓN
+    // Método para recargar datos
     const recargarDatos = async () => {
-      console.log(
-        "🔄 Recargando datos organización para esquema:",
-        props.esquema
-      );
+      console.log("Recargando datos organización para esquema:", props.esquema);
 
       try {
         // Emit para que el padre recargue los datos
@@ -995,13 +966,11 @@ export default {
         .replace(/\b\w/g, (l) => l.toUpperCase());
     };
 
-    // =====================================
-    // WATCHERS
-    // =====================================
+    // Watchers
     watch(
       () => props.esquema,
       (nuevoEsquema) => {
-        console.log(`🔄 Esquema organización cambió a: ${nuevoEsquema}`);
+        console.log(`Esquema organización cambió a: ${nuevoEsquema}`);
         // Resetear filtros y paginación
         filtroTexto.value = "";
         paginaActual.value = 1;
@@ -1016,18 +985,14 @@ export default {
       }
     );
 
-    // =====================================
-    // LIFECYCLE
-    // =====================================
+    // Lifecycle
     onMounted(() => {
       console.log(
-        `🏛️ TablaDinamicaOrganizacion FAH montada para esquema: ${props.esquema}`
+        `TablaDinamicaOrganizacion FAH montada para esquema: ${props.esquema}`
       );
     });
 
-    // =====================================
-    // RETURN
-    // =====================================
+    // Return
     return {
       // Estado
       modalVisible,
@@ -1038,7 +1003,7 @@ export default {
       registrosPorPagina,
       paginaActual,
 
-      // 🆕 NUEVAS VARIABLES DE ORDENAMIENTO ORGANIZACIÓN
+      // Variables de ordenamiento
       campoOrdenamiento,
       tipoOrdenamiento,
       opcionesOrdenamiento,
@@ -1098,7 +1063,7 @@ export default {
 <style>
 @import "@/styles/components/formularios/tabla-dinamica-organizacion.css";
 
-/* 🆕 ESTILOS ESPECÍFICOS PARA ORDENAMIENTO ORGANIZACIÓN */
+/* Estilos específicos para ordenamiento */
 .controles-ordenamiento {
   border-left: 4px solid #7c3aed !important; /* Púrpura organización */
 }
