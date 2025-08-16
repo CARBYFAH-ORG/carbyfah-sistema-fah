@@ -1,11 +1,11 @@
 <template>
-  <div class="s1-unidad-view">
-    <div class="s1-header">
-      <h1>S-1 Unidad</h1>
-      <p>Panel táctico para jefes de unidad</p>
+  <div class="seccion-view">
+    <div class="seccion-header">
+      <h1>Vista de Sección</h1>
+      <p>Panel operativo para jefes de sección</p>
     </div>
 
-    <div class="s1-contenido">
+    <div class="seccion-contenido">
       <!-- El contenido se carga según las rutas hijas -->
       <router-view />
     </div>
@@ -17,7 +17,7 @@ import { computed } from "vue";
 import { useNivelesStore } from "@/stores/nivelesStore";
 
 export default {
-  name: "S1UnidadView",
+  name: "SeccionView",
   setup() {
     const nivelesStore = useNivelesStore();
 
@@ -31,24 +31,24 @@ export default {
 </script>
 
 <style scoped>
-.s1-unidad-view {
+.seccion-view {
   padding: 1.5rem;
 }
 
-.s1-header {
+.seccion-header {
   margin-bottom: 2rem;
 }
 
-.s1-header h1 {
+.seccion-header h1 {
   color: #1e3a5f;
   margin-bottom: 0.5rem;
 }
 
-.s1-header p {
+.seccion-header p {
   color: #6b7280;
 }
 
-.s1-contenido {
+.seccion-contenido {
   min-height: 400px;
 }
 </style>
