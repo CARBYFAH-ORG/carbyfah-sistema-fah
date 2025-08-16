@@ -1,990 +1,1070 @@
 <template>
-  <!-- FORMULARIO DINÁMICO ORGANIZACIÓN - CARBYFAH -->
-  <!-- Motor inteligente para TODOS los 7 módulos de organización -->
-  <div class="contenedor-formulario-dinamico-organizacion">
-    <!-- Indicador de carga -->
-    <div v-if="cargando" class="flex items-center justify-center py-8">
-      <ProgressSpinner size="50" strokeWidth="4" />
-      <span class="ml-3 text-purple-300">{{ mensajeCarga }}</span>
-    </div>
-
-    <!-- Contenido del formulario -->
-    <div v-else-if="esquemaValido" class="formulario-contenido">
-      <!-- Mensaje de error global -->
-      <Message
-        v-if="tieneErrores"
-        severity="error"
-        :closable="false"
-        class="mb-5 rounded-lg bg-red-900/50 border-2 border-red-500"
-      >
-        <div>
-          <strong class="block mb-2 text-red-300">Error de validación:</strong>
-          <ul class="m-0 pl-5">
-            <li
-              v-for="(error, campo) in erroresValidacion"
-              :key="campo"
-              class="mb-1 text-sm text-red-300"
-            >
-              <strong>{{ obtenerEtiquetaCampo(campo) }}:</strong> {{ error }}
-            </li>
-          </ul>
+  <!-- Tabla de microservicio estructura organizacional -->
+  <div class="tabla-dinamica-contenedor">
+    <!-- Header de la tabla -->
+    <div
+      class="flex justify-between items-center px-6 py-5 bg-gradient-to-r from-slate-50 to-slate-100 border-b-2"
+      style="border-bottom-color: #7c3aed"
+    >
+      <div class="flex items-center gap-3">
+        <div
+          class="w-11 h-11 rounded-lg flex items-center justify-center text-xl text-white"
+          style="background: #7c3aed"
+        >
+          {{ configuracionEsquema?.icono || "🏛️" }}
         </div>
-      </Message>
-
-      <!-- Formulario dinámico -->
-      <form
-        @submit.prevent="manejarEnvio"
-        class="formulario-dinamico-organizacion"
-      >
-        <div class="grid grid-cols-12 gap-5">
-          <!-- Generar campos dinámicamente -->
-          <CampoFormularioOrganizacion
-            v-for="configuracionCampo in camposConfigurados"
-            :key="configuracionCampo.nombre"
-            :configuracion="configuracionCampo"
-            :valor="datosFormulario[configuracionCampo.nombre]"
-            :error="erroresValidacion[configuracionCampo.nombre]"
-            :deshabilitado="cargando"
-            :opciones-externas="obtenerOpcionesParaCampo(configuracionCampo)"
-            @actualizar="actualizarCampo"
-            @ubicacion-seleccionada="manejarUbicacionSeleccionada"
-            @departamento-seleccionado="manejarDepartamentoSeleccionado"
-            @municipio-seleccionado="manejarMunicipioSeleccionado"
-            class="campo-wrapper"
-          />
-        </div>
-      </form>
-    </div>
-
-    <!-- Error de configuración -->
-    <div v-else-if="!cargando" class="p-5 text-center">
-      <Message severity="warn" :closable="false">
         <div>
-          <strong>Configuración no encontrada</strong>
-          <p class="mt-2.5 text-purple-300">
-            No hay configuración disponible para el esquema:
-            <code
-              class="bg-purple-800 px-1.5 py-0.5 rounded font-semibold text-red-500"
-            >
-              {{ nombreEsquema }}
-            </code>
+          <h3 class="m-0 text-gray-800 text-lg font-semibold">
+            {{ configuracionEsquema?.titulo || "Organización" }}
+          </h3>
+          <p class="m-0 text-sm text-gray-600">
+            {{ contadorRegistros }}
           </p>
         </div>
-      </Message>
+      </div>
     </div>
+
+    <!-- Controles superiores con ordenamiento -->
+    <div class="tabla-controles-superiores tabla-controles-con-ordenamiento">
+      <!-- Botones izquierda -->
+      <div class="controles-izquierda">
+        <button
+          @click="abrirModalCrear"
+          :disabled="cargando"
+          class="btn-fah btn-fah-agregar"
+        >
+          <i class="pi pi-plus"></i>
+          Agregar Nuevo
+        </button>
+
+        <button
+          @click="recargarDatos"
+          :disabled="cargando"
+          class="btn-fah btn-fah-actualizar"
+        >
+          <i class="pi pi-refresh" :class="{ 'pi-spin': cargando }"></i>
+          Actualizar
+        </button>
+      </div>
+
+      <!-- Buscador centro -->
+      <div class="controles-centro">
+        <div class="busqueda-container">
+          <input
+            type="text"
+            class="input-busqueda"
+            placeholder="🔍 Buscar en tabla..."
+            v-model="filtroTexto"
+            @input="filtrarRegistros"
+          />
+          <i class="pi pi-search busqueda-icon"></i>
+        </div>
+      </div>
+
+      <!-- Selector registros derecha -->
+      <div class="controles-derecha">
+        <label for="registrosPorPagina" class="label-registros">Mostrar:</label>
+        <select
+          id="registrosPorPagina"
+          class="select-registros"
+          v-model="registrosPorPagina"
+          @change="cambiarRegistrosPorPagina"
+        >
+          <option value="5">5</option>
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="50">50</option>
+        </select>
+        <span class="label-registros">registros</span>
+      </div>
+
+      <!-- Selectores de ordenamiento -->
+      <div class="controles-ordenamiento">
+        <label class="label-ordenamiento">Ordenar por:</label>
+        <select
+          v-model="campoOrdenamiento"
+          @change="cambiarOrdenamiento"
+          class="select-ordenamiento"
+        >
+          <option
+            v-for="opcion in opcionesOrdenamiento"
+            :key="opcion.value"
+            :value="opcion.value"
+          >
+            {{ opcion.label }}
+          </option>
+        </select>
+
+        <select
+          v-model="tipoOrdenamiento"
+          @change="cambiarOrdenamiento"
+          class="select-orden-tipo"
+        >
+          <option
+            v-for="tipo in tiposOrdenamiento"
+            :key="tipo.value"
+            :value="tipo.value"
+          >
+            {{ tipo.label }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Contenido principal -->
+    <div class="p-6 bg-gray-100 relative">
+      <!-- Overlay de carga -->
+      <div v-if="cargando" class="loading-overlay">
+        <div class="loading-content">
+          <ProgressSpinner size="50" strokeWidth="4" />
+          <span class="loading-text">Cargando datos...</span>
+        </div>
+      </div>
+
+      <!-- Estado de error -->
+      <div v-else-if="error" class="text-center py-12">
+        <Message severity="error" :closable="false">
+          <div>
+            <strong>Error al cargar datos</strong>
+            <p class="mt-2">{{ error }}</p>
+            <Button
+              label="Reintentar"
+              icon="pi pi-refresh"
+              @click="recargarDatos"
+              class="mt-3"
+            />
+          </div>
+        </Message>
+      </div>
+
+      <!-- Tabla con datos -->
+      <div
+        v-else-if="registrosFiltrados?.length > 0"
+        class="overflow-x-auto rounded-lg border-2"
+        style="border-color: #7c3aed"
+      >
+        <table class="tabla-fah">
+          <!-- Encabezados dinámicos -->
+          <thead>
+            <tr>
+              <th
+                v-for="campo in camposMostrar"
+                :key="campo.nombre"
+                style="background: #7c3aed; color: #ffffff"
+              >
+                {{ campo.etiqueta }}
+              </th>
+              <th style="background: #7c3aed; color: #ffffff">Acciones</th>
+            </tr>
+          </thead>
+
+          <!-- Filas dinámicas -->
+          <tbody>
+            <tr
+              v-for="registro in registrosPaginados"
+              :key="registro.id || registro.codigo"
+            >
+              <!-- Celdas dinámicas -->
+              <td v-for="campo in camposMostrar" :key="campo.nombre">
+                <!-- Relación foránea -->
+                <div v-if="esRelacionForanea(campo)" class="contenido-relacion">
+                  <div
+                    v-if="cargandoRelaciones"
+                    class="flex items-center gap-2"
+                  >
+                    <i class="pi pi-spin pi-spinner text-blue-500 text-xs"></i>
+                    <span class="text-xs text-gray-500">Cargando...</span>
+                  </div>
+
+                  <div v-else class="relacion-datos">
+                    <div class="nombre-relacion">
+                      {{ obtenerNombreRelacion(registro, campo) }}
+                    </div>
+                    <div
+                      v-if="obtenerCodigoRelacion(registro, campo)"
+                      class="codigo-relacion"
+                    >
+                      {{ obtenerCodigoRelacion(registro, campo) }}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Booleano -->
+                <div
+                  v-else-if="esBooleano(campo, registro)"
+                  class="contenido-booleano"
+                >
+                  <span :class="claseBooleano(registro[campo.nombre])">
+                    <i :class="iconoBooleano(registro[campo.nombre])"></i>
+                    {{ textoBooleano(registro[campo.nombre]) }}
+                  </span>
+                </div>
+
+                <!-- Fecha -->
+                <div
+                  v-else-if="esFecha(campo, registro)"
+                  class="contenido-fecha"
+                >
+                  {{ formatearFecha(registro[campo.nombre]) }}
+                </div>
+
+                <!-- Número -->
+                <div
+                  v-else-if="esNumero(campo, registro)"
+                  class="contenido-numero"
+                >
+                  {{ formatearNumero(registro[campo.nombre]) }}
+                </div>
+
+                <!-- URL -->
+                <div v-else-if="esUrl(campo, registro)" class="contenido-url">
+                  <a
+                    :href="registro[campo.nombre]"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="link-url"
+                  >
+                    <i class="pi pi-external-link mr-1"></i>
+                    Ver enlace
+                  </a>
+                </div>
+
+                <!-- Texto -->
+                <div v-else class="contenido-texto">
+                  {{ obtenerValorMostrar(registro[campo.nombre]) }}
+                </div>
+              </td>
+
+              <!-- Celda de acciones -->
+              <td class="whitespace-nowrap">
+                <div class="flex gap-1">
+                  <button
+                    @click="abrirModalEditar(registro)"
+                    :disabled="cargando"
+                    class="btn-fah btn-fah-editar"
+                    style="padding: 6px 10px; font-size: 12px"
+                    title="Editar"
+                  >
+                    <i class="pi pi-pencil"></i>
+                  </button>
+
+                  <button
+                    @click="abrirModalEliminar(registro)"
+                    :disabled="cargando"
+                    class="btn-fah btn-fah-eliminar"
+                    style="padding: 6px 10px; font-size: 12px"
+                    title="Eliminar"
+                  >
+                    <i class="pi pi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Estado vacío -->
+      <div v-else class="estado-vacio">
+        <div class="estado-vacio-icono">
+          {{ configuracionEsquema?.icono || "🏛️" }}
+        </div>
+        <h4 class="estado-vacio-titulo">Sin registros disponibles</h4>
+        <p class="estado-vacio-descripcion">
+          No hay
+          {{ configuracionEsquema?.titulo?.toLowerCase() || "registros" }} para
+          mostrar
+          <span v-if="filtroTexto"> que coincidan con "{{ filtroTexto }}"</span>
+        </p>
+        <button
+          @click="limpiarFiltros"
+          v-if="filtroTexto"
+          class="btn-fah btn-fah-actualizar"
+          style="margin-right: 10px"
+        >
+          <i class="pi pi-filter-slash"></i>
+          Limpiar Filtros
+        </button>
+        <button @click="abrirModalCrear" class="btn-fah btn-fah-agregar">
+          <i class="pi pi-plus"></i>
+          Crear el primer registro
+        </button>
+      </div>
+    </div>
+
+    <!-- Controles inferiores de paginación -->
+    <div
+      v-if="registrosFiltrados?.length > 0"
+      class="tabla-controles-inferiores"
+    >
+      <!-- Info de registros -->
+      <div class="info-registros">
+        Mostrando <span>{{ registroInicio }}</span> a
+        <span>{{ registroFin }}</span> de
+        <span>{{ totalRegistrosFiltrados }}</span> registros
+        <span v-if="filtroTexto" class="text-sm text-gray-500">
+          (filtrados de {{ registrosActuales.length }} totales)
+        </span>
+      </div>
+
+      <!-- Paginación -->
+      <div class="paginacion" v-if="totalPaginas > 1">
+        <button
+          class="btn-paginacion"
+          @click="irAPagina(paginaActual - 1)"
+          :disabled="paginaActual <= 1"
+        >
+          ⬅️ Anterior
+        </button>
+
+        <div class="numeros-pagina">
+          <!-- Primera página -->
+          <button
+            v-if="paginaActual > 3"
+            class="btn-pagina"
+            @click="irAPagina(1)"
+          >
+            1
+          </button>
+
+          <!-- Puntos suspensivos izquierda -->
+          <span v-if="paginaActual > 4" class="dots">...</span>
+
+          <!-- Páginas alrededor de la actual -->
+          <button
+            v-for="pagina in paginasVisibles"
+            :key="pagina"
+            class="btn-pagina"
+            :class="{ activa: pagina === paginaActual }"
+            @click="irAPagina(pagina)"
+          >
+            {{ pagina }}
+          </button>
+
+          <!-- Puntos suspensivos derecha -->
+          <span v-if="paginaActual < totalPaginas - 3" class="dots">...</span>
+
+          <!-- Última página -->
+          <button
+            v-if="paginaActual < totalPaginas - 2"
+            class="btn-pagina"
+            @click="irAPagina(totalPaginas)"
+          >
+            {{ totalPaginas }}
+          </button>
+        </div>
+
+        <button
+          class="btn-paginacion"
+          @click="irAPagina(paginaActual + 1)"
+          :disabled="paginaActual >= totalPaginas"
+        >
+          Siguiente ➡️
+        </button>
+      </div>
+    </div>
+
+    <!-- Modal especializado para organización -->
+    <ModalFormularioOrganizacion
+      v-model:visible="modalVisible"
+      :esquema="esquema"
+      :modo="modalModo"
+      :datos-iniciales="modalDatos"
+      @guardado="manejarGuardado"
+      @eliminado="manejarEliminado"
+      @cancelado="manejarCancelado"
+      @error="manejarError"
+    />
   </div>
 </template>
 
 <script>
-import { ref, computed, watch, onMounted, nextTick } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useToast } from "primevue/usetoast";
 
 // Componentes PrimeVue
 import ProgressSpinner from "primevue/progressspinner";
 import Message from "primevue/message";
+import Button from "primevue/button";
 
-// Componentes propios especializados
-import CampoFormularioOrganizacion from "./CampoFormularioOrganizacion.vue";
+// Componentes especializados
+import ModalFormularioOrganizacion from "./ModalFormularioOrganizacion.vue";
 
-// Composables y utilidades para organización
+// Composables y stores para organización
+import { usarCrudOrganizacion } from "@/composables/usarCrudOrganizacion";
 import { usarFormularioDinamico } from "@/composables/usarFormularioDinamico";
-import { useOrganizacionStore } from "@/stores/organizacionStore";
-import { useCatalogosStore } from "@/stores/catalogosStore"; // Para países y tipos_estructura_militar
-
-// ✅ AGREGAR ESTA LÍNEA AQUÍ:
 import { obtenerEsquema } from "@/config/esquemaOrganizacion";
 
 export default {
-  name: "FormularioDinamicoOrganizacion",
+  name: "TablaDinamicaOrganizacion",
 
   components: {
     ProgressSpinner,
     Message,
-    CampoFormularioOrganizacion,
+    Button,
+    ModalFormularioOrganizacion,
   },
 
   props: {
     esquema: {
       type: String,
       required: true,
-      validator: (valor) => {
-        const esquemasValidos = [
-          "departamentos",
-          "municipios",
-          "ciudades",
-          "ubicaciones_geograficas",
-          "estructura_militar",
-          "cargos",
-          "roles_funcionales",
-        ];
-        return esquemasValidos.includes(valor);
-      },
     },
-    modo: {
+    datos: {
+      type: Array,
+      default: () => [],
+    },
+    cargando: {
+      type: Boolean,
+      default: false,
+    },
+    error: {
       type: String,
-      default: "crear",
-      validator: (valor) => ["crear", "editar"].includes(valor),
-    },
-    datosIniciales: {
-      type: Object,
-      default: () => ({}),
+      default: null,
     },
     tema: {
       type: String,
-      default: "organizacion-purple",
+      default: "militar-oscuro",
+    },
+    permitirCrud: {
+      type: Boolean,
+      default: true,
     },
   },
 
-  emits: ["enviado", "error", "cancelado"],
+  emits: ["recargar", "creado", "actualizado", "eliminado", "error"],
 
   setup(props, { emit }) {
-    // Composables especializados
+    // Composables y stores
     const toast = useToast();
-    const organizacionStore = useOrganizacionStore();
-    const catalogosStore = useCatalogosStore(); // Para foráneas de catálogos
 
     const {
-      configurarEsquema,
-      validarDatos,
-      formatearParaBackend,
-      obtenerValoresDefecto,
-      analizarConfiguracionCampo,
-      mostrarNotificacion,
-      limpiarErrores,
-    } = usarFormularioDinamico();
+      registros,
+      cargarDatos,
+      crearRegistro,
+      actualizarRegistro,
+      eliminarRegistro,
+    } = usarCrudOrganizacion(props.esquema);
+
+    const { analizarConfiguracionCampo } = usarFormularioDinamico();
 
     // Estado reactivo
-    const cargando = ref(false);
-    const datosFormulario = ref({});
-    const erroresValidacion = ref({});
-    const configuracionEsquema = ref(null);
-    const camposConfigurados = ref([]);
+    const modalVisible = ref(false);
+    const modalModo = ref("crear");
+    const modalDatos = ref({});
+    const cargandoRelaciones = ref(false);
 
-    // 🔥 NUEVOS REFS PARA FILTRADO JERÁRQUICO
-    const paisSeleccionado = ref(null);
-    const departamentoSeleccionado = ref(null);
-    const municipioSeleccionado = ref(null);
-    const ciudadSeleccionada = ref(null);
+    // Estados para filtros y paginación
+    const filtroTexto = ref("");
+    const registrosPorPagina = ref(10);
+    const paginaActual = ref(1);
+
+    // Variables para ordenamiento
+    const campoOrdenamiento = ref("default");
+    const tipoOrdenamiento = ref("asc");
 
     // Computed properties
-    const nombreEsquema = computed(() => props.esquema);
 
-    const esquemaValido = computed(() => {
-      return configuracionEsquema.value !== null;
+    // Configuración del esquema
+    const configuracionEsquema = computed(() => {
+      return obtenerEsquema(props.esquema);
     });
 
-    const tieneErrores = computed(() => {
-      return Object.keys(erroresValidacion.value).length > 0;
-    });
+    // Opciones de ordenamiento dinámicas por tabla
+    const opcionesOrdenamiento = computed(() => {
+      const tabla = configuracionEsquema.value?.tabla;
 
-    const mensajeCarga = computed(() => {
-      if (props.modo === "crear") {
-        return "Preparando formulario de organización...";
-      } else {
-        return "Cargando datos organizacionales para editar...";
-      }
-    });
+      const opcionesComunes = [
+        { label: "Por defecto", value: "default" },
+        { label: "Fecha de creación", value: "created_at" },
+        { label: "Alfabético por nombre", value: "alfabetico" },
+      ];
 
-    // 🌍 COMPUTED PARA FILTRADO JERÁRQUICO
-    const departamentosFiltrados = computed(() => {
-      if (!paisSeleccionado.value) {
-        return organizacionStore.departamentos || [];
-      }
-
-      return (organizacionStore.departamentos || []).filter(
-        (depto) => depto.pais_id === paisSeleccionado.value
-      );
-    });
-
-    const municipiosFiltrados = computed(() => {
-      if (!departamentoSeleccionado.value) {
-        return organizacionStore.municipios || [];
-      }
-
-      return (organizacionStore.municipios || []).filter(
-        (municipio) =>
-          municipio.departamento_id === departamentoSeleccionado.value
-      );
-    });
-
-    const ciudadesFiltradas = computed(() => {
-      if (!municipioSeleccionado.value) {
-        return organizacionStore.ciudades || [];
-      }
-
-      return (organizacionStore.ciudades || []).filter(
-        (ciudad) => ciudad.municipio_id === municipioSeleccionado.value
-      );
-    });
-
-    const ubicacionesFiltradas = computed(() => {
-      let ubicaciones = organizacionStore.ubicacionesGeograficas || [];
-
-      // Filtrar por país si está seleccionado
-      if (paisSeleccionado.value) {
-        ubicaciones = ubicaciones.filter(
-          (ubicacion) => ubicacion.pais_id === paisSeleccionado.value
-        );
-      }
-
-      // Filtrar por departamento si está seleccionado
-      if (departamentoSeleccionado.value) {
-        ubicaciones = ubicaciones.filter(
-          (ubicacion) =>
-            ubicacion.departamento_id === departamentoSeleccionado.value
-        );
-      }
-
-      // Filtrar por municipio si está seleccionado
-      if (municipioSeleccionado.value) {
-        ubicaciones = ubicaciones.filter(
-          (ubicacion) => ubicacion.municipio_id === municipioSeleccionado.value
-        );
-      }
-
-      // Filtrar por ciudad si está seleccionada
-      if (ciudadSeleccionada.value) {
-        ubicaciones = ubicaciones.filter(
-          (ubicacion) => ubicacion.ciudad_id === ciudadSeleccionada.value
-        );
-      }
-
-      return ubicaciones;
-    });
-
-    // 🎯 FUNCIÓN PARA DETECTAR CAMBIOS EN SELECCIONES Y FILTRAR
-    const actualizarFiltrosJerarquicos = (nombreCampo, valor) => {
-      console.log(`🔄 Actualizando filtros: ${nombreCampo} = ${valor}`);
-
-      switch (nombreCampo) {
-        case "pais_id":
-          paisSeleccionado.value = valor;
-          // Reset cascada
-          departamentoSeleccionado.value = null;
-          municipioSeleccionado.value = null;
-          ciudadSeleccionada.value = null;
-
-          // ✅ LIMPIAR CAMPOS DEPENDIENTES EN EL FORMULARIO
-          if (datosFormulario.value.departamento_id) {
-            datosFormulario.value.departamento_id = null;
-          }
-          if (datosFormulario.value.municipio_id) {
-            datosFormulario.value.municipio_id = null;
-          }
-          if (datosFormulario.value.ciudad_id) {
-            datosFormulario.value.ciudad_id = null;
-          }
-          console.log("🌍 País seleccionado, campos dependientes reseteados");
-          break;
-
-        case "departamento_id":
-          departamentoSeleccionado.value = valor;
-          // Reset cascada siguiente
-          municipioSeleccionado.value = null;
-          ciudadSeleccionada.value = null;
-
-          // ✅ LIMPIAR CAMPOS DEPENDIENTES
-          if (datosFormulario.value.municipio_id) {
-            datosFormulario.value.municipio_id = null;
-          }
-          if (datosFormulario.value.ciudad_id) {
-            datosFormulario.value.ciudad_id = null;
-          }
-          console.log(
-            "🏛️ Departamento seleccionado, municipios/ciudades reseteados"
-          );
-          break;
-
-        case "municipio_id":
-          municipioSeleccionado.value = valor;
-          // Reset cascada siguiente
-          ciudadSeleccionada.value = null;
-
-          // ✅ LIMPIAR CAMPOS DEPENDIENTES
-          if (datosFormulario.value.ciudad_id) {
-            datosFormulario.value.ciudad_id = null;
-          }
-          console.log("🏙️ Municipio seleccionado, ciudades reseteadas");
-          break;
-
-        case "ciudad_id":
-          ciudadSeleccionada.value = valor;
-          console.log("🌃 Ciudad seleccionada");
-          break;
-      }
-
-      // ✅ FORZAR ACTUALIZACIÓN DE LA UI
-      nextTick(() => {
-        console.log("🔄 UI actualizada con nuevos filtros");
-      });
-    };
-
-    // 🚀 FUNCIÓN MEJORADA PARA OBTENER OPCIONES CON FILTRADO JERÁRQUICO
-    const obtenerOpcionesParaCampo = (configuracionCampo) => {
-      console.log("🔍 Obteniendo opciones para:", configuracionCampo);
-      if (
-        (configuracionCampo.tipo !== "seleccion" &&
-          configuracionCampo.tipo !== "foraneo_autocompletado") ||
-        !configuracionCampo.tablaReferencia
-      ) {
-        console.log(
-          "❌ Campo no válido para opciones:",
-          configuracionCampo.tipo,
-          configuracionCampo.tablaReferencia
-        );
-        return [];
-      }
-
-      switch (configuracionCampo.tablaReferencia) {
-        // REFERENCIAS A CATÁLOGOS (foráneas)
-        case "paises":
-          const paises = catalogosStore.paises || [];
-          console.log("🌍 Países disponibles:", paises.length, paises);
-
-          if (paises.length === 0) {
-            console.log("📡 Forzando carga de países...");
-            catalogosStore.loadPaises();
-            return [
-              {
-                etiqueta: "Cargando países...",
-                valor: null,
-                disabled: true,
-              },
-            ];
-          }
-
-          console.log("✅ Retornando países:", paises.length);
-          return paises
-            .filter((pais) => pais.is_active !== false)
-            .map((pais) => ({
-              etiqueta: pais.nombre || `País ${pais.id}`,
-              valor: pais.id,
-              datos: pais,
-            }));
-
-        case "tipos_estructura_militar":
-          const tiposEstructura = catalogosStore.tiposEstructuraMilitar || [];
-          if (tiposEstructura.length === 0) {
-            catalogosStore.loadTiposEstructuraMilitar();
-            return [
-              {
-                etiqueta: "Cargando tipos estructura...",
-                valor: null,
-                disabled: true,
-              },
-            ];
-          }
-          return tiposEstructura
-            .filter((tipo) => tipo.is_active !== false)
-            .map((tipo) => ({
-              etiqueta: tipo.nombre_tipo || `Tipo ${tipo.id}`,
-              valor: tipo.id,
-              datos: tipo,
-            }));
-
-        // 🎯 REFERENCIAS FILTRADAS JERÁRQUICAMENTE
+      // Opciones específicas por tabla
+      switch (tabla) {
         case "departamentos":
-          const departamentosDisponibles = departamentosFiltrados.value;
-          console.log(
-            `🏘️ Departamentos filtrados (país: ${paisSeleccionado.value}):`,
-            departamentosDisponibles.length
-          );
-
-          if (
-            departamentosDisponibles.length === 0 &&
-            organizacionStore.departamentos?.length === 0
-          ) {
-            organizacionStore.loadDepartamentos();
-            return [
-              {
-                etiqueta: "Cargando departamentos...",
-                valor: null,
-                disabled: true,
-              },
-            ];
-          }
-
-          if (departamentosDisponibles.length === 0 && paisSeleccionado.value) {
-            return [
-              {
-                etiqueta: "No hay departamentos para este país",
-                valor: null,
-                disabled: true,
-              },
-            ];
-          }
-
-          return departamentosDisponibles
-            .filter((depto) => depto.is_active !== false)
-            .map((depto) => ({
-              etiqueta: depto.nombre_departamento || `Departamento ${depto.id}`,
-              valor: depto.id,
-              datos: depto,
-            }));
+          return [
+            ...opcionesComunes,
+            { label: "Código Departamento", value: "codigo_departamento" },
+            { label: "País", value: "pais_id" },
+          ];
 
         case "municipios":
-          const municipiosDisponibles = municipiosFiltrados.value;
-          console.log(
-            `🏙️ Municipios filtrados (depto: ${departamentoSeleccionado.value}):`,
-            municipiosDisponibles.length
-          );
-
-          if (
-            municipiosDisponibles.length === 0 &&
-            organizacionStore.municipios?.length === 0
-          ) {
-            organizacionStore.loadMunicipios();
-            return [
-              {
-                etiqueta: "Cargando municipios...",
-                valor: null,
-                disabled: true,
-              },
-            ];
-          }
-
-          if (
-            municipiosDisponibles.length === 0 &&
-            departamentoSeleccionado.value
-          ) {
-            return [
-              {
-                etiqueta: "No hay municipios para este departamento",
-                valor: null,
-                disabled: true,
-              },
-            ];
-          }
-
-          return municipiosDisponibles
-            .filter((municipio) => municipio.is_active !== false)
-            .map((municipio) => ({
-              etiqueta:
-                municipio.nombre_municipio || `Municipio ${municipio.id}`,
-              valor: municipio.id,
-              datos: municipio,
-            }));
+          return [
+            ...opcionesComunes,
+            { label: "Código Municipio", value: "codigo_municipio" },
+            { label: "Departamento", value: "departamento_id" },
+          ];
 
         case "ciudades":
-          const ciudadesDisponibles = ciudadesFiltradas.value;
-          console.log(
-            `🌃 Ciudades filtradas (municipio: ${municipioSeleccionado.value}):`,
-            ciudadesDisponibles.length
-          );
-
-          if (
-            ciudadesDisponibles.length === 0 &&
-            organizacionStore.ciudades?.length === 0
-          ) {
-            organizacionStore.loadCiudades();
-            return [
-              {
-                etiqueta: "Cargando ciudades...",
-                valor: null,
-                disabled: true,
-              },
-            ];
-          }
-
-          if (ciudadesDisponibles.length === 0 && municipioSeleccionado.value) {
-            return [
-              {
-                etiqueta: "No hay ciudades para este municipio",
-                valor: null,
-                disabled: true,
-              },
-            ];
-          }
-
-          return ciudadesDisponibles
-            .filter((ciudad) => ciudad.is_active !== false)
-            .map((ciudad) => ({
-              etiqueta: ciudad.nombre_ciudad || `Ciudad ${ciudad.id}`,
-              valor: ciudad.id,
-              datos: ciudad,
-            }));
+          return [
+            ...opcionesComunes,
+            { label: "Código Ciudad", value: "codigo_ciudad" },
+            { label: "Tipo Localidad", value: "tipo_localidad" },
+            { label: "Municipio", value: "municipio_id" },
+          ];
 
         case "ubicaciones_geograficas":
-          const ubicacionesDisponibles = ubicacionesFiltradas.value;
-          console.log(
-            `📍 Ubicaciones filtradas:`,
-            ubicacionesDisponibles.length
-          );
-
-          if (
-            ubicacionesDisponibles.length === 0 &&
-            organizacionStore.ubicacionesGeograficas?.length === 0
-          ) {
-            organizacionStore.loadUbicacionesGeograficas();
-            return [
-              {
-                etiqueta: "Cargando ubicaciones...",
-                valor: null,
-                disabled: true,
-              },
-            ];
-          }
-
-          return ubicacionesDisponibles
-            .filter((ubicacion) => ubicacion.is_active !== false)
-            .map((ubicacion) => ({
-              etiqueta:
-                ubicacion.nombre_ubicacion || `Ubicación ${ubicacion.id}`,
-              valor: ubicacion.id,
-              datos: ubicacion,
-            }));
+          return [
+            ...opcionesComunes,
+            { label: "Código Ubicación", value: "codigo_ubicacion" },
+            { label: "Latitud", value: "latitud" },
+            { label: "Longitud", value: "longitud" },
+            { label: "País", value: "pais_id" },
+          ];
 
         case "estructura_militar":
-          const estructuras = organizacionStore.estructuraMilitar || [];
-          if (estructuras.length === 0) {
-            organizacionStore.loadEstructuraMilitar();
-            return [
-              {
-                etiqueta: "Cargando estructuras...",
-                valor: null,
-                disabled: true,
-              },
-            ];
-          }
-          return estructuras
-            .filter((estructura) => estructura.is_active !== false)
-            .map((estructura) => ({
-              etiqueta: estructura.nombre_unidad || `Unidad ${estructura.id}`,
-              valor: estructura.id,
-              datos: estructura,
-            }));
+          return [
+            ...opcionesComunes,
+            { label: "Nivel Jerárquico", value: "nivel_jerarquico" },
+            { label: "Orden Horizontal", value: "orden_horizontal" },
+            { label: "Código Unidad", value: "codigo_unidad" },
+            { label: "Capacidad Personal", value: "capacidad_personal" },
+          ];
+
+        case "cargos":
+          return [
+            ...opcionesComunes,
+            { label: "Código Cargo", value: "codigo_cargo" },
+            { label: "Nivel Autoridad", value: "nivel_autoridad" },
+          ];
+
+        case "roles_funcionales":
+          return [
+            ...opcionesComunes,
+            { label: "Código Rol", value: "codigo_rol" },
+            { label: "Nivel Autoridad", value: "nivel_autoridad" },
+          ];
 
         default:
-          return [];
+          return opcionesComunes;
       }
-    };
+    });
 
-    // Inicializar formulario ESPECIALIZADO PARA ORGANIZACIÓN
-    const inicializarFormulario = async () => {
-      cargando.value = true;
-      limpiarErrores();
-      erroresValidacion.value = {};
+    // Opciones de tipo de ordenamiento
+    const tiposOrdenamiento = ref([
+      { label: "Menor a Mayor (A-Z, 1-9)", value: "asc" },
+      { label: "Mayor a Menor (Z-A, 9-1)", value: "desc" },
+    ]);
 
-      try {
-        // ✅ USAR IMPORT DINÁMICO (temporal hasta resolver el estático)
-        const { obtenerEsquema } = await import("@/config/esquemaOrganizacion");
-        const configuracion = obtenerEsquema(props.esquema);
+    // Función de ordenamiento inteligente
+    const aplicarOrdenamiento = (registros, campo, tipo) => {
+      if (campo === "default") {
+        // Usar ordenamiento por defecto del esquema
+        const campoDefecto = configuracionEsquema.value?.ordenarPor || "id";
+        return [...registros].sort((a, b) => {
+          const valorA = a[campoDefecto] || "";
+          const valorB = b[campoDefecto] || "";
+          return tipo === "asc"
+            ? String(valorA).localeCompare(String(valorB))
+            : String(valorB).localeCompare(String(valorA));
+        });
+      }
 
-        if (!configuracion) {
-          console.error(
-            `❌ Esquema de organización no encontrado: ${props.esquema}`
-          );
-          return;
+      if (campo === "alfabetico") {
+        // Buscar campo de nombre automáticamente
+        const campoNombre =
+          Object.keys(registros[0] || {}).find(
+            (key) => key.includes("nombre") || key.includes("name")
+          ) || "nombre";
+
+        return [...registros].sort((a, b) => {
+          const nombreA = (a[campoNombre] || "").toLowerCase();
+          const nombreB = (b[campoNombre] || "").toLowerCase();
+          return tipo === "asc"
+            ? nombreA.localeCompare(nombreB)
+            : nombreB.localeCompare(nombreA);
+        });
+      }
+
+      return [...registros].sort((a, b) => {
+        const valorA = a[campo];
+        const valorB = b[campo];
+
+        // Ordenamiento numérico
+        if (!isNaN(valorA) && !isNaN(valorB)) {
+          return tipo === "asc"
+            ? Number(valorA) - Number(valorB)
+            : Number(valorB) - Number(valorA);
         }
 
-        console.log(`✅ Configuración encontrada:`, configuracion);
-        configuracionEsquema.value = configuracion;
+        // Ordenamiento de fechas
+        if (campo.includes("fecha") || campo.includes("_at")) {
+          const fechaA = new Date(valorA);
+          const fechaB = new Date(valorB);
+          return tipo === "asc" ? fechaA - fechaB : fechaB - fechaA;
+        }
 
-        // 🔥 CARGA INTELIGENTE POR ESQUEMA - MEJORADA
-        await cargarDependenciasEsquema(props.esquema);
+        // Ordenamiento de texto
+        return tipo === "asc"
+          ? String(valorA || "").localeCompare(String(valorB || ""))
+          : String(valorB || "").localeCompare(String(valorA || ""));
+      });
+    };
 
-        camposConfigurados.value = configuracion.campos
-          .map((configuracionCampo) => {
-            return analizarConfiguracionCampo(configuracionCampo);
-          })
-          .filter((config) => config !== null);
+    // Campos que se muestran en la tabla
+    const camposMostrar = computed(() => {
+      if (!configuracionEsquema.value) return [];
 
-        if (props.modo === "crear") {
-          datosFormulario.value = obtenerValoresDefecto(configuracion);
-        } else {
-          datosFormulario.value = { ...props.datosIniciales };
+      const camposConfigurados =
+        configuracionEsquema.value.mostrarEnTabla || [];
 
-          // 🎯 INICIALIZAR FILTROS PARA MODO EDITAR
-          if (props.modo === "editar") {
-            paisSeleccionado.value = datosFormulario.value.pais_id || null;
-            departamentoSeleccionado.value =
-              datosFormulario.value.departamento_id || null;
-            municipioSeleccionado.value =
-              datosFormulario.value.municipio_id || null;
-            ciudadSeleccionada.value = datosFormulario.value.ciudad_id || null;
+      return camposConfigurados.map((nombreCampo) => {
+        const configuracionCampo = configuracionEsquema.value.campos.find(
+          (campo) => {
+            const config = analizarConfiguracionCampo(campo);
+            return config && config.nombre === nombreCampo;
           }
+        );
+
+        if (configuracionCampo) {
+          return analizarConfiguracionCampo(configuracionCampo);
         }
 
-        console.log(
-          `✅ Formulario organización inicializado: ${props.esquema}`
-        );
-      } catch (error) {
-        console.error("❌ Error inicializando formulario organización:", error);
-        mostrarNotificacion("errorConexion");
-      } finally {
-        cargando.value = false;
+        return {
+          nombre: nombreCampo,
+          etiqueta: formatearEtiqueta(nombreCampo),
+          tipo: "texto",
+        };
+      });
+    });
+
+    // Registros actuales
+    const registrosActuales = computed(() => {
+      return props.datos || registros.value || [];
+    });
+
+    // Filtros y búsqueda
+    const registrosFiltrados = computed(() => {
+      if (!filtroTexto.value.trim()) {
+        return registrosActuales.value;
       }
-    };
 
-    // 🚀 CARGA INTELIGENTE DE DEPENDENCIAS - MEJORADA CON VERIFICACIÓN
-    const cargarDependenciasEsquema = async (esquema) => {
-      try {
-        switch (esquema) {
-          case "departamentos":
-            // Necesita países - CARGA FORZADA
-            console.log("🌍 Iniciando carga de países para departamentos...");
-            await catalogosStore.loadPaises();
+      const textoFiltro = filtroTexto.value.toLowerCase().trim();
 
-            // Verificar que se cargaron
-            const paisesVerificados = catalogosStore.paises || [];
-            console.log(
-              "✅ Países verificados:",
-              paisesVerificados.length,
-              paisesVerificados
+      return registrosActuales.value.filter((registro) => {
+        return camposMostrar.value.some((campo) => {
+          const valor = registro[campo.nombre];
+          if (valor === null || valor === undefined) return false;
+
+          // Buscar en relaciones foráneas
+          if (esRelacionForanea(campo)) {
+            const nombreRelacion = obtenerNombreRelacion(registro, campo);
+            const codigoRelacion = obtenerCodigoRelacion(registro, campo);
+            return (
+              nombreRelacion.toLowerCase().includes(textoFiltro) ||
+              (codigoRelacion &&
+                codigoRelacion.toLowerCase().includes(textoFiltro))
             );
+          }
 
-            if (paisesVerificados.length === 0) {
-              console.warn("⚠️ No se cargaron países - reintentando...");
-              await catalogosStore.loadPaises();
-            }
-            break;
+          return String(valor).toLowerCase().includes(textoFiltro);
+        });
+      });
+    });
 
-          case "municipios":
-            // Necesita países y departamentos
-            await Promise.all([
-              catalogosStore.loadPaises(),
-              organizacionStore.loadDepartamentos(),
-            ]);
-            console.log("🏘️ Países y departamentos cargados para municipios");
-            break;
+    // Registros ordenados
+    const registrosOrdenados = computed(() => {
+      if (!registrosFiltrados.value?.length) return [];
 
-          case "ciudades":
-            // Necesita toda la cascada hasta municipios
-            await Promise.all([
-              catalogosStore.loadPaises(),
-              organizacionStore.loadDepartamentos(),
-              organizacionStore.loadMunicipios(),
-            ]);
-            console.log("🏙️ Cascada hasta municipios cargada para ciudades");
-            break;
+      return aplicarOrdenamiento(
+        registrosFiltrados.value,
+        campoOrdenamiento.value,
+        tipoOrdenamiento.value
+      );
+    });
 
-          case "ubicaciones_geograficas":
-            // Necesita toda la cascada geográfica
-            await Promise.all([
-              catalogosStore.loadPaises(),
-              organizacionStore.loadDepartamentos(),
-              organizacionStore.loadMunicipios(),
-              organizacionStore.loadCiudades(),
-            ]);
-            console.log("🌍 Cascada geográfica completa cargada");
-            break;
+    // Paginación con registros ordenados
+    const totalRegistrosFiltrados = computed(() => {
+      return registrosOrdenados.value?.length || 0;
+    });
 
-          case "estructura_militar":
-            // Necesita tipos_estructura_militar y ubicaciones
-            await Promise.all([
-              catalogosStore.loadTiposEstructuraMilitar(),
-              organizacionStore.loadUbicacionesGeograficas(),
-              catalogosStore.loadPaises(), // Para filtros de ubicaciones
-              organizacionStore.loadDepartamentos(),
-              organizacionStore.loadMunicipios(),
-              organizacionStore.loadCiudades(),
-            ]);
-            console.log("🏛️ Tipos estructura y cascada geográfica cargados");
-            break;
+    const totalPaginas = computed(() =>
+      Math.ceil(totalRegistrosFiltrados.value / registrosPorPagina.value)
+    );
 
-          case "cargos":
-            // Necesita estructura_militar
-            await organizacionStore.loadEstructuraMilitar();
-            console.log("👔 Estructura militar cargada para cargos");
-            break;
+    const registroInicio = computed(
+      () => (paginaActual.value - 1) * registrosPorPagina.value + 1
+    );
 
-          case "roles_funcionales":
-            // No necesita dependencias externas
-            console.log("🎭 Roles funcionales - sin dependencias");
-            break;
+    const registroFin = computed(() =>
+      Math.min(
+        paginaActual.value * registrosPorPagina.value,
+        totalRegistrosFiltrados.value
+      )
+    );
 
-          default:
-            console.log(`ℹ️ Sin dependencias específicas para: ${esquema}`);
+    const registrosPaginados = computed(() => {
+      const inicio = (paginaActual.value - 1) * registrosPorPagina.value;
+      const fin = inicio + registrosPorPagina.value;
+      return registrosOrdenados.value.slice(inicio, fin);
+    });
+
+    const paginasVisibles = computed(() => {
+      const total = totalPaginas.value;
+      const actual = paginaActual.value;
+      const paginas = [];
+
+      let inicio = Math.max(1, actual - 2);
+      let fin = Math.min(total, actual + 2);
+
+      // Ajustar para mostrar siempre 5 páginas si es posible
+      if (fin - inicio < 4) {
+        if (inicio === 1) {
+          fin = Math.min(total, inicio + 4);
+        } else if (fin === total) {
+          inicio = Math.max(1, fin - 4);
         }
-      } catch (error) {
-        console.error(`❌ Error cargando dependencias para ${esquema}:`, error);
+      }
+
+      for (let i = inicio; i <= fin; i++) {
+        paginas.push(i);
+      }
+
+      return paginas;
+    });
+
+    // Contador de registros
+    const contadorRegistros = computed(() => {
+      const cantidad = totalRegistrosFiltrados.value;
+      const total = registrosActuales.value.length;
+      const singular = configuracionEsquema.value?.titulo || "registro";
+      const plural = cantidad === 1 ? singular : `${singular}s`;
+
+      if (filtroTexto.value && cantidad !== total) {
+        return `${cantidad} de ${total} ${plural.toLowerCase()}`;
+      }
+
+      return `${cantidad} ${plural.toLowerCase()}`;
+    });
+
+    // Métodos de filtros y paginación
+    const filtrarRegistros = () => {
+      paginaActual.value = 1; // Resetear a primera página al filtrar
+    };
+
+    const limpiarFiltros = () => {
+      filtroTexto.value = "";
+      paginaActual.value = 1;
+    };
+
+    const cambiarRegistrosPorPagina = () => {
+      paginaActual.value = 1; // Resetear a primera página al cambiar cantidad
+    };
+
+    const irAPagina = (pagina) => {
+      if (pagina >= 1 && pagina <= totalPaginas.value) {
+        paginaActual.value = pagina;
       }
     };
 
-    // 🎯 ACTUALIZAR CAMPO CON FILTRADO JERÁRQUICO
-    const actualizarCampo = (nombreCampo, nuevoValor) => {
-      console.log(`🔄 Campo actualizado: ${nombreCampo} = ${nuevoValor}`);
+    // Función para cambiar ordenamiento
+    const cambiarOrdenamiento = () => {
+      // Resetear paginación al cambiar ordenamiento
+      paginaActual.value = 1;
 
-      // ✅ ACTUALIZAR EL FORMULARIO
-      datosFormulario.value[nombreCampo] = nuevoValor;
-
-      // 🔥 ACTUALIZAR FILTROS JERÁRQUICOS
-      actualizarFiltrosJerarquicos(nombreCampo, nuevoValor);
-
-      // ✅ LIMPIAR ERRORES
-      if (erroresValidacion.value[nombreCampo]) {
-        delete erroresValidacion.value[nombreCampo];
-      }
-    };
-
-    // 🌍 MANEJO DE EVENTOS ESPECÍFICOS DE ORGANIZACIÓN
-
-    // Auto-llenado cuando selecciona ubicación geográfica
-    const manejarUbicacionSeleccionada = (ubicacionData) => {
       console.log(
-        "📍 Ubicación seleccionada para auto-llenado:",
-        ubicacionData
+        `Ordenamiento organización cambiado: ${campoOrdenamiento.value} - ${tipoOrdenamiento.value}`
       );
-
-      const mapaAutollenado = {
-        latitud: ubicacionData.latitud,
-        longitud: ubicacionData.longitud,
-        direccion_referencia: ubicacionData.direccionReferencia,
-        altitud_metros: ubicacionData.altitudMetros,
-        telefono_principal: ubicacionData.telefonoPrincipal,
-        telefono_emergencia: ubicacionData.telefonoEmergencia,
-      };
-
-      aplicarAutollenado(mapaAutollenado, `ubicación ${ubicacionData.nombre}`);
     };
 
-    // Auto-llenado cuando selecciona departamento
-    const manejarDepartamentoSeleccionado = (departamentoData) => {
-      console.log("🏘️ Departamento seleccionado:", departamentoData);
-
-      toast.add({
-        severity: "info",
-        summary: "Departamento seleccionado",
-        detail: `${departamentoData.nombre} configurado correctamente`,
-        life: 2500,
-      });
+    // Métodos para relaciones
+    const esRelacionForanea = (campo) => {
+      return campo.nombre.endsWith("_id") && campo.tipo !== "numero";
     };
 
-    // Auto-llenado cuando selecciona municipio
-    const manejarMunicipioSeleccionado = (municipioData) => {
-      console.log("🏙️ Municipio seleccionado:", municipioData);
+    const obtenerNombreRelacion = (registro, campo) => {
+      const nombreCampo = campo.nombre;
+      const nombreTabla = nombreCampo.replace("_id", "");
 
-      toast.add({
-        severity: "info",
-        summary: "Municipio seleccionado",
-        detail: `${municipioData.nombre} configurado correctamente`,
-        life: 2500,
-      });
-    };
-
-    // Función helper para aplicar auto-llenado
-    const aplicarAutollenado = (mapaAutollenado, nombreReferencia) => {
-      Object.keys(mapaAutollenado).forEach((nombreCampo) => {
-        if (
-          datosFormulario.value.hasOwnProperty(nombreCampo) &&
-          mapaAutollenado[nombreCampo]
-        ) {
-          datosFormulario.value[nombreCampo] = mapaAutollenado[nombreCampo];
-          console.log(
-            `🔄 Auto-llenado: ${nombreCampo} = ${mapaAutollenado[nombreCampo]}`
-          );
-        }
-      });
-
-      // Limpiar errores de campos auto-llenados
-      Object.keys(mapaAutollenado).forEach((nombreCampo) => {
-        if (erroresValidacion.value[nombreCampo]) {
-          delete erroresValidacion.value[nombreCampo];
-        }
-      });
-
-      toast.add({
-        severity: "success",
-        summary: "Auto-llenado completado",
-        detail: `Campos llenados automáticamente para ${nombreReferencia}`,
-        life: 3000,
-      });
-    };
-
-    // Obtener etiqueta legible de un campo
-    const obtenerEtiquetaCampo = (nombreCampo) => {
-      const campo = camposConfigurados.value.find(
-        (c) => c.nombre === nombreCampo
-      );
-      return campo ? campo.etiqueta : nombreCampo;
-    };
-
-    // Validar todos los datos del formulario
-    const validarFormulario = () => {
-      const resultadoValidacion = validarDatos(
-        configuracionEsquema.value,
-        datosFormulario.value
-      );
-
-      erroresValidacion.value = resultadoValidacion.errores;
-
-      return resultadoValidacion.esValido;
-    };
-
-    // Procesar envío del formulario
-    const manejarEnvio = async () => {
-      if (!validarFormulario()) {
-        mostrarNotificacion("errorValidacion");
-        return;
+      if (registro[nombreTabla]) {
+        const datosRelacion = registro[nombreTabla];
+        return (
+          datosRelacion.nombre ||
+          datosRelacion.nombre_categoria ||
+          datosRelacion.nombre_especialidad ||
+          datosRelacion.nombre_grado ||
+          datosRelacion.nombre_tipo ||
+          datosRelacion.nombre_evento ||
+          datosRelacion.nombre_departamento ||
+          datosRelacion.nombre_municipio ||
+          datosRelacion.nombre_ciudad ||
+          datosRelacion.nombre_ubicacion ||
+          datosRelacion.nombre_estructura ||
+          datosRelacion.nombre_cargo ||
+          datosRelacion.nombre_rol ||
+          `ID: ${registro[nombreCampo]}`
+        );
       }
 
-      cargando.value = true;
+      return `ID: ${registro[nombreCampo]}`;
+    };
+
+    const obtenerCodigoRelacion = (registro, campo) => {
+      const nombreCampo = campo.nombre;
+      const nombreTabla = nombreCampo.replace("_id", "");
+
+      if (registro[nombreTabla]) {
+        const datosRelacion = registro[nombreTabla];
+        return (
+          datosRelacion.codigo_iso3 ||
+          datosRelacion.codigo_categoria ||
+          datosRelacion.codigo_especialidad ||
+          datosRelacion.codigo_grado ||
+          datosRelacion.codigo_tipo ||
+          datosRelacion.codigo_evento ||
+          datosRelacion.codigo_departamento ||
+          datosRelacion.codigo_municipio ||
+          datosRelacion.codigo_ciudad ||
+          datosRelacion.codigo_ubicacion ||
+          datosRelacion.codigo_estructura ||
+          datosRelacion.codigo_cargo ||
+          datosRelacion.codigo_rol ||
+          datosRelacion.codigo
+        );
+      }
+
+      return null;
+    };
+
+    // Métodos para formateo
+    const esBooleano = (campo, registro) => {
+      return typeof registro[campo.nombre] === "boolean";
+    };
+
+    const esFecha = (campo, registro) => {
+      const valor = registro[campo.nombre];
+      if (!valor) return false;
+      const fechaRegex = /^\d{4}-\d{2}-\d{2}/;
+      return typeof valor === "string" && fechaRegex.test(valor);
+    };
+
+    const esNumero = (campo, registro) => {
+      return (
+        typeof registro[campo.nombre] === "number" && !esRelacionForanea(campo)
+      );
+    };
+
+    const esUrl = (campo, registro) => {
+      const valor = registro[campo.nombre];
+      if (!valor || typeof valor !== "string") return false;
+      return (
+        valor.includes("http") ||
+        valor.includes("www.") ||
+        valor.includes(".com")
+      );
+    };
+
+    const claseBooleano = (valor) => {
+      return valor ? "badge-success" : "badge-inactive";
+    };
+
+    const iconoBooleano = (valor) => {
+      return valor ? "pi pi-check-circle" : "pi pi-times-circle";
+    };
+
+    const textoBooleano = (valor) => {
+      return valor ? "Activo" : "Inactivo";
+    };
+
+    const formatearFecha = (valor) => {
+      try {
+        const fecha = new Date(valor);
+        return fecha.toLocaleDateString("es-HN", {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+        });
+      } catch {
+        return valor;
+      }
+    };
+
+    const formatearNumero = (valor) => {
+      return new Intl.NumberFormat("es-HN").format(valor);
+    };
+
+    const obtenerValorMostrar = (valor) => {
+      if (valor === null || valor === undefined) return "-";
+      if (typeof valor === "string" && valor.trim() === "") return "-";
+      return valor;
+    };
+
+    // Métodos principales
+    const abrirModalCrear = async () => {
+      modalVisible.value = false;
+
+      // Lógica específica para organización si es necesaria
+      if (props.esquema === "departamentos") {
+        // Aquí puedes agregar lógica específica para departamentos
+      }
+
+      modalModo.value = "crear";
+      modalDatos.value = {};
+      modalVisible.value = true;
+    };
+
+    const abrirModalEditar = (registro) => {
+      modalModo.value = "editar";
+      modalDatos.value = { ...registro };
+      modalVisible.value = true;
+    };
+
+    const abrirModalEliminar = (registro) => {
+      modalModo.value = "eliminar";
+      modalDatos.value = { ...registro };
+      modalVisible.value = true;
+    };
+
+    // Método para recargar datos
+    const recargarDatos = async () => {
+      console.log("Recargando datos organización para esquema:", props.esquema);
 
       try {
-        const datosFormateados = formatearParaBackend(
-          configuracionEsquema.value,
-          datosFormulario.value
-        );
+        // Emit para que el padre recargue los datos
+        emit("recargar");
 
-        emit("enviado", {
-          esquema: props.esquema,
-          modo: props.modo,
-          datos: datosFormateados,
-          datosOriginales: datosFormulario.value,
+        // Mostrar toast de éxito
+        toast.add({
+          severity: "success",
+          summary: "Datos actualizados",
+          detail: "La tabla de organización ha sido recargada exitosamente",
+          life: 3000,
         });
       } catch (error) {
-        emit("error", {
-          esquema: props.esquema,
-          modo: props.modo,
-          error: error.message || "Error desconocido",
+        console.error("Error al recargar datos organización:", error);
+        toast.add({
+          severity: "error",
+          summary: "Error al actualizar",
+          detail: "No se pudieron recargar los datos de organización",
+          life: 5000,
         });
-      } finally {
-        cargando.value = false;
       }
     };
 
-    // Cancelar operación del formulario
-    const cancelarFormulario = () => {
-      datosFormulario.value = {};
-      erroresValidacion.value = {};
+    const manejarGuardado = (evento) => {
+      emit(evento.modo === "crear" ? "creado" : "actualizado", evento);
+      emit("recargar");
+    };
 
-      emit("cancelado", {
-        esquema: props.esquema,
-        modo: props.modo,
-      });
+    const manejarEliminado = (evento) => {
+      emit("eliminado", evento);
+      emit("recargar");
+    };
+
+    const manejarCancelado = () => {
+      modalVisible.value = false;
+    };
+
+    const manejarError = (evento) => {
+      emit("error", evento);
+    };
+
+    const formatearEtiqueta = (nombreCampo) => {
+      return nombreCampo
+        .replace(/_/g, " ")
+        .replace(/\b\w/g, (l) => l.toUpperCase());
     };
 
     // Watchers
     watch(
       () => props.esquema,
-      () => {
-        inicializarFormulario();
+      (nuevoEsquema) => {
+        console.log(`Esquema organización cambió a: ${nuevoEsquema}`);
+        // Resetear filtros y paginación
+        filtroTexto.value = "";
+        paginaActual.value = 1;
       }
     );
 
+    // Resetear paginación cuando cambien los datos
     watch(
-      () => props.modo,
+      () => props.datos,
       () => {
-        inicializarFormulario();
+        paginaActual.value = 1;
       }
-    );
-
-    watch(
-      () => props.datosIniciales,
-      (nuevosDatos) => {
-        if (props.modo === "editar" && nuevosDatos) {
-          datosFormulario.value = { ...nuevosDatos };
-
-          // Actualizar filtros jerárquicos para modo editar
-          paisSeleccionado.value = nuevosDatos.pais_id || null;
-          departamentoSeleccionado.value = nuevosDatos.departamento_id || null;
-          municipioSeleccionado.value = nuevosDatos.municipio_id || null;
-          ciudadSeleccionada.value = nuevosDatos.ciudad_id || null;
-        }
-      },
-      { deep: true }
     );
 
     // Lifecycle
-    onMounted(async () => {
+    onMounted(() => {
       console.log(
-        "🛠️ FormularioDinamicoOrganizacion montado para:",
-        props.esquema
+        `TablaDinamicaOrganizacion FAH montada para esquema: ${props.esquema}`
       );
-
-      // 🔥 DEBUG: Forzar carga de países
-      console.log("📡 Estado inicial países:", catalogosStore.paises);
-
-      try {
-        await catalogosStore.loadPaises();
-        console.log("✅ Países después de cargar:", catalogosStore.paises);
-      } catch (error) {
-        console.error("❌ Error cargando países:", error);
-      }
-
-      // 🔥 DEBUG: Verificar configuración esquema
-      console.log(
-        "📋 Configuración esquema actual:",
-        configuracionEsquema.value
-      );
-
-      inicializarFormulario();
     });
 
+    // Return
     return {
       // Estado
-      cargando,
-      datosFormulario,
-      erroresValidacion,
-      configuracionEsquema,
-      camposConfigurados,
+      modalVisible,
+      modalModo,
+      modalDatos,
+      cargandoRelaciones,
+      filtroTexto,
+      registrosPorPagina,
+      paginaActual,
+
+      // Variables de ordenamiento
+      campoOrdenamiento,
+      tipoOrdenamiento,
+      opcionesOrdenamiento,
+      tiposOrdenamiento,
+      cambiarOrdenamiento,
 
       // Computed
-      nombreEsquema,
-      esquemaValido,
-      tieneErrores,
-      mensajeCarga,
+      configuracionEsquema,
+      camposMostrar,
+      registrosActuales,
+      registrosFiltrados,
+      totalRegistrosFiltrados,
+      totalPaginas,
+      registroInicio,
+      registroFin,
+      registrosPaginados,
+      paginasVisibles,
+      contadorRegistros,
 
-      // Métodos
-      actualizarCampo,
-      manejarUbicacionSeleccionada,
-      manejarDepartamentoSeleccionado,
-      manejarMunicipioSeleccionado,
-      obtenerEtiquetaCampo,
-      obtenerOpcionesParaCampo,
-      manejarEnvio,
-      cancelarFormulario,
-      validarFormulario,
-      inicializarFormulario,
+      // Métodos principales
+      abrirModalCrear,
+      abrirModalEditar,
+      abrirModalEliminar,
+      recargarDatos,
+      manejarGuardado,
+      manejarEliminado,
+      manejarCancelado,
+      manejarError,
+
+      // Métodos de filtros y paginación
+      filtrarRegistros,
+      limpiarFiltros,
+      cambiarRegistrosPorPagina,
+      irAPagina,
+
+      // Métodos para relaciones
+      esRelacionForanea,
+      obtenerNombreRelacion,
+      obtenerCodigoRelacion,
+
+      // Métodos para formateo
+      esBooleano,
+      esFecha,
+      esNumero,
+      esUrl,
+      claseBooleano,
+      iconoBooleano,
+      textoBooleano,
+      formatearFecha,
+      formatearNumero,
+      obtenerValorMostrar,
     };
   },
 };
 </script>
 
-<style scoped>
-.contenedor-formulario-dinamico-organizacion {
-  @apply w-full;
-}
+<style>
+@import "@/styles/components/formularios/tabla-dinamica-organizacion.css";
 
-.formulario-contenido {
-  @apply space-y-6;
-}
-
-.formulario-dinamico-organizacion {
-  @apply w-full;
-}
-
-.campo-wrapper {
-  animation: aparecer 0.3s ease-out;
-}
-
-@keyframes aparecer {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.cargando {
-  @apply opacity-50 pointer-events-none;
-}
-
-/* Tema púrpura para organización */
-.contenedor-formulario-dinamico-organizacion .text-purple-300 {
-  color: #d8b4fe;
-}
-
-.contenedor-formulario-dinamico-organizacion .bg-purple-800 {
-  background-color: #6b21a8;
-}
-
-@media (max-width: 768px) {
-  .formulario-dinamico-organizacion .grid {
-    @apply grid-cols-1 gap-3;
-  }
+/* Estilos específicos para ordenamiento */
+.controles-ordenamiento {
+  border-left: 4px solid #7c3aed !important; /* Púrpura organización */
 }
 </style>

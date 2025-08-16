@@ -550,3 +550,103 @@
 .tabla-fah tbody td .codigo-relacion {
   color: #6b7280 !important;
 }
+
+/* =====================================
+   🎯 ESTILOS PARA SELECTORES DE ORDENAMIENTO
+   AGREGADO PARA FUNCIONALIDAD DE ORDENAMIENTO
+   ===================================== */
+
+.tabla-controles-con-ordenamiento {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+  border-bottom: 2px solid #e2e8f0;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.controles-ordenamiento {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: white;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.label-ordenamiento {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  white-space: nowrap;
+}
+
+.select-ordenamiento,
+.select-orden-tipo {
+  padding: 0.375rem 0.75rem;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: white;
+  font-size: 0.875rem;
+  color: #374151;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 120px;
+}
+
+.select-ordenamiento:focus,
+.select-orden-tipo:focus {
+  outline: none;
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.select-ordenamiento:hover,
+.select-orden-tipo:hover {
+  border-color: #9ca3af;
+}
+
+/* =====================================
+   📱 RESPONSIVO PARA SELECTORES DE ORDENAMIENTO
+   ===================================== */
+
+@media (max-width: 768px) {
+  .tabla-controles-con-ordenamiento {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .controles-ordenamiento {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .select-ordenamiento,
+  .select-orden-tipo {
+    flex: 1;
+    min-width: auto;
+  }
+}
+
+/* =====================================
+   🎨 VARIANTES POR TIPO DE TABLA
+   ===================================== */
+
+/* Para tipos estructura militar */
+.tabla-tipos-estructura-militar .controles-ordenamiento {
+  border-left: 4px solid #1e3a8a;
+}
+
+/* Para grados */
+.tabla-grados .controles-ordenamiento {
+  border-left: 4px solid #f59e0b;
+}
+
+/* Para países */
+.tabla-paises .controles-ordenamiento {
+  border-left: 4px solid #10b981;
+}

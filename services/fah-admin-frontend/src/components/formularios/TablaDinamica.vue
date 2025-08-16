@@ -1,12 +1,7 @@
 <template>
-  <!-- ============================================ -->
-  <!-- TABLA DINÁMICA CATÁLOGOS FAH - VERSIÓN COMPLETA -->
-  <!-- ✅ CONTROLES SUPERIORES E INFERIORES + PALETA FAH -->
-  <!-- ============================================ -->
+  <!-- CONTROLES SUPERIORES E INFERIORES + PALETA FAH -->
   <div class="tabla-dinamica-contenedor">
-    <!-- =====================================
-         HEADER DE LA TABLA FAH
-         ===================================== -->
+    <!-- HEADER DE LA TABLA FAH -->
     <div
       class="flex justify-between items-center px-6 py-5 bg-gradient-to-r from-slate-50 to-slate-100 border-b-2"
       :style="{ borderBottomColor: coloresEsquema.borderColor }"
@@ -16,7 +11,7 @@
           class="w-11 h-11 rounded-lg flex items-center justify-center text-xl text-white"
           style="background: #1e3a8a"
         >
-          {{ configuracionEsquema?.icono || "📋" }}
+          {{ configuracionEsquema?.icono || "📋 " }}
         </div>
         <div>
           <h3 class="m-0 text-gray-800 text-lg font-semibold">
@@ -29,10 +24,8 @@
       </div>
     </div>
 
-    <!-- =====================================
-         CONTROLES SUPERIORES FAH
-         ===================================== -->
-    <div class="tabla-controles-superiores">
+    <!-- CONTROLES SUPERIORES CON ORDENAMIENTO -->
+    <div class="tabla-controles-superiores tabla-controles-con-ordenamiento">
       <!-- BOTONES IZQUIERDA -->
       <div class="controles-izquierda">
         <button
@@ -83,6 +76,38 @@
           <option value="50">50</option>
         </select>
         <span class="label-registros">registros</span>
+      </div>
+
+      <!-- SELECTORES DE ORDENAMIENTO -->
+      <div class="controles-ordenamiento">
+        <label class="label-ordenamiento">Ordenar por:</label>
+        <select
+          v-model="campoOrdenamiento"
+          @change="cambiarOrdenamiento"
+          class="select-ordenamiento"
+        >
+          <option
+            v-for="opcion in opcionesOrdenamiento"
+            :key="opcion.value"
+            :value="opcion.value"
+          >
+            {{ opcion.label }}
+          </option>
+        </select>
+
+        <select
+          v-model="tipoOrdenamiento"
+          @change="cambiarOrdenamiento"
+          class="select-orden-tipo"
+        >
+          <option
+            v-for="tipo in tiposOrdenamiento"
+            :key="tipo.value"
+            :value="tipo.value"
+          >
+            {{ tipo.label }}
+          </option>
+        </select>
       </div>
     </div>
 
@@ -444,6 +469,10 @@ export default {
     const registrosPorPagina = ref(10);
     const paginaActual = ref(1);
 
+    // 🔄 NUEVAS VARIABLES PARA ORDENAMIENTO
+    const campoOrdenamiento = ref("default"); // Campo seleccionado para ordenar
+    const tipoOrdenamiento = ref("asc"); // asc = menor a mayor, desc = mayor a menor
+
     // =====================================
     // COMPUTED PROPERTIES
     // =====================================
@@ -452,6 +481,118 @@ export default {
     const configuracionEsquema = computed(() => {
       return obtenerEsquema(props.esquema);
     });
+
+    // 🎯 OPCIONES DE ORDENAMIENTO DINÁMICAS POR TABLA
+    const opcionesOrdenamiento = computed(() => {
+      const tabla = configuracionEsquema.value?.tabla;
+
+      const opcionesComunes = [
+        { label: "Por defecto", value: "default" },
+        { label: "Fecha de creación", value: "created_at" },
+        { label: "Alfabético por nombre", value: "alfabetico" },
+      ];
+
+      // 🏛️ OPCIONES ESPECÍFICAS POR TABLA
+      switch (tabla) {
+        case "tipos_estructura_militar":
+          return [
+            ...opcionesComunes,
+            { label: "Nivel Organizacional", value: "nivel_organizacional" },
+            { label: "Código Tipo", value: "codigo_tipo" },
+          ];
+
+        case "grados":
+          return [
+            ...opcionesComunes,
+            { label: "Orden Jerárquico", value: "orden_jerarquico" },
+            { label: "Categoría Personal", value: "categoria_personal_id" },
+          ];
+
+        case "categorias_personal":
+          return [
+            ...opcionesComunes,
+            { label: "Orden Jerárquico", value: "orden_jerarquico" },
+          ];
+
+        case "paises":
+          return [
+            ...opcionesComunes,
+            { label: "Código ISO3", value: "codigo_iso3" },
+            { label: "Código Teléfono", value: "codigo_telefono" },
+          ];
+
+        case "niveles_prioridad":
+        case "niveles_seguridad":
+          return [
+            ...opcionesComunes,
+            { label: "Nivel Numérico", value: "nivel_numerico" },
+          ];
+
+        default:
+          return opcionesComunes;
+      }
+    });
+
+    // 🎯 OPCIONES DE TIPO DE ORDENAMIENTO
+    const tiposOrdenamiento = ref([
+      { label: "Menor a Mayor (A-Z, 1-9)", value: "asc" },
+      { label: "Mayor a Menor (Z-A, 9-1)", value: "desc" },
+    ]);
+
+    // 🚀 FUNCIÓN DE ORDENAMIENTO INTELIGENTE
+    const aplicarOrdenamiento = (registros, campo, tipo) => {
+      if (campo === "default") {
+        // Usar ordenamiento por defecto del esquema
+        const campoDefecto = configuracionEsquema.value?.ordenarPor || "id";
+        return [...registros].sort((a, b) => {
+          const valorA = a[campoDefecto] || "";
+          const valorB = b[campoDefecto] || "";
+          return tipo === "asc"
+            ? String(valorA).localeCompare(String(valorB))
+            : String(valorB).localeCompare(String(valorA));
+        });
+      }
+
+      if (campo === "alfabetico") {
+        // Buscar campo de nombre automáticamente
+        const campoNombre =
+          Object.keys(registros[0] || {}).find(
+            (key) => key.includes("nombre") || key.includes("name")
+          ) || "nombre";
+
+        return [...registros].sort((a, b) => {
+          const nombreA = (a[campoNombre] || "").toLowerCase();
+          const nombreB = (b[campoNombre] || "").toLowerCase();
+          return tipo === "asc"
+            ? nombreA.localeCompare(nombreB)
+            : nombreB.localeCompare(nombreA);
+        });
+      }
+
+      return [...registros].sort((a, b) => {
+        const valorA = a[campo];
+        const valorB = b[campo];
+
+        // 🔢 ORDENAMIENTO NUMÉRICO
+        if (!isNaN(valorA) && !isNaN(valorB)) {
+          return tipo === "asc"
+            ? Number(valorA) - Number(valorB)
+            : Number(valorB) - Number(valorA);
+        }
+
+        // 📅 ORDENAMIENTO DE FECHAS
+        if (campo.includes("fecha") || campo.includes("_at")) {
+          const fechaA = new Date(valorA);
+          const fechaB = new Date(valorB);
+          return tipo === "asc" ? fechaA - fechaB : fechaB - fechaA;
+        }
+
+        // 📝 ORDENAMIENTO DE TEXTO
+        return tipo === "asc"
+          ? String(valorA || "").localeCompare(String(valorB || ""))
+          : String(valorB || "").localeCompare(String(valorA || ""));
+      });
+    };
 
     // 🎨 COLORES PROFESIONALES FAH - SÓLIDOS Y SOBRIOS
     const coloresEsquema = computed(() => {
@@ -524,10 +665,22 @@ export default {
       });
     });
 
-    // 📄 PAGINACIÓN
-    const totalRegistrosFiltrados = computed(
-      () => registrosFiltrados.value.length
-    );
+    // 🔄 COMPUTED PARA REGISTROS ORDENADOS
+    const registrosOrdenados = computed(() => {
+      if (!registrosFiltrados.value?.length) return [];
+
+      return aplicarOrdenamiento(
+        registrosFiltrados.value,
+        campoOrdenamiento.value,
+        tipoOrdenamiento.value
+      );
+    });
+
+    // 📄 PAGINACIÓN ACTUALIZADA
+    const totalRegistrosFiltrados = computed(() => {
+      return registrosOrdenados.value?.length || 0;
+    });
+
     const totalPaginas = computed(() =>
       Math.ceil(totalRegistrosFiltrados.value / registrosPorPagina.value)
     );
@@ -543,10 +696,11 @@ export default {
       )
     );
 
+    // 🎯 USAR registrosOrdenados EN LUGAR DE registrosFiltrados
     const registrosPaginados = computed(() => {
       const inicio = (paginaActual.value - 1) * registrosPorPagina.value;
       const fin = inicio + registrosPorPagina.value;
-      return registrosFiltrados.value.slice(inicio, fin);
+      return registrosOrdenados.value.slice(inicio, fin);
     });
 
     const paginasVisibles = computed(() => {
@@ -607,6 +761,16 @@ export default {
       if (pagina >= 1 && pagina <= totalPaginas.value) {
         paginaActual.value = pagina;
       }
+    };
+
+    // ⚡ FUNCIÓN PARA CAMBIAR ORDENAMIENTO
+    const cambiarOrdenamiento = () => {
+      // Resetear paginación al cambiar ordenamiento
+      paginaActual.value = 1;
+
+      console.log(
+        `🔄 Ordenamiento cambiado: ${campoOrdenamiento.value} - ${tipoOrdenamiento.value}`
+      );
     };
 
     // =====================================
@@ -862,6 +1026,13 @@ export default {
       filtroTexto,
       registrosPorPagina,
       paginaActual,
+
+      // 🆕 NUEVAS VARIABLES DE ORDENAMIENTO
+      campoOrdenamiento,
+      tipoOrdenamiento,
+      opcionesOrdenamiento,
+      tiposOrdenamiento,
+      cambiarOrdenamiento,
 
       // Computed
       configuracionEsquema,
