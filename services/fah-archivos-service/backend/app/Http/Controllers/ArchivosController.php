@@ -41,39 +41,94 @@ class ArchivosController extends Controller
      * Subir nuevo archivo
      * POST /api/archivos/upload
      */
+    // public function upload(Request $request)
+    // {
+    //     try {
+    //         $validator = Validator::make($request->all(), [
+    //             'archivo' => 'required|file|max:102400', // 100MB máximo
+    //             'categoria_contenido_id' => 'nullable|integer',
+    //             'nivel_acceso_id' => 'nullable|integer',
+    //             'descripcion_archivo' => 'nullable|string|max:1000'
+    //         ]);
+
+    //         if ($validator->fails()) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Datos de entrada inválidos',
+    //                 'errors' => $validator->errors()
+    //             ], 400);
+    //         }
+
+    //         $file = $request->file('archivo');
+    //         $hash = hash_file('sha256', $file->getRealPath());
+
+    //         // Verificar archivo duplicado
+    //         if (ArchivoDigital::where('hash_contenido', $hash)->exists()) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'El archivo ya existe en el sistema',
+    //                 'error' => 'Archivo duplicado'
+    //             ], 409);
+    //         }
+
+    //         $fileName = Str::uuid() . '.' . $file->getClientOriginalExtension();
+
+    //         // Subir a MinIO
+    //         Storage::disk('minio')->put($fileName, file_get_contents($file));
+
+    //         $archivo = ArchivoDigital::create([
+    //             'nombre_archivo' => $fileName,
+    //             'nombre_original' => $file->getClientOriginalName(),
+    //             'ruta_storage' => $fileName,
+    //             'repositorio_id' => 1,
+    //             'tipo_archivo_id' => 1,
+    //             'categoria_contenido_id' => $request->categoria_contenido_id ?? 1,
+    //             'nivel_acceso_id' => $request->nivel_acceso_id ?? 1,
+    //             'tamano_bytes' => $file->getSize(),
+    //             'checksum_md5' => md5_file($file->getRealPath()),
+    //             'hash_contenido' => $hash,
+    //             'subido_por_id' => 1,
+    //             'unidad_origen_id' => 1,
+    //             'descripcion_archivo' => $request->descripcion_archivo,
+    //             'created_by' => 1,
+    //             'updated_by' => 1
+    //         ]);
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'message' => 'Archivo subido correctamente',
+    //             'data' => $archivo
+    //         ], 201);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Error al subir archivo',
+    //             'error' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
     public function upload(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
-                'archivo' => 'required|file|max:102400', // 100MB máximo
-                'categoria_contenido_id' => 'nullable|integer',
-                'nivel_acceso_id' => 'nullable|integer',
+                'archivo' => 'required|file|max:102400',
                 'descripcion_archivo' => 'nullable|string|max:1000'
             ]);
 
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Datos de entrada inválidos',
+                    'message' => 'Datos inválidos',
                     'errors' => $validator->errors()
                 ], 400);
             }
 
             $file = $request->file('archivo');
+            $fileName = Str::uuid() . '.' . $file->getClientOriginalExtension();
             $hash = hash_file('sha256', $file->getRealPath());
 
-            // Verificar archivo duplicado
-            if (ArchivoDigital::where('hash_contenido', $hash)->exists()) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'El archivo ya existe en el sistema',
-                    'error' => 'Archivo duplicado'
-                ], 409);
-            }
-
-            $fileName = Str::uuid() . '.' . $file->getClientOriginalExtension();
-
-            // Subir a MinIO
+            // Subir a MinIO SIN verificar
             Storage::disk('minio')->put($fileName, file_get_contents($file));
 
             $archivo = ArchivoDigital::create([
@@ -82,16 +137,15 @@ class ArchivosController extends Controller
                 'ruta_storage' => $fileName,
                 'repositorio_id' => 1,
                 'tipo_archivo_id' => 1,
-                'categoria_contenido_id' => $request->categoria_contenido_id ?? 1,
-                'nivel_acceso_id' => $request->nivel_acceso_id ?? 1,
+                'categoria_contenido_id' => 1,
+                'nivel_acceso_id' => 1,
                 'tamano_bytes' => $file->getSize(),
                 'checksum_md5' => md5_file($file->getRealPath()),
                 'hash_contenido' => $hash,
-                'subido_por_id' => 1,
+                'subido_por_id' => 2,
                 'unidad_origen_id' => 1,
                 'descripcion_archivo' => $request->descripcion_archivo,
-                'created_by' => 1,
-                'updated_by' => 1
+                'is_active' => true
             ]);
 
             return response()->json([
@@ -102,8 +156,7 @@ class ArchivosController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al subir archivo',
-                'error' => $e->getMessage()
+                'message' => 'Error: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -142,6 +195,47 @@ class ArchivosController extends Controller
      * Descargar archivo
      * GET /api/archivos/{id}/download
      */
+    // public function download($id)
+    // {
+    //     try {
+    //         $archivo = ArchivoDigital::find($id);
+
+    //         if (!$archivo) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Archivo no encontrado'
+    //             ], 404);
+    //         }
+
+    //         // Verificar que el archivo existe en MinIO
+    //         if (!Storage::disk('minio')->exists($archivo->ruta_storage)) {
+    //             return response()->json([
+    //                 'success' => false,
+    //                 'message' => 'Archivo no encontrado en storage'
+    //             ], 404);
+    //         }
+
+    //         // Obtener el contenido del archivo
+    //         $contenido = Storage::disk('minio')->get($archivo->ruta_storage);
+
+    //         // Determinar el tipo MIME
+    //         $extension = pathinfo($archivo->nombre_original, PATHINFO_EXTENSION);
+    //         $mimeType = $this->getMimeType($extension);
+
+    //         // Crear la respuesta con headers correctos
+    //         return response($contenido, 200)
+    //             ->header('Content-Type', $mimeType)
+    //             ->header('Content-Disposition', 'attachment; filename="' . $archivo->nombre_original . '"')
+    //             ->header('Content-Length', strlen($contenido));
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Error al descargar archivo',
+    //             'error' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
+
     public function download($id)
     {
         try {
@@ -154,15 +248,7 @@ class ArchivosController extends Controller
                 ], 404);
             }
 
-            // Verificar que el archivo existe en MinIO
-            if (!Storage::disk('minio')->exists($archivo->ruta_storage)) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Archivo no encontrado en storage'
-                ], 404);
-            }
-
-            // Obtener el contenido del archivo
+            // Obtener el contenido del archivo directamente
             $contenido = Storage::disk('minio')->get($archivo->ruta_storage);
 
             // Determinar el tipo MIME
@@ -172,13 +258,12 @@ class ArchivosController extends Controller
             // Crear la respuesta con headers correctos
             return response($contenido, 200)
                 ->header('Content-Type', $mimeType)
-                ->header('Content-Disposition', 'attachment; filename="' . $archivo->nombre_original . '"')
+                ->header('Content-Disposition', 'inline; filename="' . $archivo->nombre_original . '"')
                 ->header('Content-Length', strlen($contenido));
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al descargar archivo',
-                'error' => $e->getMessage()
+                'message' => 'Error al descargar archivo: ' . $e->getMessage()
             ], 500);
         }
     }
@@ -358,6 +443,45 @@ class ArchivosController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Error al obtener estadísticas: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Obtener manual de tabla dinámica
+     * GET /api/manual/tabla-dinamica
+     */
+    public function getManualTablaDinamica()
+    {
+        try {
+            // Usar directamente el archivo que SÍ funciona en Minio
+            $content = Storage::disk('minio')->get('Manual de usuario.pdf');
+
+            return response($content, 200)
+                ->header('Content-Type', 'application/pdf')
+                ->header('Content-Disposition', 'inline; filename="Manual-Usuario-FAH.pdf"');
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function testMinioFiles()
+    {
+        try {
+            $allFiles = Storage::disk('minio')->allFiles();
+
+            return response()->json([
+                'success' => true,
+                'total_files' => count($allFiles),
+                'files' => $allFiles
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error: ' . $e->getMessage()
             ], 500);
         }
     }

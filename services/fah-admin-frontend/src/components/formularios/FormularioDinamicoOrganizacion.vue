@@ -1,6 +1,6 @@
+<!-- services\fah-admin-frontend\src\components\formularios\FormularioDinamicoOrganizacion.vue -->
 <template>
-  <!-- FORMULARIO DINÁMICO ORGANIZACIÓN - CARBYFAH -->
-  <!-- Motor inteligente para TODOS los 7 módulos de organización -->
+  <!-- Formulario dinamico organizacion -->
   <div class="contenedor-formulario-dinamico-organizacion">
     <!-- Indicador de carga -->
     <div v-if="cargando" class="flex items-center justify-center py-8">
@@ -31,18 +31,18 @@
         </div>
       </Message>
 
-      <!-- Formulario dinámico -->
+      <!-- Formulario dinamico -->
       <form
         @submit.prevent="manejarEnvio"
         class="formulario-dinamico-organizacion"
       >
         <div class="grid grid-cols-12 gap-5">
-          <!-- Generar campos dinámicamente CON SOPORTE PARA MAPA -->
+          <!-- Generar campos dinamicamente con soporte para mapa -->
           <template
             v-for="(configuracionCampo, index) in camposConfigurados"
             :key="configuracionCampo.nombre"
           >
-            <!-- Botón de mapa JUSTO ANTES del campo Latitud -->
+            <!-- Boton de mapa antes del campo latitud -->
             <div
               v-if="
                 configuracionCampo.nombre === 'latitud' &&
@@ -59,7 +59,7 @@
               />
             </div>
 
-            <!-- Campo normal CORREGIDO -->
+            <!-- Campo normal -->
             <CampoFormularioOrganizacion
               :configuracion="configuracionCampo"
               :valor="datosFormulario[configuracionCampo.nombre]"
@@ -98,20 +98,16 @@
 import { ref, computed, watch, onMounted, nextTick } from "vue";
 import { useToast } from "primevue/usetoast";
 
-// Componentes PrimeVue
 import ProgressSpinner from "primevue/progressspinner";
 import Message from "primevue/message";
 
-// Componentes propios especializados
 import CampoFormularioOrganizacion from "./CampoFormularioOrganizacion.vue";
 import ModalMapaCoordenadas from "./ModalMapaCoordenadas.vue";
 
-// Composables y utilidades para organización
 import { usarFormularioDinamico } from "@/composables/usarFormularioDinamico";
 import { useOrganizacionStore } from "@/stores/organizacionStore";
 import { useCatalogosStore } from "@/stores/catalogosStore";
 
-// Configuracion de esquemas
 import { obtenerEsquema } from "@/config/esquemaOrganizacion";
 
 export default {
@@ -159,7 +155,6 @@ export default {
   emits: ["enviado", "error", "cancelado"],
 
   setup(props, { emit }) {
-    // Composables especializados
     const toast = useToast();
     const organizacionStore = useOrganizacionStore();
     const catalogosStore = useCatalogosStore();
@@ -174,7 +169,6 @@ export default {
       limpiarErrores,
     } = usarFormularioDinamico();
 
-    // Estado reactivo
     const cargando = ref(false);
     const datosFormulario = ref({});
     const erroresValidacion = ref({});
@@ -190,7 +184,6 @@ export default {
     const municipioSeleccionado = ref(null);
     const ciudadSeleccionada = ref(null);
 
-    // Computed properties
     const nombreEsquema = computed(() => props.esquema);
 
     const esquemaValido = computed(() => {
@@ -209,22 +202,18 @@ export default {
       }
     });
 
-    // Computed para mostrar botón de mapa solo en ubicaciones geográficas
+    // Computed para mostrar boton de mapa solo en ubicaciones geograficas
     const mostrarBotonMapaGlobal = computed(() => {
       return props.esquema === "ubicaciones_geograficas";
     });
 
     // Abrir modal de mapa para seleccionar coordenadas
     const abrirModalMapa = () => {
-      console.log("Abriendo modal de mapa para seleccionar coordenadas");
       modalMapaVisible.value = true;
     };
 
     // Manejar coordenadas seleccionadas desde el modal de mapa
     const manejarCoordenadasModalMapa = (coordenadas) => {
-      console.log("Coordenadas recibidas del modal de mapa:", coordenadas);
-
-      // Actualizar formulario con las coordenadas seleccionadas
       datosFormulario.value.latitud = coordenadas.latitud;
       datosFormulario.value.longitud = coordenadas.longitud;
       datosFormulario.value.altitud_metros = coordenadas.altitud;
@@ -241,18 +230,11 @@ export default {
         life: 3000,
       });
 
-      // Cerrar modal
       modalMapaVisible.value = false;
     };
 
     // Actualizar todas las coordenadas desde el mapa
     const actualizarTodasLasCoordenadas = (coordenadas) => {
-      console.log(
-        "Actualizando todas las coordenadas desde mapa:",
-        coordenadas
-      );
-
-      // Actualizar los campos en el formulario
       datosFormulario.value.latitud = coordenadas.latitud;
       datosFormulario.value.longitud = coordenadas.longitud;
       datosFormulario.value.altitud_metros = coordenadas.altitud_metros;
@@ -262,18 +244,12 @@ export default {
       delete erroresValidacion.value.longitud;
       delete erroresValidacion.value.altitud_metros;
 
-      // Mostrar notificación de éxito
       toast.add({
         severity: "success",
         summary: "Coordenadas actualizadas",
         detail: `Latitud: ${coordenadas.latitud}, Longitud: ${coordenadas.longitud}, Altitud: ${coordenadas.altitud_metros}m`,
         life: 4000,
       });
-
-      console.log(
-        "Formulario actualizado con coordenadas:",
-        datosFormulario.value
-      );
     };
 
     // Computed para filtrado jerarquico
@@ -311,14 +287,14 @@ export default {
     const ubicacionesFiltradas = computed(() => {
       let ubicaciones = organizacionStore.ubicacionesGeograficas || [];
 
-      // Filtrar por país si está seleccionado
+      // Filtrar por pais si esta seleccionado
       if (paisSeleccionado.value) {
         ubicaciones = ubicaciones.filter(
           (ubicacion) => ubicacion.pais_id === paisSeleccionado.value
         );
       }
 
-      // Filtrar por departamento si está seleccionado
+      // Filtrar por departamento si esta seleccionado
       if (departamentoSeleccionado.value) {
         ubicaciones = ubicaciones.filter(
           (ubicacion) =>
@@ -326,14 +302,14 @@ export default {
         );
       }
 
-      // Filtrar por municipio si está seleccionado
+      // Filtrar por municipio si esta seleccionado
       if (municipioSeleccionado.value) {
         ubicaciones = ubicaciones.filter(
           (ubicacion) => ubicacion.municipio_id === municipioSeleccionado.value
         );
       }
 
-      // Filtrar por ciudad si está seleccionada
+      // Filtrar por ciudad si esta seleccionada
       if (ciudadSeleccionada.value) {
         ubicaciones = ubicaciones.filter(
           (ubicacion) => ubicacion.ciudad_id === ciudadSeleccionada.value
@@ -343,10 +319,8 @@ export default {
       return ubicaciones;
     });
 
-    // Funcion para detectar cambios en selecciones y filtrar - CORREGIDA
+    // Funcion para detectar cambios en selecciones y filtrar
     const actualizarFiltrosJerarquicos = (nombreCampo, valor) => {
-      console.log(`Actualizando filtros: ${nombreCampo} = ${valor}`);
-
       switch (nombreCampo) {
         case "pais_id":
           paisSeleccionado.value = valor;
@@ -365,7 +339,6 @@ export default {
           if (datosFormulario.value.ciudad_id) {
             datosFormulario.value.ciudad_id = null;
           }
-          console.log("País seleccionado, campos dependientes reseteados");
           break;
 
         case "departamento_id":
@@ -381,9 +354,6 @@ export default {
           if (datosFormulario.value.ciudad_id) {
             datosFormulario.value.ciudad_id = null;
           }
-          console.log(
-            "Departamento seleccionado, municipios/ciudades reseteados"
-          );
           break;
 
         case "municipio_id":
@@ -395,12 +365,10 @@ export default {
           if (datosFormulario.value.ciudad_id) {
             datosFormulario.value.ciudad_id = null;
           }
-          console.log("Municipio seleccionado, ciudades reseteadas");
           break;
 
         case "ciudad_id":
           ciudadSeleccionada.value = valor;
-          console.log("Ciudad seleccionada");
           break;
       }
 
@@ -410,34 +378,24 @@ export default {
       });
     };
 
-    // Funcion mejorada para obtener opciones CORREGIDA FINAL
+    // Funcion para obtener opciones
     const obtenerOpcionesParaCampo = (configuracionCampo) => {
-      console.log(
-        "Obteniendo opciones para:",
-        configuracionCampo.nombre,
-        configuracionCampo.tablaReferencia
-      );
-      console.log("Esquema actual:", props.esquema);
-
       if (
         (configuracionCampo.tipo !== "seleccion" &&
           configuracionCampo.tipo !== "foraneo_autocompletado") ||
         !configuracionCampo.tablaReferencia
       ) {
-        console.log("Campo no válido para opciones");
         return [];
       }
 
       // Detectar si estamos en ubicaciones geograficas
       const esUbicacionesGeograficas =
         props.esquema === "ubicaciones_geograficas";
-      console.log("Es ubicaciones geográficas:", esUbicacionesGeograficas);
 
       switch (configuracionCampo.tablaReferencia) {
         // Paises - siempre disponibles
         case "paises":
           const paises = catalogosStore.paises || [];
-          console.log("Países disponibles:", paises.length);
 
           if (paises.length === 0) {
             catalogosStore.loadPaises();
@@ -456,16 +414,8 @@ export default {
 
         // Departamentos - Filtrado solo en ubicaciones geograficas
         case "departamentos":
-          console.log("Procesando departamentos...");
-
           // Solo aplicar filtrado en ubicaciones geograficas
           if (esUbicacionesGeograficas) {
-            console.log("Aplicando filtrado jerárquico para departamentos");
-            console.log(
-              "País seleccionado actualmente:",
-              paisSeleccionado.value
-            );
-
             if (!paisSeleccionado.value) {
               return [
                 {
@@ -477,10 +427,6 @@ export default {
             }
 
             const departamentosDisponibles = departamentosFiltrados.value;
-            console.log(
-              `Departamentos filtrados para país ${paisSeleccionado.value}:`,
-              departamentosDisponibles.length
-            );
 
             if (departamentosDisponibles.length === 0) {
               return [
@@ -502,8 +448,6 @@ export default {
               }));
           } else {
             // Para otros esquemas: mostrar todos los departamentos
-            console.log("Mostrando TODOS los departamentos (sin filtrado)");
-
             const todosDepartamentos = organizacionStore.departamentos || [];
 
             if (todosDepartamentos.length === 0) {
@@ -529,15 +473,7 @@ export default {
 
         // Municipios - Filtrado solo en ubicaciones geograficas
         case "municipios":
-          console.log("Procesando municipios...");
-
           if (esUbicacionesGeograficas) {
-            console.log("Aplicando filtrado jerárquico para municipios");
-            console.log(
-              "Departamento seleccionado actualmente:",
-              departamentoSeleccionado.value
-            );
-
             if (!departamentoSeleccionado.value) {
               return [
                 {
@@ -549,10 +485,6 @@ export default {
             }
 
             const municipiosDisponibles = municipiosFiltrados.value;
-            console.log(
-              `Municipios filtrados para departamento ${departamentoSeleccionado.value}:`,
-              municipiosDisponibles.length
-            );
 
             if (municipiosDisponibles.length === 0) {
               return [
@@ -574,8 +506,6 @@ export default {
               }));
           } else {
             // Para otros esquemas: mostrar todos los municipios
-            console.log("Mostrando TODOS los municipios (sin filtrado)");
-
             const todosMunicipios = organizacionStore.municipios || [];
 
             if (todosMunicipios.length === 0) {
@@ -601,15 +531,7 @@ export default {
 
         // Ciudades - Filtrado solo en ubicaciones geograficas
         case "ciudades":
-          console.log("Procesando ciudades...");
-
           if (esUbicacionesGeograficas) {
-            console.log("Aplicando filtrado jerárquico para ciudades");
-            console.log(
-              "Municipio seleccionado actualmente:",
-              municipioSeleccionado.value
-            );
-
             if (!municipioSeleccionado.value) {
               return [
                 {
@@ -621,10 +543,6 @@ export default {
             }
 
             const ciudadesDisponibles = ciudadesFiltradas.value;
-            console.log(
-              `Ciudades filtradas para municipio ${municipioSeleccionado.value}:`,
-              ciudadesDisponibles.length
-            );
 
             if (ciudadesDisponibles.length === 0) {
               return [
@@ -645,8 +563,6 @@ export default {
               }));
           } else {
             // Para otros esquemas: mostrar todas las ciudades
-            console.log("Mostrando TODAS las ciudades (sin filtrado)");
-
             const todasCiudades = organizacionStore.ciudades || [];
 
             if (todasCiudades.length === 0) {
@@ -690,7 +606,7 @@ export default {
               datos: tipo,
             }));
 
-        // NUEVO: Ubicaciones geograficas - todas disponibles
+        // Ubicaciones geograficas - todas disponibles
         case "ubicaciones_geograficas":
           const ubicacionesGeo = organizacionStore.ubicacionesGeograficas || [];
           if (ubicacionesGeo.length === 0) {
@@ -712,7 +628,7 @@ export default {
               datos: ubicacion,
             }));
 
-        // NUEVO: Estructura militar padre - todas las unidades existentes
+        // Estructura militar padre - todas las unidades existentes
         case "estructura_militar":
           const estructurasMilitares =
             organizacionStore.estructuraMilitar || [];
@@ -737,10 +653,6 @@ export default {
             }));
 
         default:
-          console.log(
-            "Tabla de referencia no reconocida:",
-            configuracionCampo.tablaReferencia
-          );
           return [];
       }
     };
@@ -752,17 +664,12 @@ export default {
       erroresValidacion.value = {};
 
       try {
-        // Usar import estatico que ya existe arriba
         const configuracion = obtenerEsquema(props.esquema);
 
         if (!configuracion) {
-          console.error(
-            `Esquema de organización no encontrado: ${props.esquema}`
-          );
           return;
         }
 
-        console.log(`Configuración encontrada:`, configuracion);
         configuracionEsquema.value = configuracion;
 
         // Cargar dependencias
@@ -789,112 +696,84 @@ export default {
             ciudadSeleccionada.value = datosFormulario.value.ciudad_id || null;
           }
         }
-
-        console.log(`Formulario organización inicializado: ${props.esquema}`);
       } catch (error) {
-        console.error("Error inicializando formulario organización:", error);
         mostrarNotificacion("errorConexion");
       } finally {
         cargando.value = false;
       }
     };
 
-    // Carga inteligente de dependencias mejorada con verificacion
+    // Carga inteligente de dependencias
     const cargarDependenciasEsquema = async (esquema) => {
       try {
         switch (esquema) {
           case "departamentos":
-            // Necesita países - carga forzada
-            console.log("Iniciando carga de países para departamentos...");
             await catalogosStore.loadPaises();
 
-            // Verificar que se cargaron
             const paisesVerificados = catalogosStore.paises || [];
-            console.log(
-              "Países verificados:",
-              paisesVerificados.length,
-              paisesVerificados
-            );
 
             if (paisesVerificados.length === 0) {
-              console.warn("No se cargaron países - reintentando...");
               await catalogosStore.loadPaises();
             }
             break;
 
           case "municipios":
-            // Necesita países y departamentos
             await Promise.all([
               catalogosStore.loadPaises(),
               organizacionStore.loadDepartamentos(),
             ]);
-            console.log("Países y departamentos cargados para municipios");
             break;
 
           case "ciudades":
-            // Necesita toda la cascada hasta municipios
             await Promise.all([
               catalogosStore.loadPaises(),
               organizacionStore.loadDepartamentos(),
               organizacionStore.loadMunicipios(),
             ]);
-            console.log("Cascada hasta municipios cargada para ciudades");
             break;
 
           case "ubicaciones_geograficas":
-            // Necesita toda la cascada geográfica
             await Promise.all([
               catalogosStore.loadPaises(),
               organizacionStore.loadDepartamentos(),
               organizacionStore.loadMunicipios(),
               organizacionStore.loadCiudades(),
             ]);
-            console.log("Cascada geográfica completa cargada");
             break;
 
           case "estructura_militar":
-            // ACTUALIZADO: Necesita tipos_estructura_militar, ubicaciones Y estructura militar existente
             await Promise.all([
               catalogosStore.loadTiposEstructuraMilitar(),
               organizacionStore.loadUbicacionesGeograficas(),
-              organizacionStore.loadEstructuraMilitar(), // AGREGADO: Para unidad padre
-              catalogosStore.loadPaises(), // Para filtros de ubicaciones
+              organizacionStore.loadEstructuraMilitar(),
+              catalogosStore.loadPaises(),
               organizacionStore.loadDepartamentos(),
               organizacionStore.loadMunicipios(),
               organizacionStore.loadCiudades(),
             ]);
-            console.log(
-              "Tipos estructura, ubicaciones y unidades padre cargados"
-            );
             break;
 
           case "cargos":
-            // Necesita estructura_militar
             await organizacionStore.loadEstructuraMilitar();
-            console.log("Estructura militar cargada para cargos");
             break;
 
           case "roles_funcionales":
-            // No necesita dependencias externas
-            console.log("Roles funcionales - sin dependencias");
             break;
 
           default:
-            console.log(`Sin dependencias específicas para: ${esquema}`);
+            break;
         }
       } catch (error) {
         console.error(`Error cargando dependencias para ${esquema}:`, error);
       }
     };
 
-    // Actualizar campo con filtrado jerarquico - CORREGIDA
+    // Actualizar campo con filtrado jerarquico
     const actualizarCampo = (nombreCampo, nuevoValor) => {
-      console.log(`Campo actualizado: ${nombreCampo} = ${nuevoValor}`);
-
       // Actualizar el formulario
       datosFormulario.value[nombreCampo] = nuevoValor;
 
-      // IMPORTANTE: Solo aplicar filtros jerárquicos en ubicaciones geográficas
+      // Solo aplicar filtros jerarquicos en ubicaciones geograficas
       if (props.esquema === "ubicaciones_geograficas") {
         actualizarFiltrosJerarquicos(nombreCampo, nuevoValor);
       }
@@ -905,12 +784,8 @@ export default {
       }
     };
 
-    // Manejo de eventos especificos de organizacion
-
     // Auto-llenado cuando selecciona ubicacion geografica
     const manejarUbicacionSeleccionada = (ubicacionData) => {
-      console.log("Ubicación seleccionada para auto-llenado:", ubicacionData);
-
       const mapaAutollenado = {
         latitud: ubicacionData.latitud,
         longitud: ubicacionData.longitud,
@@ -925,8 +800,6 @@ export default {
 
     // Auto-llenado cuando selecciona departamento
     const manejarDepartamentoSeleccionado = (departamentoData) => {
-      console.log("Departamento seleccionado:", departamentoData);
-
       toast.add({
         severity: "info",
         summary: "Departamento seleccionado",
@@ -937,8 +810,6 @@ export default {
 
     // Auto-llenado cuando selecciona municipio
     const manejarMunicipioSeleccionado = (municipioData) => {
-      console.log("Municipio seleccionado:", municipioData);
-
       toast.add({
         severity: "info",
         summary: "Municipio seleccionado",
@@ -955,9 +826,6 @@ export default {
           mapaAutollenado[nombreCampo]
         ) {
           datosFormulario.value[nombreCampo] = mapaAutollenado[nombreCampo];
-          console.log(
-            `Auto-llenado: ${nombreCampo} = ${mapaAutollenado[nombreCampo]}`
-          );
         }
       });
 
@@ -996,7 +864,7 @@ export default {
       return resultadoValidacion.esValido;
     };
 
-    // Procesar envío del formulario
+    // Procesar envio del formulario
     const manejarEnvio = async () => {
       if (!validarFormulario()) {
         mostrarNotificacion("errorValidacion");
@@ -1028,7 +896,7 @@ export default {
       }
     };
 
-    // Cancelar operación del formulario
+    // Cancelar operacion del formulario
     const cancelarFormulario = () => {
       datosFormulario.value = {};
       erroresValidacion.value = {};
@@ -1060,7 +928,7 @@ export default {
         if (props.modo === "editar" && nuevosDatos) {
           datosFormulario.value = { ...nuevosDatos };
 
-          // Actualizar filtros jerárquicos para modo editar
+          // Actualizar filtros jerarquicos para modo editar
           paisSeleccionado.value = nuevosDatos.pais_id || null;
           departamentoSeleccionado.value = nuevosDatos.departamento_id || null;
           municipioSeleccionado.value = nuevosDatos.municipio_id || null;
@@ -1072,29 +940,16 @@ export default {
 
     // Lifecycle
     onMounted(async () => {
-      console.log(
-        "FormularioDinamicoOrganizacion montado para:",
-        props.esquema
-      );
-
-      // Debug forzar carga de países
-      console.log("Estado inicial países:", catalogosStore.paises);
-
       try {
         await catalogosStore.loadPaises();
-        console.log("Países después de cargar:", catalogosStore.paises);
       } catch (error) {
         console.error("Error cargando países:", error);
       }
-
-      // Debug verificar configuracion esquema
-      console.log("Configuración esquema actual:", configuracionEsquema.value);
 
       inicializarFormulario();
     });
 
     return {
-      // Estado
       cargando,
       datosFormulario,
       erroresValidacion,
@@ -1102,14 +957,12 @@ export default {
       camposConfigurados,
       modalMapaVisible,
 
-      // Computed
       nombreEsquema,
       esquemaValido,
       tieneErrores,
       mensajeCarga,
       mostrarBotonMapaGlobal,
 
-      // Métodos
       actualizarCampo,
       actualizarTodasLasCoordenadas,
       abrirModalMapa,

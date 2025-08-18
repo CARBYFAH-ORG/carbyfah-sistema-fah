@@ -1,4 +1,5 @@
 <?php
+// services\fah-catalogos-service\app\Models\CategoriaPersonal.php
 
 namespace App\Models;
 
@@ -45,16 +46,19 @@ class CategoriaPersonal extends Model
         'deleted_by' => 'integer'
     ];
 
+    // Relacion con Grados
     public function grados()
     {
         return $this->hasMany(Grado::class, 'categoria_personal_id', 'id');
     }
 
+    // Scope para registros activos
     public function scopeActivos($query)
     {
         return $query->where('is_active', true);
     }
 
+    // Scope ordenado por jerarquia
     public function scopeOrdenadoPorJerarquia($query)
     {
         return $query->orderBy('orden_jerarquico', 'asc');

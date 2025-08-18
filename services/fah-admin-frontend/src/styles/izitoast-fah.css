@@ -1,0 +1,232 @@
+/* services\fah-admin-frontend\src\styles\izitoast-fah.css */
+
+/* Sobreescribir estilos base de iziToast */
+.iziToast {
+  border-radius: 8px !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  min-height: 70px !important;
+  padding: 18px 20px !important;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+  border: none !important;
+  backdrop-filter: blur(10px) !important;
+}
+
+/* Titulo mas prominente */
+.iziToast > .iziToast-body .iziToast-title {
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  margin-bottom: 4px !important;
+  line-height: 1.3 !important;
+  letter-spacing: 0.3px !important;
+}
+
+/* Mensaje mas legible */
+.iziToast > .iziToast-body .iziToast-message {
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  line-height: 1.4 !important;
+  margin: 0 !important;
+  opacity: 0.95 !important;
+}
+
+/* Icono mas grande y centrado */
+.iziToast > .iziToast-body .iziToast-icon {
+  width: 28px !important;
+  height: 28px !important;
+  margin-right: 15px !important;
+  margin-top: 2px !important;
+  font-size: 16px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+/* Boton de cerrar estilizado */
+.iziToast > .iziToast-close {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-radius: 50% !important;
+  width: 26px !important;
+  height: 26px !important;
+  opacity: 1 !important;
+  transition: all 0.2s ease !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  color: #1e3a5f !important;
+  border: 1px solid rgba(30, 58, 95, 0.2) !important;
+}
+
+/* Agregar el simbolo × */
+.iziToast > .iziToast-close::before {
+  content: '×' !important;
+  font-size: 18px !important;
+  font-weight: bold !important;
+  line-height: 1 !important;
+}
+
+.iziToast > .iziToast-close:hover {
+  background: rgba(255, 255, 255, 1) !important;
+  opacity: 1 !important;
+  transform: scale(1.1) !important;
+  color: #c1666b !important;
+  border-color: #c1666b !important;
+}
+
+/* Barra de progreso personalizada */
+.iziToast > .iziToast-progressbar {
+  height: 3px !important;
+  border-radius: 0 0 8px 8px !important;
+}
+
+/* Clases especificas FAH */
+
+/* Exito - Verde FAH */
+.fah-toast-success {
+  border-left: 4px solid #1e7e34 !important;
+}
+
+.fah-toast-success .iziToast-icon {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 50% !important;
+}
+
+/* Informacion - Azul Naval FAH */
+.fah-toast-info {
+  border-left: 4px solid #d4af37 !important;
+}
+
+.fah-toast-info .iziToast-icon {
+  background: rgba(212, 175, 55, 0.2) !important;
+  border-radius: 50% !important;
+}
+
+/* Error - Azul Naval FAH */
+.fah-toast-error {
+  border-left: 4px solid #ffffff !important;
+}
+
+.fah-toast-error .iziToast-icon {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 50% !important;
+}
+
+/* Advertencia - Azul Naval FAH */
+.fah-toast-warning {
+  border-left: 4px solid #d4af37 !important;
+}
+
+.fah-toast-warning .iziToast-icon {
+  background: rgba(212, 175, 55, 0.2) !important;
+  border-radius: 50% !important;
+}
+
+/* Importante - Especial dorado */
+.fah-toast-important {
+  border: 2px solid #d4af37 !important;
+  box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3), 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+}
+
+.fah-toast-important .iziToast-icon {
+  background: rgba(212, 175, 55, 0.3) !important;
+  border-radius: 50% !important;
+  animation: fahPulseGold 2s ease-in-out infinite !important;
+}
+
+/* Critico - Rojo suave con efectos */
+.fah-toast-critical {
+  border: 2px solid #ffffff !important;
+  animation: fahShake 0.5s ease-in-out !important;
+}
+
+.fah-toast-critical .iziToast-icon {
+  background: rgba(255, 255, 255, 0.3) !important;
+  border-radius: 50% !important;
+  animation: fahPulseWhite 1s ease-in-out infinite !important;
+}
+
+/* Animaciones FAH */
+
+@keyframes fahPulseGold {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(212, 175, 55, 0);
+  }
+}
+
+@keyframes fahPulseWhite {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.7);
+  }
+  50% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(255, 255, 255, 0);
+  }
+}
+
+@keyframes fahShake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  10%,
+  30%,
+  50%,
+  70%,
+  90% {
+    transform: translateX(-2px);
+  }
+  20%,
+  40%,
+  60%,
+  80% {
+    transform: translateX(2px);
+  }
+}
+
+/* Hover effects */
+
+.iziToast:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  transition: all 0.3s ease !important;
+}
+
+/* Responsive */
+
+@media (max-width: 568px) {
+  .iziToast {
+    margin: 0 10px !important;
+    min-width: auto !important;
+    max-width: calc(100vw - 20px) !important;
+  }
+
+  .iziToast > .iziToast-body .iziToast-title {
+    font-size: 14px !important;
+  }
+
+  .iziToast > .iziToast-body .iziToast-message {
+    font-size: 12px !important;
+  }
+}
+
+/* Posicion personalizada FAH */
+
+.iziToast-wrapper-topRight {
+  top: 85px !important;
+  right: 20px !important;
+}
+
+/* Tema oscuro compatibility */
+
+@media (prefers-color-scheme: dark) {
+  .iziToast {
+    backdrop-filter: blur(15px) !important;
+  }
+}

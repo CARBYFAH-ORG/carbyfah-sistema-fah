@@ -1,9 +1,11 @@
-/* Animación para transiciones de pestañas */
+/* services\fah-admin-frontend\src\styles\views\catalogos-view.css */
+
+/* Animacion para transiciones de pestañas */
 .animate-fade-in {
   animation: fadeIn 0.3s ease-out;
 }
 
-/* Keyframes para animación suave */
+/* Keyframes para animacion suave */
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -15,7 +17,7 @@
   }
 }
 
-/* Responsive para pestañas en móviles */
+/* Responsive para pestañas en moviles */
 @media (max-width: 768px) {
   .flex-wrap {
     display: grid;
@@ -24,7 +26,7 @@
   }
 }
 
-/* Mejoras adicionales para todos los catálogos */
+/* Mejoras adicionales para todos los catalogos */
 .transition-all {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

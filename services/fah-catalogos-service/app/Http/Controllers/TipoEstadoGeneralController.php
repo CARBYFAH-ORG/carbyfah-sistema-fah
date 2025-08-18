@@ -1,4 +1,5 @@
 <?php
+// services\fah-catalogos-service\app\Http\Controllers\TipoEstadoGeneralController.php
 
 namespace App\Http\Controllers;
 
@@ -8,10 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 class TipoEstadoGeneralController extends Controller
 {
-    /**
-     * Listar todos los tipos de estado general
-     * GET /api/catalogos/tipos-estado-general
-     */
+    // Listar todos los tipos de estado general
     public function index()
     {
         try {
@@ -31,10 +29,7 @@ class TipoEstadoGeneralController extends Controller
         }
     }
 
-    /**
-     * Crear nuevo tipo de estado general
-     * POST /api/catalogos/tipos-estado-general
-     */
+    // Crear nuevo tipo de estado general
     public function store(Request $request)
     {
         try {
@@ -60,7 +55,7 @@ class TipoEstadoGeneralController extends Controller
                 'permite_operaciones' => $request->permite_operaciones ?? true,
                 'es_estado_final' => $request->es_estado_final ?? false,
                 'requiere_justificacion' => $request->requiere_justificacion ?? false,
-                'created_by' => 1, // TODO: Obtener del usuario autenticado
+                'created_by' => 1,
                 'updated_by' => 1,
                 'version' => 1
             ]);
@@ -79,10 +74,7 @@ class TipoEstadoGeneralController extends Controller
         }
     }
 
-    /**
-     * Obtener tipo de estado general específico
-     * GET /api/catalogos/tipos-estado-general/{id}
-     */
+    // Obtener tipo de estado general específico
     public function show($id)
     {
         try {
@@ -109,10 +101,7 @@ class TipoEstadoGeneralController extends Controller
         }
     }
 
-    /**
-     * Actualizar tipo de estado general
-     * PUT /api/catalogos/tipos-estado-general/{id}
-     */
+    // Actualizar tipo de estado general
     public function update(Request $request, $id)
     {
         try {
@@ -149,7 +138,7 @@ class TipoEstadoGeneralController extends Controller
                 'es_estado_final' => $request->es_estado_final ?? false,
                 'requiere_justificacion' => $request->requiere_justificacion ?? false,
                 'is_active' => $request->is_active ?? true,
-                'updated_by' => 1, // TODO: Obtener del usuario autenticado
+                'updated_by' => 1,
                 'version' => $tipoEstado->version + 1
             ]);
 
@@ -167,10 +156,7 @@ class TipoEstadoGeneralController extends Controller
         }
     }
 
-    /**
-     * Eliminar tipo de estado general (soft delete)
-     * DELETE /api/catalogos/tipos-estado-general/{id}
-     */
+    // Eliminar tipo de estado general (soft delete)
     public function destroy($id)
     {
         try {
@@ -184,7 +170,7 @@ class TipoEstadoGeneralController extends Controller
             }
 
             $tipoEstado->update([
-                'deleted_by' => 1, // TODO: Obtener del usuario autenticado
+                'deleted_by' => 1,
             ]);
 
             $tipoEstado->delete();

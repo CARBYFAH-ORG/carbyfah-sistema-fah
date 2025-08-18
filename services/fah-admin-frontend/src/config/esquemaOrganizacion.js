@@ -1,76 +1,61 @@
-// ESQUEMAS DE ORGANIZACIÓN CARBYFAH
-// Configuración ultra-simplificada siguiendo patrón de catálogos
+// services\fah-admin-frontend\src\config\esquemaOrganizacion.js
 
-/**
- * SINTAXIS DE CAMPOS (IGUAL QUE CATÁLOGOS):
- * 'nombre:tipo:opciones'
- * 
- * TIPOS DISPONIBLES:
- * - texto: Campo de texto simple
- * - numero: Campo numérico  
- * - seleccion: Dropdown con opciones
- * - area_texto: Textarea
- * - booleano: Checkbox
- * - fecha: Date picker
- * - foraneo_autocompletado: Campo con búsqueda inteligente para foráneas
- */
-
-// Importar funciones desde catálogos (reutilizar)
+// Importar funciones desde catalogos (reutilizar)
 const generarEtiquetaAmigable = (nombreCampo) => {
     const mapeoEtiquetas = {
         // Campos comunes
-        codigo: 'Código',
+        codigo: 'Codigo',
         nombre: 'Nombre',
 
         // Departamentos
-        pais_id: 'País',
-        codigo_departamento: 'Código Departamento',
+        pais_id: 'Pais',
+        codigo_departamento: 'Codigo Departamento',
         nombre_departamento: 'Nombre del Departamento',
 
         // Municipios
         departamento_id: 'Departamento',
-        codigo_municipio: 'Código Municipio',
+        codigo_municipio: 'Codigo Municipio',
         nombre_municipio: 'Nombre del Municipio',
 
         // Ciudades
         municipio_id: 'Municipio',
-        codigo_ciudad: 'Código Ciudad',
+        codigo_ciudad: 'Codigo Ciudad',
         nombre_ciudad: 'Nombre de la Ciudad',
         tipo_localidad: 'Tipo de Localidad',
 
-        // Ubicaciones Geográficas
-        codigo_ubicacion: 'Código Ubicación',
-        nombre_ubicacion: 'Nombre de la Ubicación',
+        // Ubicaciones Geograficas
+        codigo_ubicacion: 'Codigo Ubicacion',
+        nombre_ubicacion: 'Nombre de la Ubicacion',
         ciudad_id: 'Ciudad',
         latitud: 'Latitud',
         longitud: 'Longitud',
-        direccion_referencia: 'Dirección de Referencia',
+        direccion_referencia: 'Direccion de Referencia',
         altitud_metros: 'Altitud (metros)',
-        telefono_principal: 'Teléfono Principal',
-        telefono_emergencia: 'Teléfono de Emergencia',
+        telefono_principal: 'Telefono Principal',
+        telefono_emergencia: 'Telefono de Emergencia',
 
         // Estructura Militar
-        codigo_unidad: 'Código de Unidad',
+        codigo_unidad: 'Codigo de Unidad',
         nombre_unidad: 'Nombre de la Unidad',
         tipo_estructura_id: 'Tipo de Estructura',
-        ubicacion_geografica_id: 'Ubicación Geográfica',
+        ubicacion_geografica_id: 'Ubicacion Geografica',
         unidad_padre_id: 'Unidad Padre',
-        nivel_jerarquico: 'Nivel Jerárquico',
+        nivel_jerarquico: 'Nivel Jerarquico',
         orden_horizontal: 'Orden Horizontal',
         capacidad_personal: 'Capacidad de Personal',
-        fecha_activacion: 'Fecha de Activación',
-        fecha_desactivacion: 'Fecha de Desactivación',
+        fecha_activacion: 'Fecha de Activacion',
+        fecha_desactivacion: 'Fecha de Desactivacion',
         logo_url: 'URL del Logo',
-        mision: 'Misión',
-        vision: 'Visión',
+        mision: 'Mision',
+        vision: 'Vision',
 
         // Cargos
         estructura_militar_id: 'Estructura Militar',
-        codigo_cargo: 'Código del Cargo',
+        codigo_cargo: 'Codigo del Cargo',
         nombre_cargo: 'Nombre del Cargo',
 
         // Roles Funcionales
-        codigo_rol: 'Código del Rol',
+        codigo_rol: 'Codigo del Rol',
         nombre_rol: 'Nombre del Rol',
         nivel_autoridad: 'Nivel de Autoridad'
     }
@@ -88,7 +73,7 @@ const generarPlaceholder = (nombreCampo, tipoCampo) => {
     const placeholders = {
         // Departamentos
         codigo_departamento: 'Ej: FM, COR, ATL',
-        nombre_departamento: 'Ej: Francisco Morazán, Cortés',
+        nombre_departamento: 'Ej: Francisco Morazan, Cortes',
 
         // Municipios
         codigo_municipio: 'Ej: TGU, SPS, LCE',
@@ -96,12 +81,12 @@ const generarPlaceholder = (nombreCampo, tipoCampo) => {
 
         // Ciudades
         codigo_ciudad: 'Ej: TGU01, SPS01',
-        nombre_ciudad: 'Ej: Tegucigalpa, Comayagüela',
+        nombre_ciudad: 'Ej: Tegucigalpa, Comayaguela',
         tipo_localidad: 'Ej: Ciudad, Aldea, Caserio',
 
         // Ubicaciones
         codigo_ubicacion: 'Ej: BASE-SOTO-CANO, HAM-TGU',
-        nombre_ubicacion: 'Ej: Base Aérea Soto Cano',
+        nombre_ubicacion: 'Ej: Base Aerea Soto Cano',
         latitud: 'Ej: 14.0583',
         longitud: 'Ej: -87.2068',
         direccion_referencia: 'Ej: 500m norte del parque central',
@@ -111,13 +96,13 @@ const generarPlaceholder = (nombreCampo, tipoCampo) => {
 
         // Estructura Militar
         codigo_unidad: 'Ej: FA-1, HAM, JEMGA',
-        nombre_unidad: 'Ej: Primera Fuerza Aérea',
+        nombre_unidad: 'Ej: Primera Fuerza Aerea',
         nivel_jerarquico: 'Ej: 1, 2, 3',
         orden_horizontal: 'Ej: 1, 2, 3',
         capacidad_personal: 'Ej: 100, 500, 1000',
         logo_url: 'Ej: https://ejemplo.com/logo.png',
-        mision: 'Misión de la unidad...',
-        vision: 'Visión de la unidad...',
+        mision: 'Mision de la unidad...',
+        vision: 'Vision de la unidad...',
 
         // Cargos
         codigo_cargo: 'Ej: CMD, SUBCMD, JEFE-OPS',
@@ -133,7 +118,7 @@ const generarPlaceholder = (nombreCampo, tipoCampo) => {
 }
 
 export const ESQUEMAS_ORGANIZACION = {
-    // ESTRUCTURA GEOGRÁFICA
+    // Estructura geografica
 
     // Departamentos
     departamentos: {
@@ -184,9 +169,9 @@ export const ESQUEMAS_ORGANIZACION = {
         ordenarPor: 'nombre_ciudad'
     },
 
-    // Ubicaciones Geográficas
+    // Ubicaciones Geograficas
     ubicaciones_geograficas: {
-        titulo: 'Ubicación Geográfica',
+        titulo: 'Ubicacion Geografica',
         icono: '📍',
         tabla: 'ubicaciones_geograficas',
         ancho: '900px',
@@ -209,7 +194,7 @@ export const ESQUEMAS_ORGANIZACION = {
         ordenarPor: 'nombre_ubicacion'
     },
 
-    // ESTRUCTURA MILITAR
+    // Estructura militar
 
     // Estructura Militar
     estructura_militar: {
@@ -271,7 +256,7 @@ export const ESQUEMAS_ORGANIZACION = {
     }
 }
 
-// CONFIGURACIÓN DE NOTIFICACIONES
+// Configuracion de notificaciones
 
 export const CONFIGURACION_NOTIFICACIONES = {
     // Duraciones (milisegundos)
@@ -282,7 +267,7 @@ export const CONFIGURACION_NOTIFICACIONES = {
         informacion: 2500
     },
 
-    // Posición en pantalla
+    // Posicion en pantalla
     posicion: 'top-right',
 
     // Plantillas de mensajes
@@ -333,29 +318,29 @@ export const CONFIGURACION_NOTIFICACIONES = {
 
         errorValidacion: () => ({
             severity: 'error',
-            summary: 'Error de Validación',
+            summary: 'Error de Validacion',
             detail: 'Por favor corrija los errores en el formulario',
             life: 5000
         }),
 
         errorConexion: () => ({
             severity: 'error',
-            summary: 'Error de Conexión',
+            summary: 'Error de Conexion',
             detail: 'No se pudo conectar con el servidor',
             life: 5000
         }),
 
         // Advertencias
         confirmacionEliminar: (tabla, nombre) => ({
-            mensaje: `¿Está seguro de eliminar el ${obtenerTituloTabla(tabla).toLowerCase()} "${nombre}"?`,
-            header: 'Confirmar Eliminación',
+            mensaje: `¿Esta seguro de eliminar el ${obtenerTituloTabla(tabla).toLowerCase()} "${nombre}"?`,
+            header: 'Confirmar Eliminacion',
             icon: 'pi pi-exclamation-triangle',
             acceptClass: 'p-button-danger',
-            acceptLabel: 'Sí, Eliminar',
+            acceptLabel: 'Si, Eliminar',
             rejectLabel: 'Cancelar'
         }),
 
-        // Información  
+        // Informacion
         cargando: (accion) => ({
             severity: 'info',
             summary: 'Procesando',
@@ -372,9 +357,9 @@ export const CONFIGURACION_NOTIFICACIONES = {
     }
 }
 
-// FUNCIONES AUXILIARES
+// Funciones auxiliares
 
-// Obtener configuración de esquema por nombre
+// Obtener configuracion de esquema por nombre
 export const obtenerEsquema = (nombreTabla) => {
     const esquema = ESQUEMAS_ORGANIZACION[nombreTabla]
     if (!esquema) {
@@ -383,13 +368,13 @@ export const obtenerEsquema = (nombreTabla) => {
     return esquema
 }
 
-// Obtener título amigable de tabla
+// Obtener titulo amigable de tabla
 export const obtenerTituloTabla = (nombreTabla) => {
     const esquema = obtenerEsquema(nombreTabla)
     return esquema ? esquema.titulo : nombreTabla
 }
 
-// Validar si existe configuración para una tabla
+// Validar si existe configuracion para una tabla
 export const tieneEsquema = (nombreTabla) => {
     return ESQUEMAS_ORGANIZACION[nombreTabla] !== undefined
 }
@@ -399,7 +384,7 @@ export const obtenerNombresTablas = () => {
     return Object.keys(ESQUEMAS_ORGANIZACION)
 }
 
-// Obtener configuración de notificación
+// Obtener configuracion de notificacion
 export const obtenerNotificacion = (tipo, tabla, nombre = null) => {
     const mensaje = CONFIGURACION_NOTIFICACIONES.mensajes[tipo]
 
@@ -410,7 +395,7 @@ export const obtenerNotificacion = (tipo, tabla, nombre = null) => {
     return mensaje || null
 }
 
-// Validar configuración de esquema
+// Validar configuracion de esquema
 export const validarEsquema = (nombreTabla) => {
     const esquema = obtenerEsquema(nombreTabla)
 
@@ -421,10 +406,10 @@ export const validarEsquema = (nombreTabla) => {
     const errores = []
 
     // Validar campos requeridos
-    if (!esquema.titulo) errores.push('Falta título')
+    if (!esquema.titulo) errores.push('Falta titulo')
     if (!esquema.tabla) errores.push('Falta nombre de tabla')
     if (!esquema.campos || !Array.isArray(esquema.campos)) {
-        errores.push('Falta configuración de campos')
+        errores.push('Falta configuracion de campos')
     }
 
     return {
@@ -440,14 +425,14 @@ export const CONFIGURACION_GLOBAL = {
     // Tema por defecto
     temaPorDefecto: 'militar-oscuro',
 
-    // Configuración de formularios
+    // Configuracion de formularios
     formularios: {
         validacionEnTiempoReal: true,
         mostrarAyuda: true,
         animacionesCampos: true
     },
 
-    // Configuración de tablas
+    // Configuracion de tablas
     tablas: {
         filasPorPagina: 10,
         paginacionTamaños: [5, 10, 25, 50],

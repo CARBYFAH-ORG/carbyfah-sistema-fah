@@ -1,21 +1,17 @@
-/* =====================================
-   ESTILOS PROFESIONALES TABLA ORGANIZACIÓN FAH
-   DISEÑO SOBRIO Y FUNCIONAL PARA FUERZAS ARMADAS
-   TEXTO NEGRO PARA MÁXIMO CONTRASTE
-   ===================================== */
+/* services\fah-admin-frontend\src\styles\components\formularios\tabla-dinamica-organizacion.css */
 
-/* =====================================
-   CONTENEDOR PRINCIPAL LIMPIO
-   ===================================== */
+/* Estilos profesionales tabla organizacion FAH */
+/* Diseno sobrio y funcional para fuerzas armadas */
+/* Texto negro para maximo contraste */
+
+/* Contenedor principal limpio */
 .tabla-dinamica-contenedor {
   @apply rounded-lg overflow-hidden transition-all duration-200;
   @apply bg-white shadow-md;
-  border: 2px solid #7c3aed; /* Púrpura organización en lugar de azul FAH */
+  border: 2px solid #7c3aed;
 }
 
-/* =====================================
-   CONTROLES SUPERIORES PROFESIONALES
-   ===================================== */
+/* Controles superiores profesionales */
 .tabla-controles-superiores {
   display: flex;
   justify-content: space-between;
@@ -44,9 +40,7 @@
   white-space: nowrap;
 }
 
-/* =====================================
-   BOTONES ORGANIZACIÓN PROFESIONALES
-   ===================================== */
+/* Botones organizacion profesionales */
 .btn-fah {
   padding: 10px 18px;
   border: none;
@@ -62,7 +56,7 @@
 }
 
 .btn-fah-agregar {
-  background: #7c3aed; /* Púrpura organización en lugar de azul FAH */
+  background: #7c3aed;
   color: #ffffff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
@@ -74,7 +68,7 @@
 }
 
 .btn-fah-actualizar {
-  background: #10b981; /* Verde simple */
+  background: #10b981;
   color: #ffffff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
@@ -86,8 +80,8 @@
 }
 
 .btn-fah-editar {
-  background: #fbbf24; /* Dorado FAH */
-  color: #1f2937; /* Texto oscuro para contraste */
+  background: #fbbf24;
+  color: #1f2937;
   font-weight: 600;
   padding: 6px 10px;
   font-size: 12px;
@@ -99,7 +93,7 @@
 }
 
 .btn-fah-eliminar {
-  background: #dc2626; /* Rojo simple */
+  background: #dc2626;
   color: #ffffff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
   padding: 6px 10px;
@@ -111,9 +105,7 @@
   transform: translateY(-1px);
 }
 
-/* =====================================
-   BUSCADOR PROFESIONAL
-   ===================================== */
+/* Buscador profesional */
 .busqueda-container {
   position: relative;
   width: 100%;
@@ -132,7 +124,7 @@
 
 .input-busqueda:focus {
   outline: none;
-  border-color: #7c3aed; /* Púrpura organización */
+  border-color: #7c3aed;
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
 }
 
@@ -149,9 +141,7 @@
   pointer-events: none;
 }
 
-/* =====================================
-   SELECTOR DE REGISTROS
-   ===================================== */
+/* Selector de registros */
 .label-registros {
   color: #374151;
   font-weight: 500;
@@ -176,9 +166,7 @@
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
 }
 
-/* =====================================
-   TABLA ORGANIZACIÓN LIMPIA Y PROFESIONAL
-   ===================================== */
+/* Tabla organizacion limpia y profesional */
 .tabla-fah {
   width: 100%;
   border-collapse: collapse;
@@ -187,7 +175,7 @@
 }
 
 .tabla-fah thead {
-  background: #7c3aed; /* Púrpura sólido organización - SIN GRADIENTES */
+  background: #7c3aed;
 }
 
 .tabla-fah th {
@@ -198,34 +186,32 @@
   letter-spacing: 0.5px;
   text-transform: uppercase;
   color: #ffffff;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3); /* Sombra sutil para legibilidad */
-  border-bottom: 2px solid #fbbf24; /* Línea dorada sutil */
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  border-bottom: 2px solid #fbbf24;
 }
 
 .tabla-fah td {
   padding: 12px;
   border-bottom: 1px solid #e2e8f0;
-  color: #000000; /* NEGRO para máximo contraste */
-  font-weight: 600; /* Más bold para que se note bien */
+  color: #000000;
+  font-weight: 600;
   vertical-align: middle;
 }
 
 .tabla-fah tbody tr:nth-child(even) {
-  background-color: #f8fafc; /* Gris muy claro */
+  background-color: #f8fafc;
 }
 
 .tabla-fah tbody tr:nth-child(odd) {
-  background-color: #ffffff; /* Blanco */
+  background-color: #ffffff;
 }
 
 .tabla-fah tbody tr:hover {
-  background-color: #f3e8ff !important; /* Púrpura muy claro al hover */
+  background-color: #f3e8ff !important;
   transition: background-color 0.15s ease;
 }
 
-/* =====================================
-   CONTROLES INFERIORES SIMPLES
-   ===================================== */
+/* Controles inferiores simples */
 .tabla-controles-inferiores {
   display: flex;
   justify-content: space-between;
@@ -242,7 +228,7 @@
 }
 
 .info-registros span {
-  color: #7c3aed; /* Púrpura para números */
+  color: #7c3aed;
   font-weight: 700;
 }
 
@@ -265,7 +251,7 @@
 }
 
 .btn-paginacion:hover:not(:disabled) {
-  background: #7c3aed; /* Púrpura al hover */
+  background: #7c3aed;
   border-color: #7c3aed;
   color: #ffffff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
@@ -306,7 +292,7 @@
 }
 
 .btn-pagina.activa {
-  background: #7c3aed; /* Púrpura sólido */
+  background: #7c3aed;
   border-color: #7c3aed;
   color: #ffffff;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
@@ -318,9 +304,7 @@
   font-weight: bold;
 }
 
-/* =====================================
-   ESTADOS PROFESIONALES
-   ===================================== */
+/* Estados profesionales */
 .badge-success {
   @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-bold;
   background: #dcfce7;
@@ -342,9 +326,7 @@
   border: 1px solid #fbbf24;
 }
 
-/* =====================================
-   RELACIONES FORÁNEAS LIMPIAS
-   ===================================== */
+/* Relaciones foraneas limpias */
 .contenido-relacion {
   @apply w-full;
 }
@@ -355,12 +337,12 @@
 
 .nombre-relacion {
   @apply text-sm font-bold;
-  color: #000000 !important; /* Negro forzado para contraste */
+  color: #000000 !important;
 }
 
 .codigo-relacion {
   @apply text-xs font-mono;
-  color: #6b7280; /* Gris para el código */
+  color: #6b7280;
   background: #f1f5f9;
   padding: 2px 6px;
   border-radius: 4px;
@@ -368,22 +350,20 @@
   display: inline-block;
 }
 
-/* =====================================
-   CONTENIDO LEGIBLE - TEXTO NEGRO
-   ===================================== */
+/* Contenido legible - texto negro */
 .contenido-numero {
   @apply text-right font-mono text-sm font-bold;
-  color: #000000 !important; /* Negro forzado */
+  color: #000000 !important;
 }
 
 .contenido-fecha {
   @apply text-sm font-bold;
-  color: #000000 !important; /* Negro forzado */
+  color: #000000 !important;
 }
 
 .contenido-texto {
   @apply text-sm font-semibold;
-  color: #000000 !important; /* Negro forzado */
+  color: #000000 !important;
 }
 
 .contenido-url {
@@ -391,7 +371,7 @@
 }
 
 .link-url {
-  color: #7c3aed; /* Púrpura organización */
+  color: #7c3aed;
   text-decoration: none;
   font-weight: 600;
   transition: color 0.2s ease;
@@ -402,9 +382,7 @@
   text-decoration: underline;
 }
 
-/* =====================================
-   ESTADO VACÍO PROFESIONAL
-   ===================================== */
+/* Estado vacio profesional */
 .estado-vacio {
   text-align: center;
   padding: 60px 20px;
@@ -422,7 +400,7 @@
 }
 
 .estado-vacio-titulo {
-  color: #7c3aed; /* Púrpura organización */
+  color: #7c3aed;
   font-size: 1.25rem;
   font-weight: 700;
   margin-bottom: 10px;
@@ -434,9 +412,7 @@
   margin-bottom: 30px;
 }
 
-/* =====================================
-   LOADING PROFESIONAL
-   ===================================== */
+/* Loading profesional */
 .loading-overlay {
   @apply absolute inset-0 bg-white bg-opacity-90;
   @apply flex items-center justify-center;
@@ -462,9 +438,7 @@
   font-size: 16px;
 }
 
-/* =====================================
-   RESPONSIVE LIMPIO
-   ===================================== */
+/* Responsive limpio */
 @media (max-width: 768px) {
   .tabla-controles-superiores {
     flex-direction: column;
@@ -507,9 +481,7 @@
   }
 }
 
-/* =====================================
-   ANIMACIÓN SUTIL
-   ===================================== */
+/* Animacion sutil */
 .tabla-dinamica-contenedor tbody tr {
   animation: fadeInRow 0.3s ease-out;
 }
@@ -525,11 +497,9 @@
   }
 }
 
-/* =====================================
-   CORRECCIONES FINALES PARA CONTRASTE
-   ===================================== */
+/* Correcciones finales para contraste */
 
-/* Asegurar que TODO el texto de las celdas sea negro */
+/* Asegurar que todo el texto de las celdas sea negro */
 .tabla-fah tbody td * {
   color: #000000 !important;
 }
@@ -541,21 +511,17 @@
   color: inherit !important;
 }
 
-/* Y los links que deben ser púrpura */
+/* Y los links que deben ser purpura */
 .tabla-fah tbody td .link-url {
   color: #7c3aed !important;
 }
 
-/* Código de relaciones puede ser gris */
+/* Codigo de relaciones puede ser gris */
 .tabla-fah tbody td .codigo-relacion {
   color: #6b7280 !important;
 }
 
-/* =====================================
-   🎯 ESTILOS PARA SELECTORES DE ORDENAMIENTO ORGANIZACIÓN
-   AGREGAR AL FINAL DEL ARCHIVO
-   ===================================== */
-
+/* Estilos para selectores de ordenamiento organizacion */
 .tabla-controles-con-ordenamiento {
   display: flex;
   justify-content: space-between;
@@ -576,7 +542,7 @@
   border-radius: 8px;
   border: 1px solid #e2e8f0;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  border-left: 4px solid #7c3aed; /* Púrpura organización */
+  border-left: 4px solid #7c3aed;
 }
 
 .label-ordenamiento {
@@ -602,7 +568,7 @@
 .select-ordenamiento:focus,
 .select-orden-tipo:focus {
   outline: none;
-  border-color: #7c3aed; /* Púrpura organización */
+  border-color: #7c3aed;
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
 }
 
@@ -611,10 +577,7 @@
   border-color: #9ca3af;
 }
 
-/* =====================================
-   📱 RESPONSIVO PARA SELECTORES ORGANIZACIÓN
-   ===================================== */
-
+/* Responsivo para selectores organizacion */
 @media (max-width: 768px) {
   .tabla-controles-con-ordenamiento {
     flex-direction: column;

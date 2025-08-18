@@ -1,3 +1,5 @@
+<!-- services\fah-admin-frontend\src\components\formularios\TablaDinamicaOrganizacion.vue -->
+
 <template>
   <!-- Tabla de microservicio estructura organizacional -->
   <div class="tabla-dinamica-contenedor">
@@ -144,7 +146,7 @@
         style="border-color: #7c3aed"
       >
         <table class="tabla-fah">
-          <!-- Encabezados dinámicos -->
+          <!-- Encabezados dinamicos -->
           <thead>
             <tr>
               <th
@@ -158,15 +160,15 @@
             </tr>
           </thead>
 
-          <!-- Filas dinámicas -->
+          <!-- Filas dinamicas -->
           <tbody>
             <tr
               v-for="registro in registrosPaginados"
               :key="registro.id || registro.codigo"
             >
-              <!-- Celdas dinámicas -->
+              <!-- Celdas dinamicas -->
               <td v-for="campo in camposMostrar" :key="campo.nombre">
-                <!-- Relación foránea -->
+                <!-- Relacion foranea -->
                 <div v-if="esRelacionForanea(campo)" class="contenido-relacion">
                   <div
                     v-if="cargandoRelaciones"
@@ -208,7 +210,7 @@
                   {{ formatearFecha(registro[campo.nombre]) }}
                 </div>
 
-                <!-- Número -->
+                <!-- Numero -->
                 <div
                   v-else-if="esNumero(campo, registro)"
                   class="contenido-numero"
@@ -264,7 +266,7 @@
         </table>
       </div>
 
-      <!-- Estado vacío -->
+      <!-- Estado vacio -->
       <div v-else class="estado-vacio">
         <div class="estado-vacio-icono">
           {{ configuracionEsquema?.icono || "🏛️" }}
@@ -292,7 +294,7 @@
       </div>
     </div>
 
-    <!-- Controles inferiores de paginación -->
+    <!-- Controles inferiores de paginacion -->
     <div
       v-if="registrosFiltrados?.length > 0"
       class="tabla-controles-inferiores"
@@ -307,7 +309,7 @@
         </span>
       </div>
 
-      <!-- Paginación -->
+      <!-- Paginacion -->
       <div class="paginacion" v-if="totalPaginas > 1">
         <button
           class="btn-paginacion"
@@ -318,7 +320,7 @@
         </button>
 
         <div class="numeros-pagina">
-          <!-- Primera página -->
+          <!-- Primera pagina -->
           <button
             v-if="paginaActual > 3"
             class="btn-pagina"
@@ -330,7 +332,7 @@
           <!-- Puntos suspensivos izquierda -->
           <span v-if="paginaActual > 4" class="dots">...</span>
 
-          <!-- Páginas alrededor de la actual -->
+          <!-- Paginas alrededor de la actual -->
           <button
             v-for="pagina in paginasVisibles"
             :key="pagina"
@@ -344,7 +346,7 @@
           <!-- Puntos suspensivos derecha -->
           <span v-if="paginaActual < totalPaginas - 3" class="dots">...</span>
 
-          <!-- Última página -->
+          <!-- Ultima pagina -->
           <button
             v-if="paginaActual < totalPaginas - 2"
             class="btn-pagina"
@@ -364,7 +366,7 @@
       </div>
     </div>
 
-    <!-- Modal especializado para organización -->
+    <!-- Modal especializado para organizacion -->
     <ModalFormularioOrganizacion
       v-model:visible="modalVisible"
       :esquema="esquema"
@@ -380,7 +382,7 @@
 
 <script>
 import { ref, computed, onMounted, watch } from "vue";
-import { useToast } from "primevue/usetoast";
+import { useToastFAH } from "@/composables/useToastFAH";
 
 // Componentes PrimeVue
 import ProgressSpinner from "primevue/progressspinner";
@@ -390,7 +392,7 @@ import Button from "primevue/button";
 // Componentes especializados
 import ModalFormularioOrganizacion from "./ModalFormularioOrganizacion.vue";
 
-// Composables y stores para organización
+// Composables y stores para organizacion
 import { usarCrudOrganizacion } from "@/composables/usarCrudOrganizacion";
 import { usarFormularioDinamico } from "@/composables/usarFormularioDinamico";
 import { obtenerEsquema } from "@/config/esquemaOrganizacion";
@@ -436,7 +438,7 @@ export default {
 
   setup(props, { emit }) {
     // Composables y stores
-    const toast = useToast();
+    const toast = useToastFAH();
 
     const {
       registros,
@@ -454,7 +456,7 @@ export default {
     const modalDatos = ref({});
     const cargandoRelaciones = ref(false);
 
-    // Estados para filtros y paginación
+    // Estados para filtros y paginacion
     const filtroTexto = ref("");
     const registrosPorPagina = ref(10);
     const paginaActual = ref(1);
@@ -465,41 +467,41 @@ export default {
 
     // Computed properties
 
-    // Configuración del esquema
+    // Configuracion del esquema
     const configuracionEsquema = computed(() => {
       return obtenerEsquema(props.esquema);
     });
 
-    // Opciones de ordenamiento dinámicas por tabla
+    // Opciones de ordenamiento dinamicas por tabla
     const opcionesOrdenamiento = computed(() => {
       const tabla = configuracionEsquema.value?.tabla;
 
       const opcionesComunes = [
         { label: "Por defecto", value: "default" },
-        { label: "Fecha de creación", value: "created_at" },
-        { label: "Alfabético por nombre", value: "alfabetico" },
+        { label: "Fecha de creacion", value: "created_at" },
+        { label: "Alfabetico por nombre", value: "alfabetico" },
       ];
 
-      // Opciones específicas por tabla
+      // Opciones especificas por tabla
       switch (tabla) {
         case "departamentos":
           return [
             ...opcionesComunes,
-            { label: "Código Departamento", value: "codigo_departamento" },
-            { label: "País", value: "pais_id" },
+            { label: "Codigo Departamento", value: "codigo_departamento" },
+            { label: "Pais", value: "pais_id" },
           ];
 
         case "municipios":
           return [
             ...opcionesComunes,
-            { label: "Código Municipio", value: "codigo_municipio" },
+            { label: "Codigo Municipio", value: "codigo_municipio" },
             { label: "Departamento", value: "departamento_id" },
           ];
 
         case "ciudades":
           return [
             ...opcionesComunes,
-            { label: "Código Ciudad", value: "codigo_ciudad" },
+            { label: "Codigo Ciudad", value: "codigo_ciudad" },
             { label: "Tipo Localidad", value: "tipo_localidad" },
             { label: "Municipio", value: "municipio_id" },
           ];
@@ -507,32 +509,32 @@ export default {
         case "ubicaciones_geograficas":
           return [
             ...opcionesComunes,
-            { label: "Código Ubicación", value: "codigo_ubicacion" },
+            { label: "Codigo Ubicacion", value: "codigo_ubicacion" },
             { label: "Latitud", value: "latitud" },
             { label: "Longitud", value: "longitud" },
-            { label: "País", value: "pais_id" },
+            { label: "Pais", value: "pais_id" },
           ];
 
         case "estructura_militar":
           return [
             ...opcionesComunes,
-            { label: "Nivel Jerárquico", value: "nivel_jerarquico" },
+            { label: "Nivel Jerarquico", value: "nivel_jerarquico" },
             { label: "Orden Horizontal", value: "orden_horizontal" },
-            { label: "Código Unidad", value: "codigo_unidad" },
+            { label: "Codigo Unidad", value: "codigo_unidad" },
             { label: "Capacidad Personal", value: "capacidad_personal" },
           ];
 
         case "cargos":
           return [
             ...opcionesComunes,
-            { label: "Código Cargo", value: "codigo_cargo" },
+            { label: "Codigo Cargo", value: "codigo_cargo" },
             { label: "Nivel Autoridad", value: "nivel_autoridad" },
           ];
 
         case "roles_funcionales":
           return [
             ...opcionesComunes,
-            { label: "Código Rol", value: "codigo_rol" },
+            { label: "Codigo Rol", value: "codigo_rol" },
             { label: "Nivel Autoridad", value: "nivel_autoridad" },
           ];
 
@@ -547,7 +549,7 @@ export default {
       { label: "Mayor a Menor (Z-A, 9-1)", value: "desc" },
     ]);
 
-    // Función de ordenamiento inteligente
+    // Funcion de ordenamiento inteligente
     const aplicarOrdenamiento = (registros, campo, tipo) => {
       if (campo === "default") {
         // Usar ordenamiento por defecto del esquema
@@ -562,7 +564,7 @@ export default {
       }
 
       if (campo === "alfabetico") {
-        // Buscar campo de nombre automáticamente
+        // Buscar campo de nombre automaticamente
         const campoNombre =
           Object.keys(registros[0] || {}).find(
             (key) => key.includes("nombre") || key.includes("name")
@@ -581,7 +583,7 @@ export default {
         const valorA = a[campo];
         const valorB = b[campo];
 
-        // Ordenamiento numérico
+        // Ordenamiento numerico
         if (!isNaN(valorA) && !isNaN(valorB)) {
           return tipo === "asc"
             ? Number(valorA) - Number(valorB)
@@ -634,7 +636,7 @@ export default {
       return props.datos || registros.value || [];
     });
 
-    // Filtros y búsqueda
+    // Filtros y busqueda
     const registrosFiltrados = computed(() => {
       if (!filtroTexto.value.trim()) {
         return registrosActuales.value;
@@ -647,7 +649,7 @@ export default {
           const valor = registro[campo.nombre];
           if (valor === null || valor === undefined) return false;
 
-          // Buscar en relaciones foráneas
+          // Buscar en relaciones foraneas
           if (esRelacionForanea(campo)) {
             const nombreRelacion = obtenerNombreRelacion(registro, campo);
             const codigoRelacion = obtenerCodigoRelacion(registro, campo);
@@ -674,7 +676,7 @@ export default {
       );
     });
 
-    // Paginación con registros ordenados
+    // Paginacion con registros ordenados
     const totalRegistrosFiltrados = computed(() => {
       return registrosOrdenados.value?.length || 0;
     });
@@ -708,7 +710,7 @@ export default {
       let inicio = Math.max(1, actual - 2);
       let fin = Math.min(total, actual + 2);
 
-      // Ajustar para mostrar siempre 5 páginas si es posible
+      // Ajustar para mostrar siempre 5 paginas si es posible
       if (fin - inicio < 4) {
         if (inicio === 1) {
           fin = Math.min(total, inicio + 4);
@@ -738,9 +740,9 @@ export default {
       return `${cantidad} ${plural.toLowerCase()}`;
     });
 
-    // Métodos de filtros y paginación
+    // Metodos de filtros y paginacion
     const filtrarRegistros = () => {
-      paginaActual.value = 1; // Resetear a primera página al filtrar
+      paginaActual.value = 1;
     };
 
     const limpiarFiltros = () => {
@@ -749,7 +751,7 @@ export default {
     };
 
     const cambiarRegistrosPorPagina = () => {
-      paginaActual.value = 1; // Resetear a primera página al cambiar cantidad
+      paginaActual.value = 1;
     };
 
     const irAPagina = (pagina) => {
@@ -758,17 +760,12 @@ export default {
       }
     };
 
-    // Función para cambiar ordenamiento
+    // Funcion para cambiar ordenamiento
     const cambiarOrdenamiento = () => {
-      // Resetear paginación al cambiar ordenamiento
       paginaActual.value = 1;
-
-      console.log(
-        `Ordenamiento organización cambiado: ${campoOrdenamiento.value} - ${tipoOrdenamiento.value}`
-      );
     };
 
-    // Métodos para relaciones
+    // Metodos para relaciones
     const esRelacionForanea = (campo) => {
       return campo.nombre.endsWith("_id") && campo.tipo !== "numero";
     };
@@ -827,7 +824,7 @@ export default {
       return null;
     };
 
-    // Métodos para formateo
+    // Metodos para formateo
     const esBooleano = (campo, registro) => {
       return typeof registro[campo.nombre] === "boolean";
     };
@@ -890,13 +887,13 @@ export default {
       return valor;
     };
 
-    // Métodos principales
+    // Metodos principales
     const abrirModalCrear = async () => {
       modalVisible.value = false;
 
-      // Lógica específica para organización si es necesaria
+      // Logica especifica para organizacion si es necesaria
       if (props.esquema === "departamentos") {
-        // Aquí puedes agregar lógica específica para departamentos
+        // Aqui puedes agregar logica especifica para departamentos
       }
 
       modalModo.value = "crear";
@@ -916,29 +913,20 @@ export default {
       modalVisible.value = true;
     };
 
-    // Método para recargar datos
+    // Metodo para recargar datos
     const recargarDatos = async () => {
-      console.log("Recargando datos organización para esquema:", props.esquema);
-
       try {
-        // Emit para que el padre recargue los datos
         emit("recargar");
 
-        // Mostrar toast de éxito
-        toast.add({
-          severity: "success",
-          summary: "Datos actualizados",
-          detail: "La tabla de organización ha sido recargada exitosamente",
-          life: 3000,
-        });
+        toast.success(
+          "Datos actualizados",
+          "La tabla de organizacion ha sido recargada exitosamente"
+        );
       } catch (error) {
-        console.error("Error al recargar datos organización:", error);
-        toast.add({
-          severity: "error",
-          summary: "Error al actualizar",
-          detail: "No se pudieron recargar los datos de organización",
-          life: 5000,
-        });
+        toast.error(
+          "Error al actualizar",
+          "No se pudieron recargar los datos de organizacion"
+        );
       }
     };
 
@@ -970,14 +958,12 @@ export default {
     watch(
       () => props.esquema,
       (nuevoEsquema) => {
-        console.log(`Esquema organización cambió a: ${nuevoEsquema}`);
-        // Resetear filtros y paginación
         filtroTexto.value = "";
         paginaActual.value = 1;
       }
     );
 
-    // Resetear paginación cuando cambien los datos
+    // Resetear paginacion cuando cambien los datos
     watch(
       () => props.datos,
       () => {
@@ -1023,7 +1009,7 @@ export default {
       paginasVisibles,
       contadorRegistros,
 
-      // Métodos principales
+      // Metodos principales
       abrirModalCrear,
       abrirModalEditar,
       abrirModalEliminar,
@@ -1033,18 +1019,18 @@ export default {
       manejarCancelado,
       manejarError,
 
-      // Métodos de filtros y paginación
+      // Metodos de filtros y paginacion
       filtrarRegistros,
       limpiarFiltros,
       cambiarRegistrosPorPagina,
       irAPagina,
 
-      // Métodos para relaciones
+      // Metodos para relaciones
       esRelacionForanea,
       obtenerNombreRelacion,
       obtenerCodigoRelacion,
 
-      // Métodos para formateo
+      // Metodos para formateo
       esBooleano,
       esFecha,
       esNumero,
@@ -1063,8 +1049,8 @@ export default {
 <style>
 @import "@/styles/components/formularios/tabla-dinamica-organizacion.css";
 
-/* Estilos específicos para ordenamiento */
+/* Estilos especificos para ordenamiento */
 .controles-ordenamiento {
-  border-left: 4px solid #7c3aed !important; /* Púrpura organización */
+  border-left: 4px solid #3ab7ed !important;
 }
 </style>

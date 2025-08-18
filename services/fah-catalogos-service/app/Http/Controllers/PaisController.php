@@ -1,4 +1,5 @@
 <?php
+// services\fah-catalogos-service\app\Http\Controllers\PaisController.php
 
 namespace App\Http\Controllers;
 
@@ -8,10 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 class PaisController extends Controller
 {
-    /**
-     * Listar todos los países
-     * GET /api/catalogos/paises
-     */
+    // Listar todos los países
     public function index()
     {
         try {
@@ -31,10 +29,7 @@ class PaisController extends Controller
         }
     }
 
-    /**
-     * Crear nuevo país
-     * POST /api/catalogos/paises
-     */
+    // Crear nuevo país
     public function store(Request $request)
     {
         try {
@@ -60,7 +55,7 @@ class PaisController extends Controller
                 'codigo_iso3' => strtoupper($request->codigo_iso3),
                 'codigo_telefono' => $request->codigo_telefono,
                 'moneda_oficial' => $request->moneda_oficial,
-                'created_by' => 1, // TODO: Obtener del usuario autenticado
+                'created_by' => 1,
                 'updated_by' => 1,
                 'version' => 1
             ]);
@@ -79,10 +74,7 @@ class PaisController extends Controller
         }
     }
 
-    /**
-     * Obtener país específico
-     * GET /api/catalogos/paises/{id}
-     */
+    // Obtener país específico
     public function show($id)
     {
         try {
@@ -109,10 +101,7 @@ class PaisController extends Controller
         }
     }
 
-    /**
-     * Actualizar país
-     * PUT /api/catalogos/paises/{id}
-     */
+    // Actualizar país
     public function update(Request $request, $id)
     {
         try {
@@ -149,7 +138,7 @@ class PaisController extends Controller
                 'codigo_telefono' => $request->codigo_telefono,
                 'moneda_oficial' => $request->moneda_oficial,
                 'is_active' => $request->is_active ?? true,
-                'updated_by' => 1, // TODO: Obtener del usuario autenticado
+                'updated_by' => 1,
                 'version' => $pais->version + 1
             ]);
 
@@ -167,10 +156,7 @@ class PaisController extends Controller
         }
     }
 
-    /**
-     * Eliminar país (soft delete)
-     * DELETE /api/catalogos/paises/{id}
-     */
+    // Eliminar país (soft delete)
     public function destroy($id)
     {
         try {
@@ -184,7 +170,7 @@ class PaisController extends Controller
             }
 
             $pais->update([
-                'deleted_by' => 1, // TODO: Obtener del usuario autenticado
+                'deleted_by' => 1,
             ]);
 
             $pais->delete();
@@ -202,10 +188,7 @@ class PaisController extends Controller
         }
     }
 
-    /**
-     * Buscar países por texto (para autocompletado)
-     * GET /api/catalogos/paises/buscar?q=texto
-     */
+    // Buscar países por texto (para autocompletado)
     public function buscar(Request $request)
     {
         try {

@@ -1,8 +1,10 @@
+// services\fah-admin-frontend\src\stores\catalogosStore.js
+
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import * as catalogosService from '@/services/catalogosService'
 
-// STORE PRINCIPAL DE CATÁLOGOS
+// Store principal de catalogos
 export const useCatalogosStore = defineStore('catalogos', () => {
 
     // Estado reactivo
@@ -15,14 +17,14 @@ export const useCatalogosStore = defineStore('catalogos', () => {
     const error = ref(null)
     const errors = ref({})
 
-    // Datos de catálogos
+    // Datos de catalogos
     const tiposGenero = ref([])
     const categoriasPersonal = ref([])
     const grados = ref([])
     const catalogosBasicos = ref(null)
     const estadisticas = ref(null)
 
-    // Nuevos catálogos
+    // Nuevos catalogos
     const tiposEstadoGeneral = ref([])
     const nivelesPrioridad = ref([])
     const nivelesSeguridad = ref([])
@@ -38,11 +40,11 @@ export const useCatalogosStore = defineStore('catalogos', () => {
     const currentItem = ref(null)
     const currentTable = ref('tipos_genero')
 
-    // Filtros y búsquedas
+    // Filtros y busquedas
     const filtroCategoria = ref(null)
     const searchTerm = ref('')
 
-    // Computed properties
+    // Computed propiedades recibidas
     const gradosFiltrados = computed(() => {
         if (!filtroCategoria.value) return grados.value
         return grados.value.filter(grado =>
@@ -89,7 +91,7 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         loadingCategoriasPersonal.value || loadingGrados.value
     )
 
-    // Métodos generales
+    // Metodos generales
     const clearErrors = () => {
         error.value = null
         errors.value = {}
@@ -109,7 +111,7 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         clearErrors()
     }
 
-    // Esta función está configurada para cargar catálogos básicos, pero parece ser el origen del problema porque solo carga categoriasPersonal desde la respuesta inicial
+    // Esta funcion esta configurada para cargar catalogos basicos
     const loadCatalogosBasicos = async () => {
         loading.value = true
         clearErrors()
@@ -159,16 +161,16 @@ export const useCatalogosStore = defineStore('catalogos', () => {
                 paises.value = Array.isArray(data.paises) ? data.paises : []
 
             } else {
-                error.value = response?.error || 'Datos no válidos recibidos'
+                error.value = response?.error || 'Datos no validos recibidos'
             }
         } catch (err) {
-            error.value = 'Error cargando catálogos básicos: ' + (err.message || err)
+            error.value = 'Error cargando catalogos basicos: ' + (err.message || err)
         } finally {
             loading.value = false
         }
     }
 
-    // Método individual para cargar grados
+    // Metodo individual para cargar grados
     const cargarGrados = async (categoriaId = null) => {
         loadingGrados.value = true
         clearErrors()
@@ -188,7 +190,7 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         }
     }
 
-    // Cargar estadísticas
+    // Cargar estadisticas
     const loadEstadisticas = async () => {
         try {
             const response = await catalogosService.getEstadisticasCatalogos()
@@ -197,11 +199,11 @@ export const useCatalogosStore = defineStore('catalogos', () => {
                 estadisticas.value = response.data
             }
         } catch (err) {
-            // Error cargando estadísticas
+            // Error cargando estadisticas
         }
     }
 
-    // Actions tipos género
+    // Actions tipos genero
     const loadTiposGenero = async () => {
         loadingTiposGenero.value = true
         clearErrors()
@@ -215,7 +217,7 @@ export const useCatalogosStore = defineStore('catalogos', () => {
                 error.value = response.error
             }
         } catch (err) {
-            error.value = 'Error cargando tipos de género'
+            error.value = 'Error cargando tipos de genero'
         } finally {
             loadingTiposGenero.value = false
         }
@@ -237,8 +239,8 @@ export const useCatalogosStore = defineStore('catalogos', () => {
                 return { success: false, error: response.error }
             }
         } catch (err) {
-            error.value = 'Error creando tipo de género'
-            return { success: false, error: 'Error creando tipo de género' }
+            error.value = 'Error creando tipo de genero'
+            return { success: false, error: 'Error creando tipo de genero' }
         } finally {
             loading.value = false
         }
@@ -263,8 +265,8 @@ export const useCatalogosStore = defineStore('catalogos', () => {
                 return { success: false, error: response.error }
             }
         } catch (err) {
-            error.value = 'Error actualizando tipo de género'
-            return { success: false, error: 'Error actualizando tipo de género' }
+            error.value = 'Error actualizando tipo de genero'
+            return { success: false, error: 'Error actualizando tipo de genero' }
         } finally {
             loading.value = false
         }
@@ -284,14 +286,14 @@ export const useCatalogosStore = defineStore('catalogos', () => {
                 return { success: false, error: response.error }
             }
         } catch (err) {
-            error.value = 'Error eliminando tipo de género'
-            return { success: false, error: 'Error eliminando tipo de género' }
+            error.value = 'Error eliminando tipo de genero'
+            return { success: false, error: 'Error eliminando tipo de genero' }
         } finally {
             loading.value = false
         }
     }
 
-    // Esta función está lista para cargar categorías, analizaremos catalogosService.js para seguir el análisis
+    // Esta funcion esta lista para cargar categorias
     const loadCategoriasPersonal = async () => {
         loadingCategoriasPersonal.value = true
         clearErrors()
@@ -305,7 +307,7 @@ export const useCatalogosStore = defineStore('catalogos', () => {
                 error.value = response.error
             }
         } catch (err) {
-            error.value = 'Error cargando categorías de personal'
+            error.value = 'Error cargando categorias de personal'
         } finally {
             loadingCategoriasPersonal.value = false
         }
@@ -327,8 +329,8 @@ export const useCatalogosStore = defineStore('catalogos', () => {
                 return { success: false, error: response.error }
             }
         } catch (err) {
-            error.value = 'Error creando categoría de personal'
-            return { success: false, error: 'Error creando categoría de personal' }
+            error.value = 'Error creando categoria de personal'
+            return { success: false, error: 'Error creando categoria de personal' }
         } finally {
             loading.value = false
         }
@@ -353,8 +355,8 @@ export const useCatalogosStore = defineStore('catalogos', () => {
                 return { success: false, error: response.error }
             }
         } catch (err) {
-            error.value = 'Error actualizando categoría de personal'
-            return { success: false, error: 'Error actualizando categoría de personal' }
+            error.value = 'Error actualizando categoria de personal'
+            return { success: false, error: 'Error actualizando categoria de personal' }
         } finally {
             loading.value = false
         }
@@ -374,8 +376,8 @@ export const useCatalogosStore = defineStore('catalogos', () => {
                 return { success: false, error: response.error }
             }
         } catch (err) {
-            error.value = 'Error eliminando categoría de personal'
-            return { success: false, error: 'Error eliminando categoría de personal' }
+            error.value = 'Error eliminando categoria de personal'
+            return { success: false, error: 'Error eliminando categoria de personal' }
         } finally {
             loading.value = false
         }
@@ -651,9 +653,7 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         }
     }
 
-    // =====================================================
-    // ACTIONS TIPOS ESTADO GENERAL
-    // =====================================================
+    // Actions tipos estado general 
     const loadTiposEstadoGeneral = async () => {
         loading.value = true
         clearErrors()
@@ -743,9 +743,7 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         }
     }
 
-    // =====================================================
-    // ACTIONS NIVELES SEGURIDAD
-    // =====================================================
+    // Actions niveles seguridad 
     const loadNivelesSeguridad = async () => {
         loading.value = true
         clearErrors()
@@ -835,9 +833,7 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         }
     }
 
-    // =====================================================
-    // ACTIONS PAÍSES
-    // =====================================================
+    // Actions paises 
     const loadPaises = async () => {
         loading.value = true
         clearErrors()
@@ -851,7 +847,7 @@ export const useCatalogosStore = defineStore('catalogos', () => {
                 error.value = response.error
             }
         } catch (err) {
-            error.value = 'Error cargando países'
+            error.value = 'Error cargando paises'
         } finally {
             loading.value = false
         }
@@ -873,8 +869,8 @@ export const useCatalogosStore = defineStore('catalogos', () => {
                 return { success: false, error: response.error }
             }
         } catch (err) {
-            error.value = 'Error creando país'
-            return { success: false, error: 'Error creando país' }
+            error.value = 'Error creando pais'
+            return { success: false, error: 'Error creando pais' }
         } finally {
             loading.value = false
         }
@@ -899,8 +895,8 @@ export const useCatalogosStore = defineStore('catalogos', () => {
                 return { success: false, error: response.error }
             }
         } catch (err) {
-            error.value = 'Error actualizando país'
-            return { success: false, error: 'Error actualizando país' }
+            error.value = 'Error actualizando pais'
+            return { success: false, error: 'Error actualizando pais' }
         } finally {
             loading.value = false
         }
@@ -920,16 +916,14 @@ export const useCatalogosStore = defineStore('catalogos', () => {
                 return { success: false, error: response.error }
             }
         } catch (err) {
-            error.value = 'Error eliminando país'
-            return { success: false, error: 'Error eliminando país' }
+            error.value = 'Error eliminando pais'
+            return { success: false, error: 'Error eliminando pais' }
         } finally {
             loading.value = false
         }
     }
 
-    // =====================================================
-    // ACTIONS TIPOS ESTRUCTURA MILITAR
-    // =====================================================
+    // Actions tipos estructura militar 
     const loadTiposEstructuraMilitar = async () => {
         loading.value = true
         clearErrors()
@@ -1019,9 +1013,7 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         }
     }
 
-    // =====================================================
-    // ACTIONS TIPOS JERARQUÍA
-    // =====================================================
+    // Actions tipos jerarquia 
     const loadTiposJerarquia = async () => {
         loading.value = true
         clearErrors()
@@ -1035,7 +1027,7 @@ export const useCatalogosStore = defineStore('catalogos', () => {
                 error.value = response.error
             }
         } catch (err) {
-            error.value = 'Error cargando tipos de jerarquía'
+            error.value = 'Error cargando tipos de jerarquia'
         } finally {
             loading.value = false
         }
@@ -1057,8 +1049,8 @@ export const useCatalogosStore = defineStore('catalogos', () => {
                 return { success: false, error: response.error }
             }
         } catch (err) {
-            error.value = 'Error creando tipo de jerarquía'
-            return { success: false, error: 'Error creando tipo de jerarquía' }
+            error.value = 'Error creando tipo de jerarquia'
+            return { success: false, error: 'Error creando tipo de jerarquia' }
         } finally {
             loading.value = false
         }
@@ -1083,8 +1075,8 @@ export const useCatalogosStore = defineStore('catalogos', () => {
                 return { success: false, error: response.error }
             }
         } catch (err) {
-            error.value = 'Error actualizando tipo de jerarquía'
-            return { success: false, error: 'Error actualizando tipo de jerarquía' }
+            error.value = 'Error actualizando tipo de jerarquia'
+            return { success: false, error: 'Error actualizando tipo de jerarquia' }
         } finally {
             loading.value = false
         }
@@ -1104,16 +1096,14 @@ export const useCatalogosStore = defineStore('catalogos', () => {
                 return { success: false, error: response.error }
             }
         } catch (err) {
-            error.value = 'Error eliminando tipo de jerarquía'
-            return { success: false, error: 'Error eliminando tipo de jerarquía' }
+            error.value = 'Error eliminando tipo de jerarquia'
+            return { success: false, error: 'Error eliminando tipo de jerarquia' }
         } finally {
             loading.value = false
         }
     }
 
-    // =====================================================
-    // ACTIONS TIPOS EVENTO
-    // =====================================================
+    // Actions tipos evento 
     const loadTiposEvento = async () => {
         loading.value = true
         clearErrors()
@@ -1203,7 +1193,7 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         }
     }
 
-    // Métodos auxiliares
+    // Metodos auxiliares
     const getCategoriaById = (id) => {
         return categoriasPersonal.value.find(categoria => categoria.id === id)
     }
@@ -1243,14 +1233,14 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         error,
         errors,
 
-        // Datos de catálogos
+        // Datos de catalogos
         tiposGenero,
         categoriasPersonal,
         grados,
         catalogosBasicos,
         estadisticas,
 
-        // Nuevos catálogos
+        // Nuevos catalogos
         tiposEstadoGeneral,
         nivelesPrioridad,
         nivelesSeguridad,
@@ -1283,13 +1273,13 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         loadCatalogosBasicos,
         loadEstadisticas,
 
-        // Actions tipos género
+        // Actions tipos genero
         loadTiposGenero,
         createTipoGenero,
         updateTipoGenero,
         deleteTipoGenero,
 
-        // Actions categorías personal
+        // Actions categorias personal
         loadCategoriasPersonal,
         createCategoriaPersonal,
         updateCategoriaPersonal,
@@ -1326,7 +1316,7 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         updateNivelSeguridad,
         deleteNivelSeguridad,
 
-        // Actions países
+        // Actions paises
         loadPaises,
         createPais,
         updatePais,
@@ -1338,7 +1328,7 @@ export const useCatalogosStore = defineStore('catalogos', () => {
         updateTipoEstructuraMilitar,
         deleteTipoEstructuraMilitar,
 
-        // Actions tipos jerarquía
+        // Actions tipos jerarquia
         loadTiposJerarquia,
         createTipoJerarquia,
         updateTipoJerarquia,

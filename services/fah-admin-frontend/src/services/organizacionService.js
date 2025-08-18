@@ -1,14 +1,16 @@
+// services\fah - admin - frontend\src\services\organizacionService.js
+
 import axios from 'axios'
 
-// Configuración base axios para organización
+// Configuracion base axios para organizacion
 const API_BASE_URL = process.env.NODE_ENV === 'development'
     ? '/api'
-    : 'http://localhost:8010/api'  // ← Puerto del fah-organizacion-service
+    : 'http://localhost:8010/api'
 
-// Crear instancia axios específica para organización
+// Crear instancia axios especifica para organizacion
 const organizacionAPI = axios.create({
     baseURL: API_BASE_URL,
-    timeout: 30000,
+    timeout: 60000,
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json'
@@ -46,9 +48,7 @@ organizacionAPI.interceptors.response.use(
     }
 )
 
-// =====================================================
-// SERVICIOS GENERALES
-// =====================================================
+/* Servicios generales */
 export const healthCheck = async () => {
     try {
         const response = await organizacionAPI.get('/organizacion/health')
@@ -59,7 +59,7 @@ export const healthCheck = async () => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error de conexión'
+            error: error.response?.data?.message || 'Error de conexion'
         }
     }
 }
@@ -79,16 +79,18 @@ export const pingService = async () => {
     }
 }
 
-// =====================================================
-// SERVICIOS DEPARTAMENTOS
-// =====================================================
+/* Servicios departamentos */
 export const getDepartamentos = async () => {
     try {
         const response = await organizacionAPI.get('/organizacion/departamentos')
-        return {
+
+        const resultado = {
             success: true,
             data: response.data.data
-        }
+        };
+
+        return resultado;
+
     } catch (error) {
         return {
             success: false,
@@ -146,9 +148,7 @@ export const deleteDepartamento = async (id) => {
     }
 }
 
-// =====================================================
-// SERVICIOS MUNICIPIOS
-// =====================================================
+/* Servicios municipios */
 export const getMunicipios = async () => {
     try {
         const response = await organizacionAPI.get('/organizacion/municipios')
@@ -213,9 +213,7 @@ export const deleteMunicipio = async (id) => {
     }
 }
 
-// =====================================================
-// SERVICIOS CIUDADES
-// =====================================================
+/* Servicios ciudades */
 export const getCiudades = async () => {
     try {
         const response = await organizacionAPI.get('/organizacion/ciudades')
@@ -280,9 +278,7 @@ export const deleteCiudad = async (id) => {
     }
 }
 
-// =====================================================
-// SERVICIOS UBICACIONES GEOGRÁFICAS
-// =====================================================
+/* Servicios ubicaciones geograficas */
 export const getUbicacionesGeograficas = async () => {
     try {
         const response = await organizacionAPI.get('/organizacion/ubicaciones-geograficas')
@@ -293,7 +289,7 @@ export const getUbicacionesGeograficas = async () => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error obteniendo ubicaciones geográficas'
+            error: error.response?.data?.message || 'Error obteniendo ubicaciones geograficas'
         }
     }
 }
@@ -309,7 +305,7 @@ export const createUbicacionGeografica = async (ubicacion) => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error creando ubicación geográfica',
+            error: error.response?.data?.message || 'Error creando ubicacion geografica',
             errors: error.response?.data?.errors || {}
         }
     }
@@ -326,7 +322,7 @@ export const updateUbicacionGeografica = async (id, ubicacion) => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error actualizando ubicación geográfica',
+            error: error.response?.data?.message || 'Error actualizando ubicacion geografica',
             errors: error.response?.data?.errors || {}
         }
     }
@@ -342,14 +338,12 @@ export const deleteUbicacionGeografica = async (id) => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error eliminando ubicación geográfica'
+            error: error.response?.data?.message || 'Error eliminando ubicacion geografica'
         }
     }
 }
 
-// =====================================================
-// SERVICIOS ESTRUCTURA MILITAR
-// =====================================================
+/* Servicios estructura militar */
 export const getEstructuraMilitar = async () => {
     try {
         const response = await organizacionAPI.get('/organizacion/estructura-militar')
@@ -414,9 +408,7 @@ export const deleteEstructuraMilitar = async (id) => {
     }
 }
 
-// =====================================================
-// SERVICIOS CARGOS
-// =====================================================
+/* Servicios cargos */
 export const getCargos = async () => {
     try {
         const response = await organizacionAPI.get('/organizacion/cargos')
@@ -481,9 +473,7 @@ export const deleteCargo = async (id) => {
     }
 }
 
-// =====================================================
-// SERVICIOS ROLES FUNCIONALES
-// =====================================================
+/* Servicios roles funcionales */
 export const getRolesFuncionales = async () => {
     try {
         const response = await organizacionAPI.get('/organizacion/roles-funcionales')
@@ -548,9 +538,7 @@ export const deleteRolFuncional = async (id) => {
     }
 }
 
-// =====================================================
-// SERVICIOS AUXILIARES (COPIADOS DE CATÁLOGOS)
-// =====================================================
+/* Servicios auxiliares */
 export const getCurrentUser = () => {
     try {
         const userString = localStorage.getItem('fah_user')
@@ -563,7 +551,7 @@ export const getCurrentUser = () => {
     }
 }
 
-export const handleApiError = (error, defaultMessage = 'Error en la operación') => {
+export const handleApiError = (error, defaultMessage = 'Error en la operacion') => {
     if (error.response) {
         return {
             message: error.response.data?.message || defaultMessage,
@@ -572,7 +560,7 @@ export const handleApiError = (error, defaultMessage = 'Error en la operación')
         }
     } else if (error.request) {
         return {
-            message: 'Error de conexión con el servidor',
+            message: 'Error de conexion con el servidor',
             errors: {},
             status: 0
         }
@@ -585,98 +573,74 @@ export const handleApiError = (error, defaultMessage = 'Error en la operación')
     }
 }
 
-// =====================================================
-// 🔍 MÉTODOS DE BÚSQUEDA PARA RELACIONES
-// Agregar estos métodos al final de organizacionService.js
-// =====================================================
+/* Metodos de busqueda para relaciones */
 
-// =====================================================
-// BÚSQUEDAS DEPARTAMENTOS
-// =====================================================
+// Busquedas departamentos
 export const buscarDepartamentos = async (query) => {
     try {
         const response = await organizacionAPI.get(`/organizacion/departamentos/buscar?q=${encodeURIComponent(query)}`)
         return response.data.data || []
     } catch (error) {
-        console.error('Error buscando departamentos:', error)
         return []
     }
 }
 
-// =====================================================
-// BÚSQUEDAS MUNICIPIOS
-// =====================================================
+// Busquedas municipios
 export const buscarMunicipios = async (query) => {
     try {
         const response = await organizacionAPI.get(`/organizacion/municipios/buscar?q=${encodeURIComponent(query)}`)
         return response.data.data || []
     } catch (error) {
-        console.error('Error buscando municipios:', error)
         return []
     }
 }
 
-// =====================================================
-// BÚSQUEDAS CIUDADES
-// =====================================================
+// Busquedas ciudades
 export const buscarCiudades = async (query) => {
     try {
         const response = await organizacionAPI.get(`/organizacion/ciudades/buscar?q=${encodeURIComponent(query)}`)
         return response.data.data || []
     } catch (error) {
-        console.error('Error buscando ciudades:', error)
         return []
     }
 }
 
-// =====================================================
-// BÚSQUEDAS UBICACIONES GEOGRÁFICAS
-// =====================================================
+// Busquedas ubicaciones geograficas
 export const buscarUbicacionesGeograficas = async (query) => {
     try {
         const response = await organizacionAPI.get(`/organizacion/ubicaciones-geograficas/buscar?q=${encodeURIComponent(query)}`)
         return response.data.data || []
     } catch (error) {
-        console.error('Error buscando ubicaciones geográficas:', error)
         return []
     }
 }
 
-// =====================================================
-// BÚSQUEDAS ESTRUCTURA MILITAR
-// =====================================================
+// Busquedas estructura militar
 export const buscarEstructuraMilitar = async (query) => {
     try {
         const response = await organizacionAPI.get(`/organizacion/estructura-militar/buscar?q=${encodeURIComponent(query)}`)
         return response.data.data || []
     } catch (error) {
-        console.error('Error buscando estructura militar:', error)
         return []
     }
 }
 
-// =====================================================
-// BÚSQUEDAS CARGOS
-// =====================================================
+// Busquedas cargos
 export const buscarCargos = async (query) => {
     try {
         const response = await organizacionAPI.get(`/organizacion/cargos/buscar?q=${encodeURIComponent(query)}`)
         return response.data.data || []
     } catch (error) {
-        console.error('Error buscando cargos:', error)
         return []
     }
 }
 
-// =====================================================
-// BÚSQUEDAS ROLES FUNCIONALES
-// =====================================================
+// Busquedas roles funcionales
 export const buscarRolesFuncionales = async (query) => {
     try {
         const response = await organizacionAPI.get(`/organizacion/roles-funcionales/buscar?q=${encodeURIComponent(query)}`)
         return response.data.data || []
     } catch (error) {
-        console.error('Error buscando roles funcionales:', error)
         return []
     }
 }

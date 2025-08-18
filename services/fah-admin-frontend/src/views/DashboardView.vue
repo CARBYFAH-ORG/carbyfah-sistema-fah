@@ -1,6 +1,8 @@
+<!-- services\fah-admin-frontend\src\views\DashboardView.vue -->
+
 <template>
   <div class="flex flex-col gap-8 p-0">
-    <!-- Información del Usuario -->
+    <!-- Informacion del Usuario -->
     <div
       class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden"
     >
@@ -15,11 +17,11 @@
             <i class="pi pi-user text-xl text-blue-600"></i>
           </div>
           <h3 class="m-0 text-gray-800 text-lg font-semibold">
-            Información del Usuario
+            Informacion del Usuario
           </h3>
         </div>
 
-        <!-- Grid Información Usuario -->
+        <!-- Grid Informacion Usuario -->
         <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
           <div
             class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border-l-4 border-blue-500 transition-all duration-300 hover:bg-blue-50 hover:translate-x-1"
@@ -72,7 +74,7 @@
           <div
             class="flex items-center justify-between p-4 bg-gray-50 rounded-lg border-l-4 border-blue-500 transition-all duration-300 hover:bg-blue-50 hover:translate-x-1"
           >
-            <strong class="text-gray-700">Último Acceso:</strong>
+            <strong class="text-gray-700">Ultimo Acceso:</strong>
             <span class="text-gray-900">{{
               formatDate(user?.ultimo_acceso)
             }}</span>
@@ -81,7 +83,7 @@
       </div>
     </div>
 
-    <!-- Estadísticas del Sistema -->
+    <!-- Estadisticas del Sistema -->
     <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-5">
       <!-- Auth Service -->
       <div
@@ -97,7 +99,7 @@
             <h4 class="m-0 mb-2 text-gray-800 text-lg font-semibold">
               Auth Service
             </h4>
-            <p class="m-0 text-green-600 font-semibold text-sm">✅ Operativo</p>
+            <p class="m-0 text-green-600 font-semibold text-sm">Operativo</p>
           </div>
         </div>
       </div>
@@ -160,7 +162,7 @@
       </div>
     </div>
 
-    <!-- Próximos Desarrollos -->
+    <!-- Proximos Desarrollos -->
     <div
       class="bg-white rounded-xl shadow-lg border border-gray-200 overflow-hidden"
     >
@@ -175,7 +177,7 @@
             <i class="pi pi-cog text-xl text-orange-600"></i>
           </div>
           <h3 class="m-0 text-gray-800 text-lg font-semibold">
-            Próximos Desarrollos
+            Proximos Desarrollos
           </h3>
         </div>
 
@@ -193,7 +195,7 @@
               Assets Service
             </button>
             <small class="text-gray-500 text-center text-xs"
-              >Gestión de archivos digitales</small
+              >Gestion de archivos digitales</small
             >
           </div>
 
@@ -209,7 +211,7 @@
               Personal Service
             </button>
             <small class="text-gray-500 text-center text-xs"
-              >Gestión de personal militar</small
+              >Gestion de personal militar</small
             >
           </div>
 
@@ -241,7 +243,7 @@
               Logistics Service
             </button>
             <small class="text-gray-500 text-center text-xs"
-              >FA-4 Logística</small
+              >FA-4 Logistica</small
             >
           </div>
         </div>
@@ -259,26 +261,24 @@ export default {
     const user = ref(null);
 
     onMounted(() => {
-      // ✅ FUNCIONALIDAD: Cargar datos del usuario desde localStorage
+      // Cargar datos del usuario desde localStorage
       const userData = localStorage.getItem("fah_user");
       if (userData) {
         try {
           user.value = JSON.parse(userData);
         } catch (error) {
-          console.error("Error al parsear datos del usuario:", error);
           user.value = null;
         }
       }
     });
 
-    // ✅ FUNCIONALIDAD: Formatear fechas
+    // Formatear fechas
     const formatDate = (dateString) => {
       if (!dateString) return "N/A";
       try {
         return new Date(dateString).toLocaleString("es-HN");
       } catch (error) {
-        console.error("Error al formatear fecha:", error);
-        return "Fecha inválida";
+        return "Fecha invalida";
       }
     };
 

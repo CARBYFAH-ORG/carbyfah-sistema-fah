@@ -1,11 +1,13 @@
+// services\fah-admin-frontend\src\services\catalogosService.js
+
 import axios from 'axios'
 
-// Configuración base axios para catálogos
+// Configuracion base axios para catalogos
 const API_BASE_URL = process.env.NODE_ENV === 'development'
     ? '/api'
     : 'http://localhost:8008/api'
 
-// Crear instancia axios específica para catálogos
+// Crear instancia axios especifica para catalogos
 const catalogosAPI = axios.create({
     baseURL: API_BASE_URL,
     timeout: 30000,
@@ -46,9 +48,7 @@ catalogosAPI.interceptors.response.use(
     }
 )
 
-// =====================================================
-// SERVICIOS GENERALES
-// =====================================================
+// Servicios generales 
 export const healthCheck = async () => {
     try {
         const response = await catalogosAPI.get('/catalogos/health')
@@ -59,7 +59,7 @@ export const healthCheck = async () => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error de conexión'
+            error: error.response?.data?.message || 'Error de conexion'
         }
     }
 }
@@ -89,7 +89,7 @@ export const getCatalogosBasicos = async () => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error obteniendo catálogos'
+            error: error.response?.data?.message || 'Error obteniendo catalogos'
         }
     }
 }
@@ -104,14 +104,12 @@ export const getEstadisticasCatalogos = async () => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error obteniendo estadísticas'
+            error: error.response?.data?.message || 'Error obteniendo estadisticas'
         }
     }
 }
 
-// =====================================================
-// SERVICIOS TIPOS GÉNERO
-// =====================================================
+// Servicios tipos genero 
 export const getTiposGenero = async () => {
     try {
         const response = await catalogosAPI.get('/catalogos/tipos-genero')
@@ -122,7 +120,7 @@ export const getTiposGenero = async () => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error obteniendo tipos de género'
+            error: error.response?.data?.message || 'Error obteniendo tipos de genero'
         }
     }
 }
@@ -138,7 +136,7 @@ export const createTipoGenero = async (tipoGenero) => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error creando tipo de género',
+            error: error.response?.data?.message || 'Error creando tipo de genero',
             errors: error.response?.data?.errors || {}
         }
     }
@@ -155,7 +153,7 @@ export const updateTipoGenero = async (id, tipoGenero) => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error actualizando tipo de género',
+            error: error.response?.data?.message || 'Error actualizando tipo de genero',
             errors: error.response?.data?.errors || {}
         }
     }
@@ -171,14 +169,12 @@ export const deleteTipoGenero = async (id) => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error eliminando tipo de género'
+            error: error.response?.data?.message || 'Error eliminando tipo de genero'
         }
     }
 }
 
-// =====================================================
-// SERVICIOS CATEGORÍAS PERSONAL
-// =====================================================
+// Servicios categorias personal 
 export const getCategoriasPersonal = async () => {
     try {
         const response = await catalogosAPI.get('/catalogos/categorias-personal')
@@ -189,7 +185,7 @@ export const getCategoriasPersonal = async () => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error obteniendo categorías de personal'
+            error: error.response?.data?.message || 'Error obteniendo categorias de personal'
         }
     }
 }
@@ -205,7 +201,7 @@ export const createCategoriaPersonal = async (categoria) => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error creando categoría de personal',
+            error: error.response?.data?.message || 'Error creando categoria de personal',
             errors: error.response?.data?.errors || {}
         }
     }
@@ -222,7 +218,7 @@ export const updateCategoriaPersonal = async (id, categoria) => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error actualizando categoría de personal',
+            error: error.response?.data?.message || 'Error actualizando categoria de personal',
             errors: error.response?.data?.errors || {}
         }
     }
@@ -238,14 +234,12 @@ export const deleteCategoriaPersonal = async (id) => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error eliminando categoría de personal'
+            error: error.response?.data?.message || 'Error eliminando categoria de personal'
         }
     }
 }
 
-// =====================================================
-// SERVICIOS GRADOS
-// =====================================================
+// Servicios grados
 export const getGrados = async (categoriaId = null) => {
     try {
         const params = categoriaId ? { categoria_id: categoriaId } : {}
@@ -287,7 +281,7 @@ export const getGradosPorCategoria = async (categoriaId) => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error obteniendo grados por categoría'
+            error: error.response?.data?.message || 'Error obteniendo grados por categoria'
         }
     }
 }
@@ -341,9 +335,7 @@ export const deleteGrado = async (id) => {
     }
 }
 
-// =====================================================
-// SERVICIOS ESPECIALIDADES
-// =====================================================
+// Servicios especialidades 
 export const getEspecialidades = async () => {
     try {
         const response = await catalogosAPI.get('/catalogos/especialidades')
@@ -408,9 +400,7 @@ export const deleteEspecialidad = async (id) => {
     }
 }
 
-// =====================================================
-// SERVICIOS NIVELES PRIORIDAD
-// =====================================================
+//Servicios niveles prioridad
 export const getNivelesPrioridad = async () => {
     try {
         const response = await catalogosAPI.get('/catalogos/niveles-prioridad')
@@ -475,9 +465,7 @@ export const deleteNivelPrioridad = async (id) => {
     }
 }
 
-// =====================================================
-// SERVICIOS TIPOS ESTADO GENERAL
-// =====================================================
+// Servicios tipos estado general 
 export const getTiposEstadoGeneral = async () => {
     try {
         const response = await catalogosAPI.get('/catalogos/tipos-estado-general')
@@ -542,9 +530,7 @@ export const deleteTipoEstadoGeneral = async (id) => {
     }
 }
 
-// =====================================================
-// SERVICIOS NIVELES SEGURIDAD
-// =====================================================
+// Servicios niveles seguridad 
 export const getNivelesSeguridad = async () => {
     try {
         const response = await catalogosAPI.get('/catalogos/niveles-seguridad')
@@ -609,9 +595,7 @@ export const deleteNivelSeguridad = async (id) => {
     }
 }
 
-// =====================================================
-// SERVICIOS PAÍSES
-// =====================================================
+// Servicios paises 
 export const getPaises = async () => {
     try {
         const response = await catalogosAPI.get('/catalogos/paises')
@@ -622,7 +606,7 @@ export const getPaises = async () => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error obteniendo países'
+            error: error.response?.data?.message || 'Error obteniendo paises'
         }
     }
 }
@@ -638,7 +622,7 @@ export const createPais = async (pais) => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error creando país',
+            error: error.response?.data?.message || 'Error creando pais',
             errors: error.response?.data?.errors || {}
         }
     }
@@ -655,7 +639,7 @@ export const updatePais = async (id, pais) => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error actualizando país',
+            error: error.response?.data?.message || 'Error actualizando pais',
             errors: error.response?.data?.errors || {}
         }
     }
@@ -671,14 +655,12 @@ export const deletePais = async (id) => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error eliminando país'
+            error: error.response?.data?.message || 'Error eliminando pais'
         }
     }
 }
 
-// =====================================================
-// SERVICIOS TIPOS ESTRUCTURA MILITAR
-// =====================================================
+// Servicios tipos estructura militar 
 export const getTiposEstructuraMilitar = async () => {
     try {
         const response = await catalogosAPI.get('/catalogos/tipos-estructura-militar')
@@ -743,9 +725,7 @@ export const deleteTipoEstructuraMilitar = async (id) => {
     }
 }
 
-// =====================================================
-// SERVICIOS TIPOS JERARQUÍA
-// =====================================================
+// Servicios tipos jerarquia 
 export const getTiposJerarquia = async () => {
     try {
         const response = await catalogosAPI.get('/catalogos/tipos-jerarquia')
@@ -756,7 +736,7 @@ export const getTiposJerarquia = async () => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error obteniendo tipos de jerarquía'
+            error: error.response?.data?.message || 'Error obteniendo tipos de jerarquia'
         }
     }
 }
@@ -772,7 +752,7 @@ export const createTipoJerarquia = async (tipo) => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error creando tipo de jerarquía',
+            error: error.response?.data?.message || 'Error creando tipo de jerarquia',
             errors: error.response?.data?.errors || {}
         }
     }
@@ -789,7 +769,7 @@ export const updateTipoJerarquia = async (id, tipo) => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error actualizando tipo de jerarquía',
+            error: error.response?.data?.message || 'Error actualizando tipo de jerarquia',
             errors: error.response?.data?.errors || {}
         }
     }
@@ -805,14 +785,12 @@ export const deleteTipoJerarquia = async (id) => {
     } catch (error) {
         return {
             success: false,
-            error: error.response?.data?.message || 'Error eliminando tipo de jerarquía'
+            error: error.response?.data?.message || 'Error eliminando tipo de jerarquia'
         }
     }
 }
 
-// =====================================================
-// SERVICIOS TIPOS EVENTO
-// =====================================================
+// Servicios tipos evento 
 export const getTiposEvento = async () => {
     try {
         const response = await catalogosAPI.get('/catalogos/tipos-evento')
@@ -877,68 +855,59 @@ export const deleteTipoEvento = async (id) => {
     }
 }
 
-// =====================================================
-// MÉTODOS DE BÚSQUEDA PARA CATÁLOGOS
-// =====================================================
+// Metodos de busqueda para catalogos 
 
-// BÚSQUEDAS PAÍSES
+// Busquedas paises
 export const buscarPaises = async (query) => {
     try {
         const response = await catalogosAPI.get(`/catalogos/paises/buscar?q=${encodeURIComponent(query)}`)
         return response.data.data || []
     } catch (error) {
-        console.error('Error buscando países:', error)
         return []
     }
 }
 
-// BÚSQUEDAS TIPOS ESTRUCTURA MILITAR
+// Busquedas tipos estructura militar
 export const buscarTiposEstructuraMilitar = async (query) => {
     try {
         const response = await catalogosAPI.get(`/catalogos/tipos-estructura-militar/buscar?q=${encodeURIComponent(query)}`)
         return response.data.data || []
     } catch (error) {
-        console.error('Error buscando tipos estructura militar:', error)
         return []
     }
 }
 
-// BÚSQUEDAS CATEGORÍAS PERSONAL
+// Busquedas categorias personal
 export const buscarCategoriasPersonal = async (query) => {
     try {
         const response = await catalogosAPI.get(`/catalogos/categorias-personal/buscar?q=${encodeURIComponent(query)}`)
         return response.data.data || []
     } catch (error) {
-        console.error('Error buscando categorías personal:', error)
         return []
     }
 }
 
-// BÚSQUEDAS ESPECIALIDADES
+// Busquedas especialidades
 export const buscarEspecialidades = async (query) => {
     try {
         const response = await catalogosAPI.get(`/catalogos/especialidades/buscar?q=${encodeURIComponent(query)}`)
         return response.data.data || []
     } catch (error) {
-        console.error('Error buscando especialidades:', error)
         return []
     }
 }
 
-// BÚSQUEDAS GRADOS
+// Busquedas grados
 export const buscarGrados = async (query) => {
     try {
         const response = await catalogosAPI.get(`/catalogos/grados/buscar?q=${encodeURIComponent(query)}`)
         return response.data.data || []
     } catch (error) {
-        console.error('Error buscando grados:', error)
         return []
     }
 }
 
-// =====================================================
-// SERVICIOS AUXILIARES
-// =====================================================
+// Servicios auxiliares 
 export const getCurrentUser = () => {
     try {
         const userString = localStorage.getItem('fah_user')
@@ -951,7 +920,7 @@ export const getCurrentUser = () => {
     }
 }
 
-export const handleApiError = (error, defaultMessage = 'Error en la operación') => {
+export const handleApiError = (error, defaultMessage = 'Error en la operacion') => {
     if (error.response) {
         return {
             message: error.response.data?.message || defaultMessage,
@@ -960,7 +929,7 @@ export const handleApiError = (error, defaultMessage = 'Error en la operación')
         }
     } else if (error.request) {
         return {
-            message: 'Error de conexión con el servidor',
+            message: 'Error de conexion con el servidor',
             errors: {},
             status: 0
         }

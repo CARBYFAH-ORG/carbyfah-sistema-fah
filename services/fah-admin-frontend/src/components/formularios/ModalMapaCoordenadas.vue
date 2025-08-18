@@ -1,3 +1,4 @@
+<!-- services\fah-admin-frontend\src\components\formularios\ModalMapaCoordenadas.vue -->
 <template>
   <Dialog
     v-model:visible="visible"
@@ -14,7 +15,7 @@
     position="center"
   >
     <div class="contenedor-mapa-completo">
-      <!-- Contenedor del mapa PANTALLA COMPLETA SIN OBSTÁCULOS -->
+      <!-- Contenedor del mapa pantalla completa -->
       <div
         ref="mapaContainer"
         class="mapa-container-completo"
@@ -29,7 +30,7 @@
 
     <template #footer>
       <div class="footer-completo-con-info">
-        <!-- Instrucciones rápidas en el footer -->
+        <!-- Instrucciones rapidas en el footer -->
         <div class="instrucciones-footer">
           <div class="instruccion-mini">
             <i class="pi pi-map-marker"></i>
@@ -57,7 +58,7 @@
           </div>
         </div>
 
-        <!-- Botones de acción -->
+        <!-- Botones de accion -->
         <div class="botones-accion">
           <Button
             label="✖ CANCELAR"
@@ -111,7 +112,6 @@ export default {
   emits: ["update:modelValue", "coordenadas-seleccionadas"],
 
   setup(props, { emit }) {
-    // Estado reactivo
     const visible = ref(false);
     const mapaContainer = ref(null);
     const cargandoMapa = ref(true);
@@ -122,7 +122,7 @@ export default {
     let marcadorCoordenadas = null;
     let capaVectorMarcador = null;
 
-    // Script de OpenLayers cargado dinámicamente
+    // Script de OpenLayers cargado dinamicamente
     const cargarOpenLayers = () => {
       return new Promise((resolve, reject) => {
         if (window.ol) {
@@ -140,18 +140,16 @@ export default {
         const script = document.createElement("script");
         script.src = "https://cdn.jsdelivr.net/npm/ol@7.5.2/dist/ol.js";
         script.onload = () => {
-          console.log("OpenLayers cargado exitosamente");
           resolve();
         };
         script.onerror = () => {
-          console.error("Error cargando OpenLayers");
           reject(new Error("No se pudo cargar OpenLayers"));
         };
         document.head.appendChild(script);
       });
     };
 
-    // Obtener altitud usando API de elevación
+    // Obtener altitud usando API de elevacion
     const obtenerAltitud = async (latitud, longitud) => {
       try {
         const response = await fetch(
@@ -165,7 +163,6 @@ export default {
 
         return 0;
       } catch (error) {
-        console.warn("Error obteniendo altitud:", error);
         return 0;
       }
     };
@@ -211,7 +208,7 @@ export default {
           visible: false,
         });
 
-        // Crear capa para el marcador con estilo más visible
+        // Crear capa para el marcador con estilo mas visible
         capaVectorMarcador = new VectorLayer({
           source: new VectorSource(),
           style: new Style({
@@ -241,8 +238,6 @@ export default {
           const coordenadas = toLonLat(evento.coordinate);
           const longitud = parseFloat(coordenadas[0].toFixed(6));
           const latitud = parseFloat(coordenadas[1].toFixed(6));
-
-          console.log("Coordenadas seleccionadas:", { latitud, longitud });
 
           // Obtener altitud
           const altitud = await obtenerAltitud(latitud, longitud);
@@ -283,8 +278,6 @@ export default {
 
           coordenadasSeleccionadas.value = { ...props.coordenadasIniciales };
         }
-
-        console.log("Mapa inicializado correctamente");
       } catch (error) {
         console.error("Error inicializando mapa:", error);
       } finally {
@@ -365,7 +358,7 @@ export default {
   overflow: hidden;
 }
 
-/* Contenedor del mapa que llena TODA la pantalla disponible */
+/* Contenedor del mapa que llena toda la pantalla disponible */
 .mapa-container-completo {
   flex: 1;
   position: relative;
@@ -399,7 +392,7 @@ export default {
   font-weight: 600;
 }
 
-/* Footer completo con toda la información */
+/* Footer completo con toda la informacion */
 .footer-completo-con-info {
   display: flex;
   justify-content: space-between;
@@ -468,7 +461,7 @@ export default {
   border: 1px solid rgba(59, 130, 246, 0.4);
 }
 
-/* Botones de acción en el footer */
+/* Botones de accion en el footer */
 .botones-accion {
   display: flex;
   gap: 15px;
@@ -570,7 +563,7 @@ export default {
   border-radius: 6px !important;
 }
 
-/* Responsive para móviles */
+/* Responsive para moviles */
 @media (max-width: 768px) {
   .footer-completo-con-info {
     flex-direction: column;

@@ -1,3 +1,5 @@
+<!-- services\fah-admin-frontend\src\views\LoginView.vue -->
+
 <template>
   <div
     class="min-h-screen bg-gradient-to-br from-blue-900 via-blue-800 to-slate-900 flex items-center justify-center p-4 relative overflow-hidden"
@@ -28,7 +30,7 @@
         >
           <img
             src="/src/assets/images/logo-fah.png"
-            alt="Fuerza Aérea Hondureña"
+            alt="Fuerza Aerea Hondureña"
             class="w-full h-full object-cover"
           />
         </div>
@@ -40,7 +42,7 @@
         <p class="text-blue-200 text-sm mb-1 font-semibold">
           Centro Automatizado de Recursos
         </p>
-        <p class="text-blue-300 text-xs mb-6">Fuerza Aérea Hondureña</p>
+        <p class="text-blue-300 text-xs mb-6">Fuerza Aerea Hondureña</p>
       </div>
 
       <!-- Form -->
@@ -159,11 +161,11 @@
         <button
           class="text-white/70 hover:text-white text-sm transition-colors duration-200"
         >
-          ¿Olvidaste tu contraseña?
+          Olvidaste tu contraseña?
         </button>
 
         <div class="text-white/50 text-xs space-y-1">
-          <p>Fuerza Aérea Hondureña © 2025</p>
+          <p>Fuerza Aerea Hondureña © 2025</p>
           <p>CARBYFAH v1.0 - Sistema Enterprise</p>
         </div>
       </div>
@@ -174,20 +176,21 @@
 <script>
 import { ref, reactive } from "vue";
 import { useRouter } from "vue-router";
-import { useToast } from "primevue/usetoast";
+import { useToastFAH } from "@/composables/useToastFAH";
+
 import axios from "axios";
 
 export default {
   name: "LoginView",
   setup() {
     const router = useRouter();
-    const toast = useToast();
+    const toast = useToastFAH();
 
     const loading = ref(false);
     const showPassword = ref(false);
     const credentials = reactive({
-      username: "carby", // ✅ Pre-llenar para testing
-      password: "2301", // ✅ Pre-llenar para testing
+      username: "carby", // Pre-llenar para testing
+      password: "2301", // Pre-llenar para testing
     });
     const errors = reactive({});
 
@@ -199,7 +202,7 @@ export default {
       // Limpiar errores
       Object.keys(errors).forEach((key) => delete errors[key]);
 
-      // Validación básica
+      // Validacion basica
       if (!credentials.username) {
         errors.username = "El usuario es obligatorio";
         return;
@@ -212,13 +215,11 @@ export default {
       loading.value = true;
 
       try {
-        // ✅ CORREGIDO - Usar proxy en lugar de URL directa
+        // Usar proxy en lugar de URL directa
         const response = await axios.post("/api/auth/login", {
           username: credentials.username,
           password: credentials.password,
         });
-
-        console.log("Response from auth service:", response.data);
 
         if (response.data.success) {
           // Guardar token
@@ -228,38 +229,28 @@ export default {
             JSON.stringify(response.data.data.usuario)
           );
 
-          toast.add({
-            severity: "success",
-            summary: "Login Exitoso",
-            detail: `Bienvenido ${response.data.data.usuario.username}`,
-            life: 3000,
-          });
+          toast.success(
+            "Acceso FAH",
+            `Bienvenido ${response.data.data.usuario.username}`
+          );
 
           // Redirigir al dashboard
           await router.push("/dashboard");
         }
       } catch (error) {
-        console.error("Error de login completo:", error);
-        console.error("Error response:", error.response);
-
-        let errorMessage = "Error de conexión con el servidor";
+        let errorMessage = "Error de conexion con el servidor";
 
         if (error.response) {
-          // El servidor respondió con error
+          // El servidor respondio con error
           errorMessage =
             error.response.data?.message ||
             `Error ${error.response.status}: ${error.response.statusText}`;
         } else if (error.request) {
-          // La petición se hizo pero no hubo respuesta
-          errorMessage = "No se pudo conectar con el servidor de autenticación";
+          // La peticion se hizo pero no hubo respuesta
+          errorMessage = "No se pudo conectar con el servidor de autenticacion";
         }
 
-        toast.add({
-          severity: "error",
-          summary: "Error de Acceso",
-          detail: errorMessage,
-          life: 5000,
-        });
+        toast.error("Error de Acceso", errorMessage);
       } finally {
         loading.value = false;
       }

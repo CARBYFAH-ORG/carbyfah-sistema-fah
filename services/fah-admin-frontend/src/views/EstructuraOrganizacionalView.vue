@@ -1,3 +1,5 @@
+<!-- services\fah-admin-frontend\src\views\EstructuraOrganizacionalView.vue -->
+
 <template>
   <div class="min-h-screen bg-gray-50">
     <!-- Header compacto -->
@@ -15,7 +17,7 @@
                 Estructura Organizacional
               </h1>
               <p class="text-sm text-purple-200 header-subtitle">
-                Gestión de estructura geográfica y militar del sistema FAH
+                Gestion de estructura geografica y militar del sistema FAH
               </p>
             </div>
           </div>
@@ -38,7 +40,7 @@
                   class="text-xs"
                 />
                 <span class="text-xs text-purple-200 status-text"
-                  >Organización Service</span
+                  >Organizacion Service</span
                 >
               </div>
               <div class="flex items-center gap-2 time-display">
@@ -71,7 +73,7 @@
                 Cargando estructura organizacional...
               </h3>
               <p class="text-gray-600 loading-text">
-                Obteniendo datos del servicio de organización. Por favor espere
+                Obteniendo datos del servicio de organizacion. Por favor espere
                 un momento.
               </p>
             </div>
@@ -114,12 +116,12 @@
       </Card>
     </div>
 
-    <!-- COMPONENTE PRINCIPAL CON PESTAÑAS - SISTEMA DINÁMICO CON SELECTOR -->
+    <!-- Componente principal con pestañas - sistema dinamico con selector -->
     <div
       v-if="!cargandoInicial && !error"
       class="max-w-7xl mx-auto px-6 pt-8 pb-6 main-container"
     >
-      <!-- Pestañas de navegación -->
+      <!-- Pestañas de navegacion -->
       <div class="mb-8 mt-4">
         <div class="flex flex-wrap gap-2 lg:gap-4 tabs-container">
           <button
@@ -140,7 +142,7 @@
             <div class="flex flex-col items-start tab-content">
               <span class="font-semibold">{{ tab.label }}</span>
               <span class="text-xs opacity-75 tab-count"
-                >({{ tab.count }} módulos)</span
+                >({{ tab.count }} modulos)</span
               >
             </div>
           </button>
@@ -151,9 +153,9 @@
       <div
         class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 content-panel"
       >
-        <!-- Pestaña Geografía -->
+        <!-- Pestaña Geografia -->
         <div v-if="activeTab === 'geografia'" class="animate-fade-in">
-          <!-- Selector de catálogo específico -->
+          <!-- Selector de catalogo especifico -->
           <div
             class="mb-6 p-6 bg-gradient-to-r from-green-50 to-green-100 rounded-xl border-2 border-green-200 shadow-sm selector-container"
           >
@@ -164,14 +166,14 @@
                 <div class="bg-green-200 p-2 rounded-lg mr-3">
                   <i class="pi pi-filter text-green-700"></i>
                 </div>
-                <span class="label-text">Seleccionar módulo:</span>
+                <span class="label-text">Seleccionar modulo:</span>
               </label>
               <Dropdown
                 v-model="catalogoActivo"
                 :options="opcionesSelect.geografia"
                 optionLabel="label"
                 optionValue="value"
-                placeholder="Elige un módulo para cargar"
+                placeholder="Elige un modulo para cargar"
                 class="w-full md:w-80 dropdown-responsive"
                 :showClear="false"
                 @change="seleccionarCatalogo($event.value)"
@@ -185,7 +187,7 @@
             </div>
           </div>
 
-          <!-- Contenido dinámico basado en selección -->
+          <!-- Contenido dinamico basado en seleccion -->
           <div
             v-if="catalogoActivo && esquemasGeografia.includes(catalogoActivo)"
             class="space-y-8"
@@ -203,11 +205,11 @@
             />
           </div>
 
-          <!-- Mensaje cuando no hay selección -->
+          <!-- Mensaje cuando no hay seleccion -->
           <div v-else class="text-center py-12 empty-state">
             <i class="pi pi-arrow-up text-green-400 text-4xl mb-4"></i>
             <h3 class="text-lg font-semibold text-gray-700 mb-2 empty-title">
-              Selecciona un módulo para comenzar
+              Selecciona un modulo para comenzar
             </h3>
             <p class="text-gray-500 empty-text">
               Usa el selector de arriba para cargar solo la tabla que necesitas
@@ -218,7 +220,7 @@
 
         <!-- Pestaña Estructura -->
         <div v-if="activeTab === 'estructura'" class="animate-fade-in">
-          <!-- Selector de catálogo específico -->
+          <!-- Selector de catalogo especifico -->
           <div
             class="mb-6 p-6 bg-gradient-to-r from-purple-50 to-purple-100 rounded-xl border-2 border-purple-200 shadow-sm selector-container"
           >
@@ -229,14 +231,14 @@
                 <div class="bg-purple-200 p-2 rounded-lg mr-3">
                   <i class="pi pi-filter text-purple-700"></i>
                 </div>
-                <span class="label-text">Seleccionar módulo:</span>
+                <span class="label-text">Seleccionar modulo:</span>
               </label>
               <Dropdown
                 v-model="catalogoActivo"
                 :options="opcionesSelect.estructura"
                 optionLabel="label"
                 optionValue="value"
-                placeholder="Elige un módulo para cargar"
+                placeholder="Elige un modulo para cargar"
                 class="w-full md:w-80 dropdown-responsive"
                 :showClear="false"
                 @change="seleccionarCatalogo($event.value)"
@@ -250,7 +252,7 @@
             </div>
           </div>
 
-          <!-- Contenido dinámico basado en selección -->
+          <!-- Contenido dinamico basado en seleccion -->
           <div
             v-if="catalogoActivo && esquemasEstructura.includes(catalogoActivo)"
             class="space-y-8"
@@ -268,11 +270,11 @@
             />
           </div>
 
-          <!-- Mensaje cuando no hay selección -->
+          <!-- Mensaje cuando no hay seleccion -->
           <div v-else class="text-center py-12 empty-state">
             <i class="pi pi-arrow-up text-purple-400 text-4xl mb-4"></i>
             <h3 class="text-lg font-semibold text-gray-700 mb-2 empty-title">
-              Selecciona un módulo para comenzar
+              Selecciona un modulo para comenzar
             </h3>
             <p class="text-gray-500 empty-text">
               Usa el selector de arriba para cargar solo la tabla que necesitas
@@ -283,7 +285,7 @@
       </div>
     </div>
 
-    <!-- Footer de información -->
+    <!-- Footer de informacion -->
     <div
       class="max-w-7xl mx-auto px-6 pt-12 pb-8 footer-container"
       v-if="!cargandoInicial && !error"
@@ -297,8 +299,8 @@
               <div class="flex items-center gap-3 info-item">
                 <i class="pi pi-info-circle text-purple-500"></i>
                 <span class="text-gray-600 text-sm info-text">
-                  Sistema dinámico: selecciona solo el módulo que necesitas para
-                  un rendimiento óptimo.
+                  Sistema dinamico: selecciona solo el modulo que necesitas para
+                  un rendimiento optimo.
                 </span>
               </div>
               <div class="flex items-center gap-3 info-item">
@@ -312,7 +314,7 @@
                 <i class="pi pi-history text-purple-500"></i>
                 <span class="text-gray-600 text-sm info-text">
                   {{ Object.keys(ESQUEMAS_ORGANIZACION).length }} esquemas
-                  configurados, múltiples campos dinámicos disponibles por
+                  configurados, multiples campos dinamicos disponibles por
                   demanda.
                 </span>
               </div>
@@ -326,7 +328,7 @@
                 @click="openUserManual"
               />
               <Button
-                label="Soporte Técnico"
+                label="Soporte Tecnico"
                 icon="pi pi-question-circle"
                 class="p-button-text p-button-sm"
                 @click="openSupport"
@@ -346,7 +348,7 @@
 import { ref, computed, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { useOrganizacionStore } from "@/stores/organizacionStore";
-import { useCatalogosStore } from "@/stores/catalogosStore"; // ← AGREGAR ESTA LÍNEA
+import { useCatalogosStore } from "@/stores/catalogosStore";
 import { ESQUEMAS_ORGANIZACION } from "@/config/esquemaOrganizacion";
 
 // Componentes PrimeVue
@@ -357,8 +359,7 @@ import Toast from "primevue/toast";
 import ProgressBar from "primevue/progressbar";
 import Dropdown from "primevue/dropdown";
 
-// Sistema dinámico - importar solo TablaDinamica
-// import TablaDinamica from "@/components/formularios/TablaDinamica.vue";
+// Sistema dinamico - importar solo TablaDinamicaOrganizacion
 import TablaDinamicaOrganizacion from "@/components/formularios/TablaDinamicaOrganizacion.vue";
 
 export default {
@@ -376,7 +377,7 @@ export default {
     // Composables
     const router = useRouter();
     const organizacionStore = useOrganizacionStore();
-    const catalogosStore = useCatalogosStore(); // ← AGREGAR ESTA LÍNEA
+    const catalogosStore = useCatalogosStore();
 
     // Estado local
     const activeTab = ref("geografia");
@@ -387,11 +388,11 @@ export default {
     const lastUpdateTime = ref("");
     const updateInterval = ref(null);
 
-    // Variable única catalogoActivo
+    // Variable unica catalogoActivo
     const catalogoActivo = ref(null);
     const cargandoInicial = ref(true);
 
-    // Configuración de esquemas
+    // Configuracion de esquemas
     const esquemasGeografia = ref([
       "departamentos",
       "municipios",
@@ -414,7 +415,7 @@ export default {
           { value: "ciudades", label: "Ciudades" },
           {
             value: "ubicaciones_geograficas",
-            label: "Ubicaciones Geográficas",
+            label: "Ubicaciones Geograficas",
           },
         ],
         estructura: [
@@ -425,11 +426,11 @@ export default {
       };
     });
 
-    // Configuración de tabs
+    // Configuracion de tabs
     const tabs = computed(() => [
       {
         id: "geografia",
-        label: "Geografía",
+        label: "Geografia",
         icon: "pi pi-map",
         count: esquemasGeografia.value.length,
       },
@@ -441,7 +442,7 @@ export default {
       },
     ]);
 
-    // Computed properties - ✅ COPIADO EXACTAMENTE DE CatalogosView.vue
+    // Computed properties
     const totalRegistros = computed(() => organizacionStore.totalRegistros);
     const isLoading = computed(() => organizacionStore.isLoading);
     const error = computed(() => organizacionStore.error);
@@ -451,8 +452,7 @@ export default {
         : null;
     });
 
-    // ✅ COPIADO EXACTAMENTE DE CatalogosView.vue
-    // Función para seleccionar catálogo específico
+    // Funcion para seleccionar catalogo especifico
     const seleccionarCatalogo = async (nombreCatalogo) => {
       if (catalogoActivo.value === nombreCatalogo) return;
 
@@ -460,79 +460,44 @@ export default {
       await recargarCatalogo();
     };
 
-    // ✅ LÓGICA COPIADA Y ADAPTADA DE CatalogosView.vue
-    // Función para recargar catálogo actual
-    // ✅ FUNCIÓN PARA RECARGAR CATÁLOGO ACTUAL - COPIADA DE CATALOGOS
+    // Funcion unica para recargar catalogo
     const recargarCatalogo = async () => {
       if (!catalogoActivo.value) return;
 
       try {
         switch (catalogoActivo.value) {
           case "departamentos":
-            await organizacionStore.loadDepartamentos();
-            // ✅ CARGAR PAISES (foránea necesaria)
             await catalogosStore.loadPaises();
-            console.log(
-              "✅ Países cargados para tabla:",
-              catalogosStore.paises?.length
-            );
-            await new Promise((resolve) => setTimeout(resolve, 100));
+            await organizacionStore.loadDepartamentos();
             break;
 
           case "municipios":
             await organizacionStore.loadMunicipios();
-            // ✅ CARGAR DEPARTAMENTOS (foránea necesaria)
             await organizacionStore.loadDepartamentos();
-            console.log(
-              "✅ Departamentos cargados para tabla:",
-              organizacionStore.departamentos?.length
-            );
-            await new Promise((resolve) => setTimeout(resolve, 100));
             break;
 
           case "ciudades":
             await organizacionStore.loadCiudades();
-            // ✅ CARGAR MUNICIPIOS (foránea necesaria)
             await organizacionStore.loadMunicipios();
-            console.log(
-              "✅ Municipios cargados para tabla:",
-              organizacionStore.municipios?.length
-            );
-            await new Promise((resolve) => setTimeout(resolve, 100));
             break;
 
           case "ubicaciones_geograficas":
             await organizacionStore.loadUbicacionesGeograficas();
-            // ✅ CARGAR TODAS LAS FORÁNEAS NECESARIAS
             await catalogosStore.loadPaises();
             await organizacionStore.loadDepartamentos();
             await organizacionStore.loadMunicipios();
             await organizacionStore.loadCiudades();
-            console.log("✅ Todas las foráneas cargadas para ubicaciones");
-            await new Promise((resolve) => setTimeout(resolve, 100));
             break;
 
           case "estructura_militar":
             await organizacionStore.loadEstructuraMilitar();
-            // ✅ CARGAR TIPOS_ESTRUCTURA_MILITAR (del catálogo)
             await catalogosStore.loadTiposEstructuraMilitar();
             await organizacionStore.loadUbicacionesGeograficas();
-            console.log(
-              "✅ Tipos estructura militar cargados para tabla:",
-              catalogosStore.tiposEstructuraMilitar?.length
-            );
-            await new Promise((resolve) => setTimeout(resolve, 100));
             break;
 
           case "cargos":
             await organizacionStore.loadCargos();
-            // ✅ CARGAR ESTRUCTURA_MILITAR (foránea necesaria)
             await organizacionStore.loadEstructuraMilitar();
-            console.log(
-              "✅ Estructura militar cargada para tabla:",
-              organizacionStore.estructuraMilitar?.length
-            );
-            await new Promise((resolve) => setTimeout(resolve, 100));
             break;
 
           case "roles_funcionales":
@@ -540,19 +505,17 @@ export default {
             break;
 
           default:
-            console.warn(`Catálogo no reconocido: ${catalogoActivo.value}`);
+            console.warn(`Catalogo no reconocido: ${catalogoActivo.value}`);
         }
-        console.log(`✅ Datos cargados para: ${catalogoActivo.value}`);
       } catch (error) {
         console.error(
-          `⚠ Error recargando catálogo ${catalogoActivo.value}:`,
+          `Error recargando catalogo ${catalogoActivo.value}:`,
           error
         );
       }
     };
 
-    // ✅ LÓGICA COPIADA Y ADAPTADA DE CatalogosView.vue
-    // Función para obtener datos de un catálogo específico
+    // Funcion para obtener datos de un catalogo especifico
     const obtenerDatosCatalogo = (nombreCatalogo) => {
       switch (nombreCatalogo) {
         case "departamentos":
@@ -579,56 +542,41 @@ export default {
       return Array.isArray(datos) ? datos.length : 0;
     };
 
-    // ✅ COPIADO EXACTAMENTE DE CatalogosView.vue
-    // Manejador para cuando se crea un registro exitosamente
+    // Manejadores para eventos CRUD
     const manejarRegistroCreado = (evento) => {
       recargarCatalogo();
     };
 
-    // Manejador para cuando se actualiza un registro exitosamente
     const manejarRegistroActualizado = (evento) => {
       recargarCatalogo();
     };
 
-    // Manejador para cuando se elimina un registro exitosamente
     const manejarRegistroEliminado = (evento) => {
       recargarCatalogo();
     };
 
-    // Manejador para errores en operaciones CRUD
     const manejarError = (evento) => {
-      console.error("❌ Error en operación CRUD:", evento);
+      console.error("Error en operacion CRUD:", evento);
     };
 
-    // ✅ VERSIÓN CORREGIDA (FUNCIONA AUTOMÁTICO)
+    // Funcion corregida para cargar datos iniciales
     const cargarDatosIniciales = async () => {
       cargandoInicial.value = true;
 
       try {
-        console.log("🚀 Iniciando carga de datos organizacionales...");
+        // Cargar solo dependencias basicas (paises de catalogos)
+        await catalogosStore.loadPaises();
 
-        // 🎯 CARGAR DATOS BÁSICOS DE ORGANIZACIÓN AUTOMÁTICAMENTE
-        await Promise.all([
-          organizacionStore.loadDepartamentos(),
-          organizacionStore.loadMunicipios(),
-          organizacionStore.loadCiudades(),
-          organizacionStore.loadUbicacionesGeograficas(),
-          organizacionStore.loadEstructuraMilitar(),
-          organizacionStore.loadCargos(),
-          organizacionStore.loadRolesFuncionales(),
-        ]);
-
-        console.log("✅ Datos organizacionales cargados exitosamente");
-
-        // Seleccionar primer catálogo por defecto
+        // Seleccionar primer catalogo por defecto
         const primerCatalogo = Object.keys(ESQUEMAS_ORGANIZACION)[0];
         if (primerCatalogo) {
           catalogoActivo.value = primerCatalogo;
-          console.log(`🎯 Catálogo seleccionado: ${primerCatalogo}`);
-          // Ya no necesitamos recargarCatalogo() porque los datos ya están cargados
+
+          // Cargar datos especificos del catalogo seleccionado
+          await recargarCatalogo();
         }
       } catch (error) {
-        console.error("❌ Error cargando datos iniciales:", error);
+        console.error("Error cargando datos iniciales:", error);
       } finally {
         cargandoInicial.value = false;
       }
@@ -659,17 +607,15 @@ export default {
       router.push("/dashboard");
     };
 
-    // Función para mostrar información del manual de usuario
     const openUserManual = () => {
-      console.log("📖 Manual de usuario solicitado");
+      console.log("Manual de usuario solicitado");
     };
 
-    // Función para mostrar información de soporte técnico
     const openSupport = () => {
-      console.log("🆘 Soporte técnico solicitado");
+      console.log("Soporte tecnico solicitado");
     };
 
-    // Auto-actualización del tiempo
+    // Auto-actualizacion del tiempo
     const startAutoUpdate = () => {
       updateInterval.value = setInterval(() => {
         if (systemStatus.value.service === "ONLINE") {
@@ -687,7 +633,6 @@ export default {
 
     // Lifecycle
     onMounted(() => {
-      console.log("🏛️ EstructuraOrganizacionalView montada");
       cargarDatosIniciales();
       checkServiceHealth();
       startAutoUpdate();
@@ -718,7 +663,7 @@ export default {
       // Datos
       ESQUEMAS_ORGANIZACION,
 
-      // Métodos
+      // Metodos
       seleccionarCatalogo,
       recargarCatalogo,
       obtenerDatosCatalogo,

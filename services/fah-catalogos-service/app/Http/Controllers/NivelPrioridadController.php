@@ -1,5 +1,7 @@
 <?php
 
+// services\fah-catalogos-service\app\Http\Controllers\NivelPrioridadController.php
+
 namespace App\Http\Controllers;
 
 use App\Models\NivelPrioridad;
@@ -8,10 +10,7 @@ use Illuminate\Support\Facades\Validator;
 
 class NivelPrioridadController extends Controller
 {
-    /**
-     * Listar todos los niveles de prioridad
-     * GET /api/catalogos/niveles-prioridad
-     */
+    // Listar todos los niveles de prioridad
     public function index()
     {
         try {
@@ -31,10 +30,7 @@ class NivelPrioridadController extends Controller
         }
     }
 
-    /**
-     * Crear nuevo nivel de prioridad
-     * POST /api/catalogos/niveles-prioridad
-     */
+    // Crear nuevo nivel de prioridad
     public function store(Request $request)
     {
         try {
@@ -47,7 +43,7 @@ class NivelPrioridadController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Datos de entrada inválidos',
+                    'message' => 'Datos de entrada invalidos',
                     'errors' => $validator->errors()
                 ], 400);
             }
@@ -56,7 +52,7 @@ class NivelPrioridadController extends Controller
                 'codigo' => $request->codigo,
                 'nombre' => $request->nombre,
                 'nivel_numerico' => $request->nivel_numerico,
-                'created_by' => 1, // TODO: Obtener del usuario autenticado
+                'created_by' => 1,
                 'updated_by' => 1,
                 'version' => 1
             ]);
@@ -75,10 +71,7 @@ class NivelPrioridadController extends Controller
         }
     }
 
-    /**
-     * Obtener nivel de prioridad específico
-     * GET /api/catalogos/niveles-prioridad/{id}
-     */
+    // Obtener nivel de prioridad especifico
     public function show($id)
     {
         try {
@@ -105,10 +98,7 @@ class NivelPrioridadController extends Controller
         }
     }
 
-    /**
-     * Actualizar nivel de prioridad
-     * PUT /api/catalogos/niveles-prioridad/{id}
-     */
+    // Actualizar nivel de prioridad
     public function update(Request $request, $id)
     {
         try {
@@ -131,7 +121,7 @@ class NivelPrioridadController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Datos de entrada inválidos',
+                    'message' => 'Datos de entrada invalidos',
                     'errors' => $validator->errors()
                 ], 400);
             }
@@ -141,7 +131,7 @@ class NivelPrioridadController extends Controller
                 'nombre' => $request->nombre,
                 'nivel_numerico' => $request->nivel_numerico,
                 'is_active' => $request->is_active ?? true,
-                'updated_by' => 1, // TODO: Obtener del usuario autenticado
+                'updated_by' => 1,
                 'version' => $nivel->version + 1
             ]);
 
@@ -159,10 +149,7 @@ class NivelPrioridadController extends Controller
         }
     }
 
-    /**
-     * Eliminar nivel de prioridad (soft delete)
-     * DELETE /api/catalogos/niveles-prioridad/{id}
-     */
+    // Eliminar nivel de prioridad (soft delete)
     public function destroy($id)
     {
         try {
@@ -176,7 +163,7 @@ class NivelPrioridadController extends Controller
             }
 
             $nivel->update([
-                'deleted_by' => 1, // TODO: Obtener del usuario autenticado
+                'deleted_by' => 1,
             ]);
 
             $nivel->delete();

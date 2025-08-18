@@ -3,20 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Models\TipoGenero;
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
 class TipoGeneroController extends Controller
 {
-    /**
-     * Listar todos los tipos de género
-     * GET /api/catalogos/tipos-genero
-     */
-    // En TipoGeneroController::index()
+    // Listar todos los tipos de genero
     public function index()
     {
         try {
-            // ✅ SIMPLE Y DIRECTO - Sin complicaciones
             $tiposGenero = TipoGenero::activos()->get();
 
             return response()->json([
@@ -33,10 +29,7 @@ class TipoGeneroController extends Controller
         }
     }
 
-    /**
-     * Crear nuevo tipo de género
-     * POST /api/catalogos/tipos-genero
-     */
+    // Crear nuevo tipo de genero
     public function store(Request $request)
     {
         try {
@@ -58,7 +51,7 @@ class TipoGeneroController extends Controller
                 'codigo' => $request->codigo,
                 'nombre' => $request->nombre,
                 'abreviatura' => $request->abreviatura,
-                'created_by' => 1, // TODO: Obtener del usuario autenticado
+                'created_by' => 1,
                 'updated_by' => 1,
                 'version' => 1
             ]);
@@ -77,10 +70,7 @@ class TipoGeneroController extends Controller
         }
     }
 
-    /**
-     * Obtener tipo de género específico
-     * GET /api/catalogos/tipos-genero/{id}
-     */
+    // Obtener tipo de genero específico
     public function show($id)
     {
         try {
@@ -107,10 +97,7 @@ class TipoGeneroController extends Controller
         }
     }
 
-    /**
-     * Actualizar tipo de género
-     * PUT /api/catalogos/tipos-genero/{id}
-     */
+    // Actualizar tipo de genero
     public function update(Request $request, $id)
     {
         try {
@@ -143,7 +130,7 @@ class TipoGeneroController extends Controller
                 'nombre' => $request->nombre,
                 'abreviatura' => $request->abreviatura,
                 'is_active' => $request->is_active ?? true,
-                'updated_by' => 1, // TODO: Obtener del usuario autenticado
+                'updated_by' => 1,
                 'version' => $tipoGenero->version + 1
             ]);
 
@@ -161,10 +148,7 @@ class TipoGeneroController extends Controller
         }
     }
 
-    /**
-     * Eliminar tipo de género (soft delete)
-     * DELETE /api/catalogos/tipos-genero/{id}
-     */
+    // Eliminar tipo de genero (soft delete)
     public function destroy($id)
     {
         try {
@@ -178,7 +162,7 @@ class TipoGeneroController extends Controller
             }
 
             $tipoGenero->update([
-                'deleted_by' => 1, // TODO: Obtener del usuario autenticado
+                'deleted_by' => 1,
             ]);
 
             $tipoGenero->delete();

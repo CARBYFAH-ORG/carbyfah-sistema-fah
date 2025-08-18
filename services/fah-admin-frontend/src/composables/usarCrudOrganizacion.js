@@ -1,27 +1,27 @@
-// COMPOSABLE CRUD DINÁMICO - ORGANIZACIÓN FAH
-// Operaciones CRUD específicas para módulos de organización
+// services\fah-admin-frontend\src\composables\usarCrudOrganizacion.js
+
+// Composable CRUD dinamico - Organizacion FAH
+// Operaciones CRUD especificas para modulos de organizacion
 
 import { ref, computed } from 'vue'
-import { useToast } from 'primevue/usetoast'
+import { useToastFAH } from '@/composables/useToastFAH'
 import { useOrganizacionStore } from '@/stores/organizacionStore'
 import { obtenerEsquema, obtenerNotificacion } from '@/config/esquemaOrganizacion'
 
 /**
- * Composable para operaciones CRUD de organización
- * @param {string} esquema - Nombre del esquema de organización
+ * Composable para operaciones CRUD de organizacion
+ * @param {string} esquema - Nombre del esquema de organizacion
  */
 export const usarCrudOrganizacion = (esquema) => {
     // Composables y dependencias
-    const toast = useToast()
+    const toast = useToastFAH()
     const organizacionStore = useOrganizacionStore()
 
     // Estado reactivo
     const cargando = ref(false)
     const error = ref(null)
 
-    // =====================================================
-    // OBTENER REGISTROS SEGÚN EL ESQUEMA
-    // =====================================================
+    // Obtener registros segun el esquema
     const registros = computed(() => {
         switch (esquema) {
             case 'departamentos':
@@ -43,28 +43,26 @@ export const usarCrudOrganizacion = (esquema) => {
         }
     })
 
-    // Configuración del esquema
+    // Configuracion del esquema
     const configuracionEsquema = computed(() => {
         return obtenerEsquema(esquema)
     })
 
-    // Registros activos únicamente
+    // Registros activos unicamente
     const registrosActivos = computed(() => {
         return registros.value.filter(registro =>
             registro.is_active !== false
         )
     })
 
-    // Estadísticas de registros
+    // Estadisticas de registros
     const estadisticas = computed(() => ({
         total: registros.value.length,
         activos: registrosActivos.value.length,
         inactivos: registros.value.length - registrosActivos.value.length
     }))
 
-    // =====================================================
-    // CARGAR DATOS
-    // =====================================================
+    // Cargar datos
     const cargarDatos = async () => {
         cargando.value = true
         error.value = null
@@ -98,15 +96,13 @@ export const usarCrudOrganizacion = (esquema) => {
 
         } catch (err) {
             error.value = err.message || 'Error cargando datos'
-            toast.add(obtenerNotificacion('errorConexion'))
+            toast.error("Error de Conexion", "No se pudo conectar con el servidor")
         } finally {
             cargando.value = false
         }
     }
 
-    // =====================================================
-    // CREAR REGISTRO
-    // =====================================================
+    // Crear registro
     const crearRegistro = async (datos) => {
         cargando.value = true
         error.value = null
@@ -137,12 +133,12 @@ export const usarCrudOrganizacion = (esquema) => {
                     resultado = await organizacionStore.createRolFuncional(datos)
                     break
                 default:
-                    throw new Error(`Creación no implementada para esquema: ${esquema}`)
+                    throw new Error(`Creacion no implementada para esquema: ${esquema}`)
             }
 
             if (resultado.success) {
                 const nombreRegistro = obtenerNombreRegistro(datos)
-                toast.add(obtenerNotificacion('creado', esquema, nombreRegistro))
+                toast.success("Registro Creado", `${nombreRegistro} creado exitosamente`)
                 return resultado
             } else {
                 throw new Error(resultado.error || 'Error desconocido')
@@ -150,16 +146,14 @@ export const usarCrudOrganizacion = (esquema) => {
 
         } catch (err) {
             error.value = err.message
-            toast.add(obtenerNotificacion('errorCrear', esquema))
+            toast.error("Error al Crear", `No se pudo crear el registro`)
             throw err
         } finally {
             cargando.value = false
         }
     }
 
-    // =====================================================
-    // ACTUALIZAR REGISTRO
-    // =====================================================
+    // Actualizar registro
     const actualizarRegistro = async (id, datos) => {
         cargando.value = true
         error.value = null
@@ -190,12 +184,12 @@ export const usarCrudOrganizacion = (esquema) => {
                     resultado = await organizacionStore.updateRolFuncional(id, datos)
                     break
                 default:
-                    throw new Error(`Actualización no implementada para esquema: ${esquema}`)
+                    throw new Error(`Actualizacion no implementada para esquema: ${esquema}`)
             }
 
             if (resultado.success) {
                 const nombreRegistro = obtenerNombreRegistro(datos)
-                toast.add(obtenerNotificacion('actualizado', esquema, nombreRegistro))
+                toast.success("Registro Actualizado", `${nombreRegistro} actualizado exitosamente`)
                 return resultado
             } else {
                 throw new Error(resultado.error || 'Error desconocido')
@@ -203,16 +197,14 @@ export const usarCrudOrganizacion = (esquema) => {
 
         } catch (err) {
             error.value = err.message
-            toast.add(obtenerNotificacion('errorActualizar', esquema))
+            toast.error("Error al Actualizar", `No se pudo actualizar el registro`)
             throw err
         } finally {
             cargando.value = false
         }
     }
 
-    // =====================================================
-    // ELIMINAR REGISTRO
-    // =====================================================
+    // Eliminar registro
     const eliminarRegistro = async (id) => {
         cargando.value = true
         error.value = null
@@ -243,11 +235,11 @@ export const usarCrudOrganizacion = (esquema) => {
                     resultado = await organizacionStore.deleteRolFuncional(id)
                     break
                 default:
-                    throw new Error(`Eliminación no implementada para esquema: ${esquema}`)
+                    throw new Error(`Eliminacion no implementada para esquema: ${esquema}`)
             }
 
             if (resultado.success) {
-                toast.add(obtenerNotificacion('eliminado', esquema, 'Registro'))
+                toast.success("Registro Eliminado", "Registro eliminado exitosamente")
                 return resultado
             } else {
                 throw new Error(resultado.error || 'Error desconocido')
@@ -255,16 +247,14 @@ export const usarCrudOrganizacion = (esquema) => {
 
         } catch (err) {
             error.value = err.message
-            toast.add(obtenerNotificacion('errorEliminar', esquema))
+            toast.error("Error al Eliminar", `No se pudo eliminar el registro`)
             throw err
         } finally {
             cargando.value = false
         }
     }
 
-    // =====================================================
-    // FUNCIONES AUXILIARES
-    // =====================================================
+    // Funciones auxiliares
 
     // Buscar registro por ID
     const buscarPorId = (id) => {
@@ -339,7 +329,7 @@ export const usarCrudOrganizacion = (esquema) => {
         return 'Registro'
     }
 
-    // Obtener título del esquema
+    // Obtener titulo del esquema
     const obtenerTituloEsquema = () => {
         const config = configuracionEsquema.value
         return config ? config.titulo : esquema
@@ -406,7 +396,7 @@ export const usarCrudOrganizacion = (esquema) => {
                     dependencias.push({
                         tipo: 'ubicaciones_geograficas',
                         cantidad: ubicacionesAsociadas.length,
-                        mensaje: `${ubicacionesAsociadas.length} ubicación(es) geográfica(s)`
+                        mensaje: `${ubicacionesAsociadas.length} ubicacion(es) geografica(s)`
                     })
                 }
                 break
@@ -454,7 +444,7 @@ export const usarCrudOrganizacion = (esquema) => {
         actualizarRegistro,
         eliminarRegistro,
 
-        // Búsqueda y filtrado
+        // Busqueda y filtrado
         buscarPorId,
         buscarPorCampo,
         filtrarRegistros,

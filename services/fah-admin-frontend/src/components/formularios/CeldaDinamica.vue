@@ -1,11 +1,8 @@
+<!-- services\fah-admin-frontend\src\components\formularios\CeldaDinamica.vue -->
 <template>
-  <!-- ============================================ -->
-  <!-- CELDA DINÁMICA UNIVERSAL MEJORADA -->
-  <!-- ✅ SOPORTE COMPLETO PARA RELACIONES BACKEND -->
-  <!-- Renderiza valores según el tipo de campo automáticamente -->
-  <!-- ============================================ -->
+  <!-- Celda dinamica universal -->
   <div class="celda-dinamica">
-    <!-- 🔗 RELACIÓN FORÁNEA: Aprovecha datos del backend -->
+    <!-- Relacion foranea -->
     <div v-if="esRelacionForanea" class="contenido-relacion">
       <div v-if="datosRelacionBackend" class="relacion-completa">
         <div class="nombre-relacion">{{ datosRelacionBackend.nombre }}</div>
@@ -19,11 +16,11 @@
       </div>
 
       <div v-else class="relacion-fallback">
-        <span class="text-gray-400 text-xs">ID: {{ valor }}</span>
+        <span class="relacion-fallback-text">ID: {{ valor }}</span>
       </div>
     </div>
 
-    <!-- ✅ BOOLEANO: Badge visual mejorado -->
+    <!-- Booleano -->
     <div v-else-if="esTipoBooleano" class="contenido-booleano">
       <span :class="claseBooleano">
         <i :class="iconoBooleano"></i>
@@ -31,24 +28,24 @@
       </span>
     </div>
 
-    <!-- 📅 FECHA: Formato legible -->
+    <!-- Fecha -->
     <div v-else-if="esFecha" class="contenido-fecha">
       {{ fechaFormateada }}
     </div>
 
-    <!-- 🔢 NÚMERO: Con separadores -->
+    <!-- Numero -->
     <div v-else-if="esTipoNumero" class="contenido-numero">
       <span :class="claseNumero">{{ numeroFormateado }}</span>
     </div>
 
-    <!-- 🌐 URL: Link clicable mejorado -->
+    <!-- URL -->
     <div v-else-if="esTipoUrl" class="contenido-url">
       <template v-if="valor && valor !== ''">
         <img
           v-if="esImagenUrl"
           :src="valor"
           :alt="configuracion.etiqueta"
-          class="w-6 h-6 object-contain rounded mr-2"
+          class="imagen-url"
           @error="$event.target.style.display = 'none'"
         />
         <a
@@ -57,40 +54,40 @@
           rel="noopener noreferrer"
           class="link-url"
         >
-          <i class="pi pi-external-link mr-1"></i>
+          <i class="icono-link">🔗</i>
           Ver enlace
         </a>
       </template>
       <span v-else class="sin-url">Sin URL</span>
     </div>
 
-    <!-- 📧 EMAIL: Link clicable -->
+    <!-- Email -->
     <div v-else-if="esEmail" class="contenido-email">
       <a :href="`mailto:${valor}`" class="link-email">
-        <i class="pi pi-envelope mr-1"></i>
+        <i class="icono-email">📧</i>
         {{ valor }}
       </a>
     </div>
 
-    <!-- 📱 TELÉFONO: Link clicable -->
+    <!-- Telefono -->
     <div v-else-if="esTelefono" class="contenido-telefono">
       <a :href="`tel:${valor}`" class="link-telefono">
-        <i class="pi pi-phone mr-1"></i>
+        <i class="icono-telefono">📞</i>
         {{ valor }}
       </a>
     </div>
 
-    <!-- 🏷️ CÓDIGO: Badge colorido -->
+    <!-- Codigo -->
     <div v-else-if="esTipoCodigo" class="contenido-codigo">
       <span :class="claseCodigo">{{ valor }}</span>
     </div>
 
-    <!-- 📝 TEXTO: Simple -->
+    <!-- Texto -->
     <div v-else-if="esTipoTexto" class="contenido-texto">
       <span :class="claseTexto">{{ textoTruncado }}</span>
     </div>
 
-    <!-- 📄 VALOR POR DEFECTO -->
+    <!-- Valor por defecto -->
     <div v-else class="contenido-defecto">
       {{ valorMostrar }}
     </div>
@@ -121,17 +118,10 @@ export default {
   },
 
   setup(props) {
-    // =====================================
-    // STORES
-    // =====================================
     const catalogosStore = useCatalogosStore();
     const organizacionStore = useOrganizacionStore();
 
-    // =====================================
-    // DETECTORES DE TIPO
-    // =====================================
-
-    // 🔗 DETECTOR MEJORADO PARA RELACIONES FORÁNEAS
+    // Detectores de tipo
     const esRelacionForanea = computed(() => {
       const campo = props.configuracion.nombre || "";
       return (
@@ -141,14 +131,13 @@ export default {
       );
     });
 
-    // 🔗 DATOS DE RELACIÓN DESDE BACKEND (PRIORITARIO)
+    // Datos de relacion desde backend
     const datosRelacionBackend = computed(() => {
       if (!esRelacionForanea.value) return null;
 
       const campo = props.configuracion.nombre;
       const nombreTabla = campo.replace("_id", "");
 
-      // Buscar en los datos relacionados que vienen del backend
       const relacion = props.registroCompleto[nombreTabla];
       if (!relacion) return null;
 
@@ -187,7 +176,7 @@ export default {
       };
     });
 
-    // 🔗 RESOLVER DESDE STORE (FALLBACK)
+    // Resolver desde store
     const valorForaneoResuelto = computed(() => {
       if (!esRelacionForanea.value || datosRelacionBackend.value) return null;
 
@@ -195,7 +184,6 @@ export default {
       const valorId = parseInt(props.valor);
 
       switch (campo) {
-        // CATÁLOGOS
         case "categoria_personal_id":
           const categoria = catalogosStore.categoriasPersonal?.find(
             (c) => c.id === valorId
@@ -230,7 +218,6 @@ export default {
           );
           return tipoEst?.nombre_tipo || tipoEst?.codigo_tipo || null;
 
-        // ORGANIZACIÓN
         case "departamento_id":
           const depto = organizacionStore.departamentos?.find(
             (d) => d.id === valorId
@@ -254,7 +241,6 @@ export default {
       }
     });
 
-    // Otros detectores
     const esTipoBooleano = computed(() => {
       return (
         typeof props.valor === "boolean" ||
@@ -367,10 +353,7 @@ export default {
       );
     });
 
-    // =====================================
-    // VALORES FORMATEADOS
-    // =====================================
-
+    // Valores formateados
     const valorMostrar = computed(() => {
       if (props.valor === null || props.valor === undefined) return "-";
       if (typeof props.valor === "string" && props.valor.trim() === "")
@@ -409,59 +392,44 @@ export default {
       return props.valor;
     });
 
-    // =====================================
-    // CLASES CSS
-    // =====================================
-
+    // Clases CSS
     const claseBooleano = computed(() => {
-      return props.valor
-        ? "badge-success inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
-        : "badge-inactive inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600";
+      return props.valor ? "badge-success-fah" : "badge-inactive-fah";
     });
 
     const iconoBooleano = computed(() => {
-      return props.valor
-        ? "pi pi-check-circle mr-1"
-        : "pi pi-times-circle mr-1";
+      return props.valor ? "icono-check-fah" : "icono-times-fah";
     });
 
-    const claseNumero = computed(() => [
-      "bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-2 py-1 rounded text-xs font-semibold min-w-6 text-center inline-block",
-    ]);
+    const claseNumero = computed(() => "numero-fah");
 
     const claseCodigo = computed(() => {
       const campo = props.configuracion.nombre || "";
 
       if (campo.includes("categoria")) {
-        return "bg-gradient-to-r from-gray-500 to-gray-600 text-white px-2 py-1 rounded text-xs font-semibold font-mono uppercase";
+        return "codigo-categoria-fah";
       }
       if (campo.includes("especialidad")) {
-        return "bg-gradient-to-r from-purple-500 to-purple-600 text-white px-2 py-1 rounded text-xs font-semibold font-mono uppercase";
+        return "codigo-especialidad-fah";
       }
       if (campo.includes("grado")) {
-        return "bg-gradient-to-r from-orange-500 to-orange-600 text-white px-2 py-1 rounded text-xs font-semibold font-mono uppercase";
+        return "codigo-grado-fah";
       }
       if (campo.includes("departamento")) {
-        return "bg-gradient-to-r from-green-500 to-green-600 text-white px-2 py-1 rounded text-xs font-semibold font-mono uppercase";
+        return "codigo-departamento-fah";
       }
       if (campo.includes("municipio")) {
-        return "bg-gradient-to-r from-blue-500 to-blue-600 text-white px-2 py-1 rounded text-xs font-semibold font-mono uppercase";
+        return "codigo-municipio-fah";
       }
 
-      return "bg-gradient-to-r from-blue-500 to-blue-600 text-white px-2 py-1 rounded text-xs font-semibold font-mono uppercase";
+      return "codigo-default-fah";
     });
 
-    const claseForaneo = computed(() => [
-      "bg-gradient-to-r from-indigo-500 to-indigo-600 text-white px-2 py-1 rounded text-xs font-semibold uppercase shadow-sm",
-    ]);
+    const claseForaneo = computed(() => "relacion-foranea-fah");
 
-    const claseTexto = computed(() => ["font-semibold text-gray-800"]);
+    const claseTexto = computed(() => "texto-fah");
 
-    // =====================================
-    // RETURN
-    // =====================================
     return {
-      // Detectores
       esRelacionForanea,
       esTipoBooleano,
       esFecha,
@@ -473,18 +441,15 @@ export default {
       esTipoTexto,
       esImagenUrl,
 
-      // Datos
       datosRelacionBackend,
       valorForaneoResuelto,
 
-      // Valores formateados
       valorMostrar,
       textoBooleano,
       fechaFormateada,
       numeroFormateado,
       textoTruncado,
 
-      // Clases
       claseBooleano,
       iconoBooleano,
       claseNumero,
@@ -497,67 +462,332 @@ export default {
 </script>
 
 <style scoped>
-/* =====================================
-   ESTILOS PARA CELDA DINÁMICA MEJORADA
-   ===================================== */
+/* Estilos para celda dinamica */
 
+/* Contenedor principal */
 .celda-dinamica {
-  @apply flex items-center min-h-[2rem];
+  display: flex;
+  align-items: center;
+  min-height: 2rem;
+  padding: 4px 0;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.4;
 }
 
-/* 🔗 RELACIONES */
+/* Contenido de relaciones foraneas */
 .contenido-relacion {
-  @apply w-full;
+  width: 100%;
 }
 
 .relacion-completa {
-  @apply flex flex-col;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .nombre-relacion {
-  @apply text-sm font-medium text-gray-800;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1e3a5f;
+  line-height: 1.3;
 }
 
 .codigo-relacion {
-  @apply text-xs text-gray-500 font-mono;
+  font-size: 11px;
+  color: #6c757d;
+  font-family: "Courier New", monospace;
+  background: rgba(212, 175, 55, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block;
+  width: fit-content;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.relacion-store {
+  display: flex;
+  align-items: center;
+}
+
+.relacion-foranea-fah {
+  background: linear-gradient(135deg, #1e3a5f, #2c4f7a);
+  color: #ffffff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  box-shadow: 0 2px 4px rgba(30, 58, 95, 0.3);
+  border: 1px solid rgba(212, 175, 55, 0.3);
+  transition: all 0.2s ease;
+}
+
+.relacion-foranea-fah:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(30, 58, 95, 0.4);
+  background: linear-gradient(135deg, #2c4f7a, #1e3a5f);
 }
 
 .relacion-fallback {
-  @apply text-gray-400 text-xs italic;
+  display: flex;
+  align-items: center;
 }
 
-/* 🌐 ENLACES */
+.relacion-fallback-text {
+  color: #6c757d;
+  font-size: 11px;
+  font-style: italic;
+  background: #f8f9fa;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+}
+
+/* Contenido booleano */
+.contenido-booleano {
+  display: flex;
+  align-items: center;
+}
+
+.badge-success-fah {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+  border: 1px solid rgba(40, 167, 69, 0.5);
+}
+
+.badge-inactive-fah {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  background: linear-gradient(135deg, #6c757d, #5a6268);
+  color: #ffffff;
+  box-shadow: 0 2px 4px rgba(108, 117, 125, 0.3);
+  border: 1px solid rgba(108, 117, 125, 0.5);
+}
+
+.icono-check-fah,
+.icono-times-fah {
+  font-size: 10px;
+  font-weight: bold;
+}
+
+.icono-check-fah::before {
+  content: "✓";
+}
+
+.icono-times-fah::before {
+  content: "✕";
+}
+
+/* Contenido fecha */
+.contenido-fecha {
+  font-size: 13px;
+  color: #495057;
+  font-weight: 500;
+  background: rgba(212, 175, 55, 0.1);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border-left: 3px solid #d4af37;
+}
+
+/* Contenido numerico */
+.contenido-numero {
+  text-align: right;
+}
+
+.numero-fah {
+  background: linear-gradient(135deg, #d4af37, #f0c674);
+  color: #1e3a5f;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  min-width: 24px;
+  text-align: center;
+  display: inline-block;
+  box-shadow: 0 2px 4px rgba(212, 175, 55, 0.3);
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  font-family: "Courier New", monospace;
+}
+
+/* Contenido URL */
+.contenido-url {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.imagen-url {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  border-radius: 4px;
+  border: 1px solid #e9ecef;
+}
+
 .link-url,
 .link-email,
 .link-telefono {
-  @apply text-blue-600 hover:text-blue-800 text-sm;
-  @apply transition-colors duration-200;
-  @apply no-underline hover:underline;
+  color: #0ea5e9;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
 }
 
-/* 📝 CONTENIDO */
-.contenido-numero {
-  @apply text-right;
+.link-url:hover,
+.link-email:hover,
+.link-telefono:hover {
+  color: #1e3a5f;
+  background: rgba(14, 165, 233, 0.1);
+  border-color: rgba(14, 165, 233, 0.3);
+  text-decoration: underline;
+  transform: translateY(-1px);
 }
 
-.contenido-fecha {
-  @apply text-sm text-gray-700;
-}
-
-.contenido-texto {
-  @apply text-sm;
+.icono-link,
+.icono-email,
+.icono-telefono {
+  font-size: 11px;
+  opacity: 0.8;
 }
 
 .sin-url {
-  @apply text-gray-500 text-xs;
+  color: #6c757d;
+  font-size: 12px;
+  font-style: italic;
+}
+
+/* Contenido codigo */
+.contenido-codigo {
+  display: flex;
+  align-items: center;
+}
+
+.codigo-categoria-fah {
+  background: linear-gradient(135deg, #6c757d, #5a6268);
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: "Courier New", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(108, 117, 125, 0.3);
+}
+
+.codigo-especialidad-fah {
+  background: linear-gradient(135deg, #5a9bd4, #4a90c2);
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: "Courier New", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(90, 155, 212, 0.3);
+}
+
+.codigo-grado-fah {
+  background: linear-gradient(135deg, #c1666b, #b55a5f);
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: "Courier New", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(193, 102, 107, 0.3);
+}
+
+.codigo-departamento-fah {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: "Courier New", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(40, 167, 69, 0.3);
+}
+
+.codigo-municipio-fah {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: "Courier New", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(14, 165, 233, 0.3);
+}
+
+.codigo-default-fah {
+  background: linear-gradient(135deg, #1e3a5f, #2c4f7a);
+  color: #ffffff;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  font-family: "Courier New", monospace;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(30, 58, 95, 0.3);
+}
+
+/* Contenido texto */
+.contenido-texto {
+  display: flex;
+  align-items: center;
+}
+
+.texto-fah {
+  font-weight: 600;
+  color: #343a40;
+  font-size: 14px;
+  line-height: 1.3;
+}
+
+/* Contenido por defecto */
+.contenido-defecto {
+  color: #495057;
+  font-size: 13px;
+  font-style: italic;
 }
 
 /* Animaciones */
-.celda-dinamica {
-  animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
+@keyframes fadeInFAH {
   from {
     opacity: 0;
     transform: translateY(-5px);
@@ -568,18 +798,205 @@ export default {
   }
 }
 
+.celda-dinamica {
+  animation: fadeInFAH 0.3s ease-out;
+}
+
+/* Efectos hover globales */
+.badge-success-fah:hover,
+.badge-inactive-fah:hover,
+.numero-fah:hover,
+.codigo-categoria-fah:hover,
+.codigo-especialidad-fah:hover,
+.codigo-grado-fah:hover,
+.codigo-departamento-fah:hover,
+.codigo-municipio-fah:hover,
+.codigo-default-fah:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: all 0.2s ease;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
+  .celda-dinamica {
+    min-height: 1.8rem;
+  }
+
   .nombre-relacion {
-    @apply text-xs;
+    font-size: 12px;
   }
 
   .codigo-relacion {
-    @apply text-xs;
+    font-size: 10px;
+    padding: 1px 4px;
   }
 
-  .celda-dinamica .bg-gradient-to-r {
-    @apply px-1 py-0.5 text-xs;
+  .relacion-foranea-fah,
+  .badge-success-fah,
+  .badge-inactive-fah,
+  .numero-fah,
+  .codigo-categoria-fah,
+  .codigo-especialidad-fah,
+  .codigo-grado-fah,
+  .codigo-departamento-fah,
+  .codigo-municipio-fah,
+  .codigo-default-fah {
+    padding: 2px 6px;
+    font-size: 10px;
+  }
+
+  .link-url,
+  .link-email,
+  .link-telefono {
+    font-size: 12px;
+  }
+
+  .texto-fah {
+    font-size: 13px;
+  }
+
+  .contenido-fecha {
+    font-size: 12px;
+    padding: 2px 6px;
+  }
+}
+
+@media (max-width: 480px) {
+  .celda-dinamica {
+    min-height: 1.6rem;
+  }
+
+  .relacion-completa {
+    gap: 1px;
+  }
+
+  .nombre-relacion {
+    font-size: 11px;
+  }
+
+  .codigo-relacion {
+    font-size: 9px;
+  }
+
+  .relacion-foranea-fah,
+  .badge-success-fah,
+  .badge-inactive-fah,
+  .numero-fah {
+    padding: 1px 4px;
+    font-size: 9px;
+  }
+
+  .texto-fah {
+    font-size: 12px;
+  }
+
+  .contenido-fecha {
+    font-size: 11px;
+  }
+}
+
+/* Accesibilidad */
+.link-url:focus,
+.link-email:focus,
+.link-telefono:focus {
+  outline: 2px solid #d4af37;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Print styles */
+@media print {
+  .celda-dinamica {
+    animation: none;
+  }
+
+  .badge-success-fah,
+  .badge-inactive-fah,
+  .numero-fah,
+  .codigo-categoria-fah,
+  .codigo-especialidad-fah,
+  .codigo-grado-fah,
+  .codigo-departamento-fah,
+  .codigo-municipio-fah,
+  .codigo-default-fah,
+  .relacion-foranea-fah {
+    background: #f8f9fa !important;
+    color: #343a40 !important;
+    box-shadow: none !important;
+    border: 1px solid #e9ecef !important;
+  }
+
+  .link-url,
+  .link-email,
+  .link-telefono {
+    color: #343a40 !important;
+    text-decoration: underline !important;
+  }
+}
+
+/* Modo alto contraste */
+@media (prefers-contrast: high) {
+  .badge-success-fah,
+  .badge-inactive-fah,
+  .numero-fah,
+  .codigo-categoria-fah,
+  .codigo-especialidad-fah,
+  .codigo-grado-fah,
+  .codigo-departamento-fah,
+  .codigo-municipio-fah,
+  .codigo-default-fah,
+  .relacion-foranea-fah {
+    border-width: 2px;
+    font-weight: 700;
+  }
+
+  .link-url,
+  .link-email,
+  .link-telefono {
+    border-width: 2px;
+    font-weight: 600;
+  }
+}
+
+/* Prefers reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .celda-dinamica {
+    animation: none;
+  }
+
+  .badge-success-fah:hover,
+  .badge-inactive-fah:hover,
+  .numero-fah:hover,
+  .codigo-categoria-fah:hover,
+  .codigo-especialidad-fah:hover,
+  .codigo-grado-fah:hover,
+  .codigo-departamento-fah:hover,
+  .codigo-municipio-fah:hover,
+  .codigo-default-fah:hover,
+  .relacion-foranea-fah:hover,
+  .link-url:hover,
+  .link-email:hover,
+  .link-telefono:hover {
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .texto-fah {
+    color: #e9ecef;
+  }
+
+  .contenido-defecto {
+    color: #e9ecef;
+  }
+
+  .relacion-fallback-text {
+    color: #e9ecef;
+    background: #343a40;
+    border-color: #495057;
   }
 }
 </style>

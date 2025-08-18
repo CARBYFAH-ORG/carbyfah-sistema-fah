@@ -4,7 +4,7 @@ import { ref } from 'vue'
 export const usarApiPaises = () => {
     const cargando = ref(false)
 
-    // ✅ BASE DE DATOS COMPLETA DE PAÍSES EN ESPAÑOL
+    // BASE DE DATOS COMPLETA DE PAÍSES EN ESPAÑOL
     const paisesEspanol = {
         'AF': { nombre: 'Afganistán', oficial: 'República Islámica de Afganistán', moneda: 'Afgani afgano', telefono: '+93' },
         'AL': { nombre: 'Albania', oficial: 'República de Albania', moneda: 'Lek albanés', telefono: '+355' },
@@ -209,7 +209,7 @@ export const usarApiPaises = () => {
         cargando.value = true
 
         try {
-            // ✅ USAR REST COUNTRIES PARA OBTENER CÓDIGOS ISO
+            // USAR REST COUNTRIES PARA OBTENER CÓDIGOS ISO
             const response = await fetch(
                 `https://restcountries.com/v3.1/name/${nombre}?fields=name,cca2,cca3,idd,currencies,translations`
             )
@@ -221,12 +221,12 @@ export const usarApiPaises = () => {
             const paises = await response.json()
 
             return paises.map(pais => {
-                // ✅ BUSCAR EN NUESTRA BASE DE DATOS COMPLETA
+                // BUSCAR EN NUESTRA BASE DE DATOS COMPLETA
                 const codigoISO2 = pais.cca2
                 const datosEspanol = paisesEspanol[codigoISO2]
 
                 if (datosEspanol) {
-                    // ✅ DATOS COMPLETOS EN ESPAÑOL
+                    // DATOS COMPLETOS EN ESPAÑOL
                     return {
                         nombre: datosEspanol.nombre,
                         nombreOficial: datosEspanol.oficial,
@@ -235,7 +235,7 @@ export const usarApiPaises = () => {
                         monedaOficial: datosEspanol.moneda
                     }
                 } else {
-                    // ✅ FALLBACK CON TRADUCCIÓN DE LA API
+                    // FALLBACK CON TRADUCCIÓN DE LA API
                     const nombreEspanol = pais.translations?.spa?.common || pais.name.common
                     const nombreOficialEspanol = pais.translations?.spa?.official || pais.name.official
                     const monedaOriginal = Object.values(pais.currencies || {})[0]?.name || ''

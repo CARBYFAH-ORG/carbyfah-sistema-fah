@@ -1,5 +1,7 @@
 <?php
 
+// services\fah-catalogos-service\app\Http\Controllers\CategoriaPersonalController.php
+
 namespace App\Http\Controllers;
 
 use App\Models\CategoriaPersonal;
@@ -8,10 +10,7 @@ use Illuminate\Support\Facades\Validator;
 
 class CategoriaPersonalController extends Controller
 {
-    /**
-     * Listar todas las categorías de personal
-     * GET /api/catalogos/categorias-personal
-     */
+    // Listar todas las categorias de personal
     public function index()
     {
         try {
@@ -24,22 +23,19 @@ class CategoriaPersonalController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Categorías de personal obtenidas correctamente',
+                'message' => 'Categorias de personal obtenidas correctamente',
                 'data' => $categorias
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al obtener categorías de personal',
+                'message' => 'Error al obtener categorias de personal',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
 
-    /**
-     * Crear nueva categoría de personal
-     * POST /api/catalogos/categorias-personal
-     */
+    // Crear nueva categoria de personal
     public function store(Request $request)
     {
         try {
@@ -52,7 +48,7 @@ class CategoriaPersonalController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Datos de entrada inválidos',
+                    'message' => 'Datos de entrada invalidos',
                     'errors' => $validator->errors()
                 ], 400);
             }
@@ -61,28 +57,25 @@ class CategoriaPersonalController extends Controller
                 'codigo_categoria' => $request->codigo_categoria,
                 'nombre_categoria' => $request->nombre_categoria,
                 'orden_jerarquico' => $request->orden_jerarquico,
-                'created_by' => 1, // TODO: Obtener del usuario autenticado
+                'created_by' => 1,
                 'updated_by' => 1
             ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Categoría de personal creada correctamente',
+                'message' => 'Categoria de personal creada correctamente',
                 'data' => $categoria
             ], 201);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al crear categoría de personal',
+                'message' => 'Error al crear categoria de personal',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
 
-    /**
-     * Obtener categoría específica
-     * GET /api/catalogos/categorias-personal/{id}
-     */
+    // Obtener categoria especifica
     public function show($id)
     {
         try {
@@ -91,28 +84,25 @@ class CategoriaPersonalController extends Controller
             if (!$categoria) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Categoría de personal no encontrada'
+                    'message' => 'Categoria de personal no encontrada'
                 ], 404);
             }
 
             return response()->json([
                 'success' => true,
-                'message' => 'Categoría de personal obtenida correctamente',
+                'message' => 'Categoria de personal obtenida correctamente',
                 'data' => $categoria
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al obtener categoría de personal',
+                'message' => 'Error al obtener categoria de personal',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
 
-    /**
-     * Actualizar categoría de personal
-     * PUT /api/catalogos/categorias-personal/{id}
-     */
+    // Actualizar categoria de personal
     public function update(Request $request, $id)
     {
         try {
@@ -121,7 +111,7 @@ class CategoriaPersonalController extends Controller
             if (!$categoria) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Categoría de personal no encontrada'
+                    'message' => 'Categoria de personal no encontrada'
                 ], 404);
             }
 
@@ -135,7 +125,7 @@ class CategoriaPersonalController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Datos de entrada inválidos',
+                    'message' => 'Datos de entrada invalidos',
                     'errors' => $validator->errors()
                 ], 400);
             }
@@ -145,28 +135,25 @@ class CategoriaPersonalController extends Controller
                 'nombre_categoria' => $request->nombre_categoria,
                 'orden_jerarquico' => $request->orden_jerarquico,
                 'is_active' => $request->is_active ?? true,
-                'updated_by' => 1, // TODO: Obtener del usuario autenticado
+                'updated_by' => 1,
                 'version' => $categoria->version + 1
             ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Categoría de personal actualizada correctamente',
+                'message' => 'Categoria de personal actualizada correctamente',
                 'data' => $categoria
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al actualizar categoría de personal',
+                'message' => 'Error al actualizar categoria de personal',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
 
-    /**
-     * Eliminar categoría de personal (soft delete)
-     * DELETE /api/catalogos/categorias-personal/{id}
-     */
+    // Eliminar categoria de personal (soft delete)
     public function destroy($id)
     {
         try {
@@ -175,7 +162,7 @@ class CategoriaPersonalController extends Controller
             if (!$categoria) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Categoría de personal no encontrada'
+                    'message' => 'Categoria de personal no encontrada'
                 ], 404);
             }
 
@@ -183,24 +170,24 @@ class CategoriaPersonalController extends Controller
             if ($categoria->grados()->count() > 0) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'No se puede eliminar la categoría porque tiene grados asociados'
+                    'message' => 'No se puede eliminar la categoria porque tiene grados asociados'
                 ], 409);
             }
 
             $categoria->update([
-                'deleted_by' => 1, // TODO: Obtener del usuario autenticado
+                'deleted_by' => 1,
             ]);
 
             $categoria->delete();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Categoría de personal eliminada correctamente'
+                'message' => 'Categoria de personal eliminada correctamente'
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al eliminar categoría de personal',
+                'message' => 'Error al eliminar categoria de personal',
                 'error' => $e->getMessage()
             ], 500);
         }

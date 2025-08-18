@@ -1,41 +1,33 @@
+// services\fah-admin-frontend\src\main.js
+
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import router from './router'
 import App from './App.vue'
 
-// ====================================
-// 📍 ESTILOS EN ORDEN CORRECTO
-// ====================================
-// 1. PRIMERO: Variables base (NUEVA UBICACIÓN)
+// Estilos en orden correcto
+// 1. Variables base
 import './styles/base/variables.css'
 
-// 2. SEGUNDO: Tailwind (utilidades)
+// 2. Tailwind (utilidades)
 import './assets/css/tailwind.css'
 
-// 3. TERCERO: Toast styles específicos
+// 3. Toast styles especificos
 import './assets/css/toast-styles.css'
 
-// ====================================
-// 🎨 PRIMEVUE CORE
-// ====================================
+// PrimeVue core
 import PrimeVue from 'primevue/config'
-import ToastService from 'primevue/toastservice'
 import ConfirmationService from 'primevue/confirmationservice'
 
-// ====================================
-// 📦 COMPONENTES BÁSICOS EXISTENTES
-// ====================================
+// Componentes basicos existentes
 import Button from 'primevue/button'
 import InputText from 'primevue/inputtext'
 import Password from 'primevue/password'
 import Card from 'primevue/card'
-import Toast from 'primevue/toast'
 import Menu from 'primevue/menu'
 import Breadcrumb from 'primevue/breadcrumb'
 
-// ====================================
-// 📊 COMPONENTES PARA CATÁLOGOS EXISTENTES
-// ====================================
+// Componentes para catalogos existentes
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 import Dialog from 'primevue/dialog'
@@ -48,9 +40,7 @@ import Tooltip from 'primevue/tooltip'
 import Dropdown from 'primevue/dropdown'
 import Image from 'primevue/image'
 
-// ====================================
-// 🚀 NUEVOS COMPONENTES PARA SISTEMA DINÁMICO
-// ====================================
+// Nuevos componentes para sistema dinamico
 import InputNumber from 'primevue/inputnumber'
 import Textarea from 'primevue/textarea'
 import Checkbox from 'primevue/checkbox'
@@ -59,22 +49,16 @@ import Message from 'primevue/message'
 import ProgressSpinner from 'primevue/progressspinner'
 import ConfirmDialog from 'primevue/confirmdialog'
 
-// ====================================
-// 🔍 COMPONENTES PARA AUTOCOMPLETADO
-// ====================================
+// Componentes para autocompletado
 import AutoComplete from 'primevue/autocomplete'
 import Select from 'primevue/select'
 
-// ====================================
-// 🔧 COMPONENTES ADICIONALES QUE PODRÍAS NECESITAR
-// ====================================
+// Componentes adicionales que podrias necesitar
 import InputSwitch from 'primevue/inputswitch'
 
 const app = createApp(App)
 
-// ====================================
-// ⚙️ CONFIGURAR SERVICIOS
-// ====================================
+// Configurar servicios
 // Configurar Pinia (store)
 app.use(createPinia())
 
@@ -83,23 +67,17 @@ app.use(router)
 
 // Configurar PrimeVue
 app.use(PrimeVue)
-app.use(ToastService)
 app.use(ConfirmationService)
 
-// ====================================
-// 📦 REGISTRAR COMPONENTES BÁSICOS EXISTENTES
-// ====================================
+// Registrar componentes basicos existentes
 app.component('Button', Button)
 app.component('InputText', InputText)
 app.component('Password', Password)
 app.component('Card', Card)
-app.component('Toast', Toast)
 app.component('Menu', Menu)
 app.component('Breadcrumb', Breadcrumb)
 
-// ====================================
-// 📊 REGISTRAR COMPONENTES PARA CATÁLOGOS EXISTENTES
-// ====================================
+// Registrar componentes para catalogos existentes
 app.component('DataTable', DataTable)
 app.component('Column', Column)
 app.component('Dialog', Dialog)
@@ -111,9 +89,7 @@ app.component('ProgressBar', ProgressBar)
 app.component('Dropdown', Dropdown)
 app.component('Image', Image)
 
-// ====================================
-// 🚀 REGISTRAR NUEVOS COMPONENTES PARA SISTEMA DINÁMICO
-// ====================================
+// Registrar nuevos componentes para sistema dinamico
 app.component('InputNumber', InputNumber)
 app.component('Textarea', Textarea)
 app.component('Checkbox', Checkbox)
@@ -122,20 +98,14 @@ app.component('Message', Message)
 app.component('ProgressSpinner', ProgressSpinner)
 app.component('ConfirmDialog', ConfirmDialog)
 
-// ====================================
-// 🔍 REGISTRAR COMPONENTES PARA AUTOCOMPLETADO
-// ====================================
+// Registrar componentes para autocompletado
 app.component('AutoComplete', AutoComplete)
 app.component('Select', Select)
 
-// ====================================
-// 🔧 REGISTRAR COMPONENTES ADICIONALES
-// ====================================
+// Registrar componentes adicionales
 app.component('InputSwitch', InputSwitch)
 
-// ====================================
-// 📍 DIRECTIVAS
-// ====================================
+// Directivas
 app.directive('tooltip', Tooltip)
 
 app.mount('#app')

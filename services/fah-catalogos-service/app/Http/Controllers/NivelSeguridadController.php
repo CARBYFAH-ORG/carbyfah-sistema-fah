@@ -1,5 +1,7 @@
 <?php
 
+// services\fah-catalogos-service\app\Http\Controllers\NivelSeguridadController.php
+
 namespace App\Http\Controllers;
 
 use App\Models\NivelSeguridad;
@@ -8,10 +10,7 @@ use Illuminate\Support\Facades\Validator;
 
 class NivelSeguridadController extends Controller
 {
-    /**
-     * Listar todos los niveles de seguridad
-     * GET /api/catalogos/niveles-seguridad
-     */
+    // Listar todos los niveles de seguridad
     public function index()
     {
         try {
@@ -31,10 +30,7 @@ class NivelSeguridadController extends Controller
         }
     }
 
-    /**
-     * Crear nuevo nivel de seguridad
-     * POST /api/catalogos/niveles-seguridad
-     */
+    // Crear nuevo nivel de seguridad
     public function store(Request $request)
     {
         try {
@@ -49,7 +45,7 @@ class NivelSeguridadController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Datos de entrada inválidos',
+                    'message' => 'Datos de entrada invalidos',
                     'errors' => $validator->errors()
                 ], 400);
             }
@@ -60,7 +56,7 @@ class NivelSeguridadController extends Controller
                 'nivel_numerico' => $request->nivel_numerico,
                 'requiere_autorizacion' => $request->requiere_autorizacion ?? false,
                 'tiempo_retencion_anos' => $request->tiempo_retencion_anos,
-                'created_by' => 1, // TODO: Obtener del usuario autenticado
+                'created_by' => 1,
                 'updated_by' => 1,
                 'version' => 1
             ]);
@@ -79,10 +75,7 @@ class NivelSeguridadController extends Controller
         }
     }
 
-    /**
-     * Obtener nivel de seguridad específico
-     * GET /api/catalogos/niveles-seguridad/{id}
-     */
+    // Obtener nivel de seguridad especifico
     public function show($id)
     {
         try {
@@ -109,10 +102,7 @@ class NivelSeguridadController extends Controller
         }
     }
 
-    /**
-     * Actualizar nivel de seguridad
-     * PUT /api/catalogos/niveles-seguridad/{id}
-     */
+    // Actualizar nivel de seguridad
     public function update(Request $request, $id)
     {
         try {
@@ -137,7 +127,7 @@ class NivelSeguridadController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Datos de entrada inválidos',
+                    'message' => 'Datos de entrada invalidos',
                     'errors' => $validator->errors()
                 ], 400);
             }
@@ -149,7 +139,7 @@ class NivelSeguridadController extends Controller
                 'requiere_autorizacion' => $request->requiere_autorizacion ?? false,
                 'tiempo_retencion_anos' => $request->tiempo_retencion_anos,
                 'is_active' => $request->is_active ?? true,
-                'updated_by' => 1, // TODO: Obtener del usuario autenticado
+                'updated_by' => 1,
                 'version' => $nivel->version + 1
             ]);
 
@@ -167,10 +157,7 @@ class NivelSeguridadController extends Controller
         }
     }
 
-    /**
-     * Eliminar nivel de seguridad (soft delete)
-     * DELETE /api/catalogos/niveles-seguridad/{id}
-     */
+    // Eliminar nivel de seguridad (soft delete)
     public function destroy($id)
     {
         try {
@@ -184,7 +171,7 @@ class NivelSeguridadController extends Controller
             }
 
             $nivel->update([
-                'deleted_by' => 1, // TODO: Obtener del usuario autenticado
+                'deleted_by' => 1,
             ]);
 
             $nivel->delete();

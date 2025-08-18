@@ -1,11 +1,9 @@
-/* =====================================
-   ESTILOS PARA CAMPO FORMULARIO UNIVERSAL - CARBYFAH
-   Extraído de CampoFormulario.vue y organizado por secciones
-   ===================================== */
+/* services\fah-admin-frontend\src\styles\components\formularios\campo-formulario.css */
 
-/* =====================================
-   CONTENEDOR PRINCIPAL DEL CAMPO
-   ===================================== */
+/* Estilos para campo formulario universal - CARBYFAH */
+/* Extraido de CampoFormulario.vue y organizado por secciones */
+
+/* Contenedor principal del campo */
 .contenedor-campo {
   @apply mb-4;
   position: relative;
@@ -25,9 +23,7 @@
   @apply w-full;
 }
 
-/* =====================================
-   ETIQUETAS Y MARCADORES
-   ===================================== */
+/* Etiquetas y marcadores */
 .etiqueta-campo {
   @apply block text-sm font-semibold mb-2;
   color: white !important;
@@ -46,9 +42,7 @@
   color: var(--fah-rojo-error);
 }
 
-/* =====================================
-   CAMPOS DE SWITCH BOOLEANO
-   ===================================== */
+/* Campos de switch booleano */
 .grupo-switch {
   @apply mt-2;
 }
@@ -89,9 +83,7 @@
   transition: color 0.2s ease;
 }
 
-/* =====================================
-   CONTROLES DE FORMULARIO BASE
-   ===================================== */
+/* Controles de formulario base */
 .fah-form-control {
   @apply w-full px-6 py-6 text-base bg-white border-2 rounded;
   border-color: var(--fah-gris-medio);
@@ -124,9 +116,7 @@
   transform: translateY(-1px);
 }
 
-/* =====================================
-   ESTADOS DE ERROR Y DESHABILITADO
-   ===================================== */
+/* Estados de error y deshabilitado */
 .fah-form-control-error {
   border-color: var(--fah-rojo-error) !important;
   box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.15) !important;
@@ -146,9 +136,7 @@
   opacity: 0.6;
 }
 
-/* =====================================
-   CAMPOS NUMÉRICOS (TRANSPARENTES)
-   ===================================== */
+/* Campos numericos */
 .fah-form-control-number {
   @apply w-full rounded;
   border: none !important;
@@ -189,9 +177,7 @@
   font-style: italic !important;
 }
 
-/* =====================================
-   CAMPOS DE SELECCIÓN
-   ===================================== */
+/* Campos de seleccion */
 .fah-form-control-select {
   cursor: pointer;
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%231B365D' viewBox='0 0 16 16'%3e%3cpath d='m7.247 4.86-4.796 5.481c-.566.647-.106 1.659.753 1.659h9.592a1 1 0 0 0 .753-1.659l-4.796-5.48a1 1 0 0 0-1.506 0z'/%3e%3c/svg%3e");
@@ -201,18 +187,14 @@
   padding-right: 40px;
 }
 
-/* =====================================
-   ÁREA DE TEXTO
-   ===================================== */
+/* Area de texto */
 .fah-form-control-textarea {
   resize: vertical;
   min-height: 120px;
   line-height: 1.5;
 }
 
-/* =====================================
-   CAMPOS DE FECHA
-   ===================================== */
+/* Campos de fecha */
 .fah-form-control-date {
   background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='%231B365D' viewBox='0 0 16 16'%3e%3cpath d='M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z'/%3e%3cpath d='M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z'/%3e%3c/svg%3e");
   background-repeat: no-repeat;
@@ -221,9 +203,7 @@
   padding-right: 40px;
 }
 
-/* =====================================
-   AUTOCOMPLETADO FORÁNEO (AZUL MILITAR)
-   ===================================== */
+/* Autocompletado foraneo */
 .fah-form-control-foraneo-autocompletado {
   border: none !important;
   background: transparent !important;
@@ -281,9 +261,7 @@
   padding: 0 !important;
 }
 
-/* =====================================
-   🎯 DROPDOWN PROFESIONAL - ESTILO VERDE CLARO ELEGANTE
-   ===================================== */
+/* Dropdown profesional - estilo verde claro elegante */
 
 /* Panel principal del dropdown */
 .fah-form-control-foraneo-autocompletado :deep(.p-autocomplete-panel) {
@@ -308,7 +286,7 @@
   overflow-y: auto !important;
 }
 
-/* Cada opción individual - ESTADO NORMAL (Verde claro bonito) */
+/* Cada opcion individual - estado normal */
 .fah-form-control-foraneo-autocompletado :deep(.p-autocomplete-item) {
   padding: 14px 16px !important;
   margin-bottom: 4px !important;
@@ -325,7 +303,7 @@
   overflow: hidden !important;
 }
 
-/* Estado HOVER - Cambio de color cuando el mouse pasa encima */
+/* Estado hover - cambio de color cuando el mouse pasa encima */
 .fah-form-control-foraneo-autocompletado :deep(.p-autocomplete-item:hover) {
   background: linear-gradient(135deg, #16a34a, #15803d) !important;
   color: white !important;
@@ -335,7 +313,7 @@
     0 0 0 1px rgba(255, 255, 255, 0.1) inset !important;
 }
 
-/* Opción seleccionada/activa */
+/* Opcion seleccionada/activa */
 .fah-form-control-foraneo-autocompletado
   :deep(.p-autocomplete-item.p-highlight) {
   background: linear-gradient(135deg, #059669, #047857) !important;
@@ -344,7 +322,7 @@
   box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3) !important;
 }
 
-/* Texto del código pequeño */
+/* Texto del codigo pequeno */
 .fah-form-control-foraneo-autocompletado :deep(.codigo-categoria) {
   font-size: 12px !important;
   margin-top: 4px !important;
@@ -353,7 +331,7 @@
   font-weight: 400 !important;
 }
 
-/* En hover, el código se vuelve blanco */
+/* En hover, el codigo se vuelve blanco */
 .fah-form-control-foraneo-autocompletado
   :deep(.p-autocomplete-item:hover .codigo-categoria) {
   color: rgba(255, 255, 255, 0.9) !important;
@@ -382,9 +360,7 @@
   background: linear-gradient(180deg, #16a34a, #15803d) !important;
 }
 
-/* =====================================
-   AUTOCOMPLETADO API (VERDE PAÍSES)
-   ===================================== */
+/* Autocompletado API para paises */
 .fah-form-control-autocompletado-api {
   border: none !important;
   background: transparent !important;
@@ -441,11 +417,9 @@
   padding: 0 !important;
 }
 
-/* =====================================
-   🎯 DROPDOWN API PAÍSES - ESTILO VERDE BONITO
-   ===================================== */
+/* Dropdown API paises - estilo verde bonito */
 
-/* Panel principal del dropdown para países API */
+/* Panel principal del dropdown para paises API */
 .fah-form-control-autocompletado-api :deep(.p-autocomplete-panel) {
   background: linear-gradient(145deg, #f0fdf4, #ecfdf5) !important;
   border: 2px solid #22c55e !important;
@@ -459,7 +433,7 @@
   animation: dropdownFadeIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
-/* Lista de opciones para países */
+/* Lista de opciones para paises */
 .fah-form-control-autocompletado-api :deep(.p-autocomplete-items) {
   padding: 8px !important;
   background: transparent !important;
@@ -468,7 +442,7 @@
   overflow-y: auto !important;
 }
 
-/* Cada opción de país - ESTADO NORMAL */
+/* Cada opcion de pais - estado normal */
 .fah-form-control-autocompletado-api :deep(.p-autocomplete-item) {
   padding: 14px 16px !important;
   margin-bottom: 4px !important;
@@ -485,7 +459,7 @@
   overflow: hidden !important;
 }
 
-/* Estado HOVER para países */
+/* Estado hover para paises */
 .fah-form-control-autocompletado-api :deep(.p-autocomplete-item:hover) {
   background: linear-gradient(135deg, #16a34a, #15803d) !important;
   color: white !important;
@@ -495,7 +469,7 @@
     0 0 0 1px rgba(255, 255, 255, 0.1) inset !important;
 }
 
-/* Opción seleccionada para países */
+/* Opcion seleccionada para paises */
 .fah-form-control-autocompletado-api :deep(.p-autocomplete-item.p-highlight) {
   background: linear-gradient(135deg, #059669, #047857) !important;
   color: white !important;
@@ -503,7 +477,7 @@
   box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3) !important;
 }
 
-/* Scrollbar para países API */
+/* Scrollbar para paises API */
 .fah-form-control-autocompletado-api
   :deep(.p-autocomplete-items::-webkit-scrollbar) {
   width: 6px !important;
@@ -526,9 +500,7 @@
   background: linear-gradient(180deg, #16a34a, #15803d) !important;
 }
 
-/* =====================================
-   OPCIONES DE DROPDOWN ORIGINALES (FALLBACK)
-   ===================================== */
+/* Opciones de dropdown originales */
 .opcion-foranea-autocompletado {
   @apply p-3 text-base flex flex-col;
   color: var(--fah-azul-principal);
@@ -572,17 +544,13 @@
   font-style: italic;
 }
 
-/* =====================================
-   INDICADORES DE CARGA
-   ===================================== */
+/* Indicadores de carga */
 .cargando-datos,
 .cargando-api {
   @apply flex items-center mt-2 px-2;
 }
 
-/* =====================================
-   CAMPOS CHECKBOX
-   ===================================== */
+/* Campos checkbox */
 .grupo-checkbox {
   @apply mt-2;
 }
@@ -622,9 +590,7 @@
   margin: 0;
 }
 
-/* =====================================
-   🎯 ANIMACIONES PROFESIONALES
-   ===================================== */
+/* Animaciones profesionales */
 .contenedor-campo {
   animation: fadeInUp 0.4s ease-out;
 }
@@ -640,7 +606,7 @@
   }
 }
 
-/* Animación para dropdown */
+/* Animacion para dropdown */
 @keyframes dropdownFadeIn {
   from {
     opacity: 0;
@@ -652,9 +618,7 @@
   }
 }
 
-/* =====================================
-   RESPONSIVE DESIGN
-   ===================================== */
+/* Responsive design */
 @media (max-width: 768px) {
   .col-span-6 {
     @apply w-full;
@@ -673,7 +637,7 @@
     @apply px-3 py-3;
   }
 
-  /* Dropdown móvil más pequeño */
+  /* Dropdown movil mas pequeno */
   .fah-form-control-foraneo-autocompletado :deep(.p-autocomplete-item),
   .fah-form-control-autocompletado-api :deep(.p-autocomplete-item) {
     padding: 12px 14px !important;
@@ -691,9 +655,7 @@
   }
 }
 
-/* =====================================
-   ACCESIBILIDAD
-   ===================================== */
+/* Accesibilidad */
 @media (prefers-reduced-motion: reduce) {
   .fah-form-control,
   .contenedor-checkbox,

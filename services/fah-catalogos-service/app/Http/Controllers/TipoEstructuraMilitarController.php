@@ -1,4 +1,5 @@
 <?php
+// services\fah-catalogos-service\app\Http\Controllers\TipoEstructuraMilitarController.php
 
 namespace App\Http\Controllers;
 
@@ -8,10 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 class TipoEstructuraMilitarController extends Controller
 {
-    /**
-     * Listar todos los tipos de estructura militar
-     * GET /api/catalogos/tipos-estructura-militar
-     */
+    // Listar todos los tipos de estructura militar
     public function index()
     {
         try {
@@ -31,10 +29,7 @@ class TipoEstructuraMilitarController extends Controller
         }
     }
 
-    /**
-     * Crear nuevo tipo de estructura militar
-     * POST /api/catalogos/tipos-estructura-militar
-     */
+    // Crear nuevo tipo de estructura militar
     public function store(Request $request)
     {
         try {
@@ -56,7 +51,7 @@ class TipoEstructuraMilitarController extends Controller
                 'codigo_tipo' => $request->codigo_tipo,
                 'nombre_tipo' => $request->nombre_tipo,
                 'nivel_organizacional' => $request->nivel_organizacional,
-                'created_by' => 1, // TODO: Obtener del usuario autenticado
+                'created_by' => 1,
                 'updated_by' => 1,
                 'version' => 1
             ]);
@@ -75,10 +70,7 @@ class TipoEstructuraMilitarController extends Controller
         }
     }
 
-    /**
-     * Obtener tipo de estructura militar específico
-     * GET /api/catalogos/tipos-estructura-militar/{id}
-     */
+    // Obtener tipo de estructura militar específico
     public function show($id)
     {
         try {
@@ -105,10 +97,7 @@ class TipoEstructuraMilitarController extends Controller
         }
     }
 
-    /**
-     * Actualizar tipo de estructura militar
-     * PUT /api/catalogos/tipos-estructura-militar/{id}
-     */
+    // Actualizar tipo de estructura militar
     public function update(Request $request, $id)
     {
         try {
@@ -141,7 +130,7 @@ class TipoEstructuraMilitarController extends Controller
                 'nombre_tipo' => $request->nombre_tipo,
                 'nivel_organizacional' => $request->nivel_organizacional,
                 'is_active' => $request->is_active ?? true,
-                'updated_by' => 1, // TODO: Obtener del usuario autenticado
+                'updated_by' => 1,
                 'version' => $tipo->version + 1
             ]);
 
@@ -159,10 +148,7 @@ class TipoEstructuraMilitarController extends Controller
         }
     }
 
-    /**
-     * Eliminar tipo de estructura militar (soft delete)
-     * DELETE /api/catalogos/tipos-estructura-militar/{id}
-     */
+    // Eliminar tipo de estructura militar (soft delete)
     public function destroy($id)
     {
         try {
@@ -176,7 +162,7 @@ class TipoEstructuraMilitarController extends Controller
             }
 
             $tipo->update([
-                'deleted_by' => 1, // TODO: Obtener del usuario autenticado
+                'deleted_by' => 1,
             ]);
 
             $tipo->delete();
@@ -194,10 +180,7 @@ class TipoEstructuraMilitarController extends Controller
         }
     }
 
-    /**
-     * Obtener tipos por nivel organizacional
-     * GET /api/catalogos/tipos-estructura-militar/por-nivel/{nivel}
-     */
+    // Obtener tipos por nivel organizacional
     public function porNivel($nivel)
     {
         try {

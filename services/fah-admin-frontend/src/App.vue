@@ -1,6 +1,12 @@
-<template>
+<!-- <template>
   <div id="app">
     <Toast />
+    <router-view />
+  </div>
+</template> -->
+
+<template>
+  <div id="app">
     <router-view />
   </div>
 </template>

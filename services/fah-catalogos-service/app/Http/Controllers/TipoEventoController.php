@@ -1,4 +1,5 @@
 <?php
+// services\fah-catalogos-service\app\Http\Controllers\TipoEventoController.php
 
 namespace App\Http\Controllers;
 
@@ -8,10 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 class TipoEventoController extends Controller
 {
-    /**
-     * Listar todos los tipos de evento
-     * GET /api/catalogos/tipos-evento
-     */
+    // Listar todos los tipos de evento
     public function index()
     {
         try {
@@ -31,10 +29,7 @@ class TipoEventoController extends Controller
         }
     }
 
-    /**
-     * Crear nuevo tipo de evento
-     * POST /api/catalogos/tipos-evento
-     */
+    // Crear nuevo tipo de evento
     public function store(Request $request)
     {
         try {
@@ -56,7 +51,7 @@ class TipoEventoController extends Controller
                 'codigo_evento' => $request->codigo_evento,
                 'nombre_evento' => $request->nombre_evento,
                 'requiere_aprobacion' => $request->requiere_aprobacion ?? false,
-                'created_by' => 1, // TODO: Obtener del usuario autenticado
+                'created_by' => 1,
                 'updated_by' => 1,
                 'version' => 1
             ]);
@@ -75,10 +70,7 @@ class TipoEventoController extends Controller
         }
     }
 
-    /**
-     * Obtener tipo de evento específico
-     * GET /api/catalogos/tipos-evento/{id}
-     */
+    // Obtener tipo de evento específico
     public function show($id)
     {
         try {
@@ -105,10 +97,7 @@ class TipoEventoController extends Controller
         }
     }
 
-    /**
-     * Actualizar tipo de evento
-     * PUT /api/catalogos/tipos-evento/{id}
-     */
+    // Actualizar tipo de evento
     public function update(Request $request, $id)
     {
         try {
@@ -141,7 +130,7 @@ class TipoEventoController extends Controller
                 'nombre_evento' => $request->nombre_evento,
                 'requiere_aprobacion' => $request->requiere_aprobacion ?? false,
                 'is_active' => $request->is_active ?? true,
-                'updated_by' => 1, // TODO: Obtener del usuario autenticado
+                'updated_by' => 1,
                 'version' => $tipo->version + 1
             ]);
 
@@ -159,10 +148,7 @@ class TipoEventoController extends Controller
         }
     }
 
-    /**
-     * Eliminar tipo de evento (soft delete)
-     * DELETE /api/catalogos/tipos-evento/{id}
-     */
+    // Eliminar tipo de evento (soft delete)
     public function destroy($id)
     {
         try {
@@ -176,7 +162,7 @@ class TipoEventoController extends Controller
             }
 
             $tipo->update([
-                'deleted_by' => 1, // TODO: Obtener del usuario autenticado
+                'deleted_by' => 1,
             ]);
 
             $tipo->delete();

@@ -1,6 +1,6 @@
+<!-- services\fah-admin-frontend\src\components\formularios\FormularioDinamico.vue -->
 <template>
-  <!-- FORMULARIO DINÁMICO UNIVERSAL - CARBYFAH -->
-  <!-- Motor inteligente para TODOS los 11 catálogos -->
+  <!-- Formulario dinamico universal -->
   <div class="contenedor-formulario-dinamico">
     <!-- Indicador de carga -->
     <div v-if="cargando" class="flex items-center justify-center py-8">
@@ -31,10 +31,10 @@
         </div>
       </Message>
 
-      <!-- Formulario dinámico -->
+      <!-- Formulario dinamico -->
       <form @submit.prevent="manejarEnvio" class="formulario-dinamico">
         <div class="grid grid-cols-12 gap-5">
-          <!-- Generar campos dinámicamente -->
+          <!-- Generar campos dinamicamente -->
           <CampoFormulario
             v-for="configuracionCampo in camposConfigurados"
             :key="configuracionCampo.nombre"
@@ -51,7 +51,7 @@
       </form>
     </div>
 
-    <!-- Error de configuración -->
+    <!-- Error de configuracion -->
     <div v-else class="p-5 text-center">
       <Message severity="warn" :closable="false">
         <div>
@@ -72,16 +72,13 @@
 
 <script>
 import { ref, computed, watch, onMounted } from "vue";
-import { useToast } from "primevue/usetoast";
+import { useToastFAH } from "@/composables/useToastFAH";
 
-// Componentes PrimeVue
 import ProgressSpinner from "primevue/progressspinner";
 import Message from "primevue/message";
 
-// Componentes propios
 import CampoFormulario from "./CampoFormulario.vue";
 
-// Composables y utilidades
 import { usarFormularioDinamico } from "@/composables/usarFormularioDinamico";
 import { useCatalogosStore } from "@/stores/catalogosStore";
 
@@ -133,8 +130,7 @@ export default {
   emits: ["enviado", "error", "cancelado"],
 
   setup(props, { emit }) {
-    // Composables
-    const toast = useToast();
+    const toast = useToastFAH();
     const catalogosStore = useCatalogosStore();
 
     const {
@@ -147,14 +143,12 @@ export default {
       limpiarErrores,
     } = usarFormularioDinamico();
 
-    // Estado reactivo
     const cargando = ref(false);
     const datosFormulario = ref({});
     const erroresValidacion = ref({});
     const configuracionEsquema = ref(null);
     const camposConfigurados = ref([]);
 
-    // Computed properties
     const nombreEsquema = computed(() => props.esquema);
 
     const esquemaValido = computed(() => {
@@ -173,7 +167,7 @@ export default {
       }
     });
 
-    // Obtener opciones para campos de selección
+    // Obtener opciones para campos de seleccion
     const obtenerOpcionesParaCampo = (configuracionCampo) => {
       if (
         configuracionCampo.tipo !== "seleccion" ||
@@ -229,7 +223,7 @@ export default {
       }
     };
 
-    // Esta función está lista para inicializar formulario, analizaremos CampoFormulario.vue para seguir el análisis
+    // Inicializar formulario
     const inicializarFormulario = async () => {
       cargando.value = true;
       limpiarErrores();
@@ -244,14 +238,8 @@ export default {
 
         configuracionEsquema.value = configuracion;
 
-        // ✅ CÓDIGO CORREGIDO:
         if (props.esquema === "grados") {
-          // 🔥 FUERZA LETAL: Siempre cargar categorías para grados
           await catalogosStore.loadCategoriasPersonal();
-          console.log(
-            "✅ Categorías cargadas para grados:",
-            catalogosStore.categoriasPersonal?.length
-          );
         }
 
         camposConfigurados.value = configuracion.campos
@@ -272,7 +260,7 @@ export default {
       }
     };
 
-    // Actualizar valor de campo específico
+    // Actualizar valor de campo especifico
     const actualizarCampo = (nombreCampo, nuevoValor) => {
       datosFormulario.value[nombreCampo] = nuevoValor;
 
@@ -281,11 +269,9 @@ export default {
       }
     };
 
-    // ✅ NUEVO: AUTO-LLENADO CUANDO SELECCIONA PAÍS
+    // Auto-llenado cuando selecciona pais
     const manejarPaisSeleccionado = (paisData) => {
-      console.log("🌍 País seleccionado para auto-llenado:", paisData);
-
-      // Mapear datos del país a campos del formulario
+      // Mapear datos del pais a campos del formulario
       const mapaAutollenado = {
         nombre_oficial: paisData.nombreOficial,
         codigo_iso3: paisData.codigoISO3,
@@ -297,9 +283,6 @@ export default {
       Object.keys(mapaAutollenado).forEach((nombreCampo) => {
         if (datosFormulario.value.hasOwnProperty(nombreCampo)) {
           datosFormulario.value[nombreCampo] = mapaAutollenado[nombreCampo];
-          console.log(
-            `🔄 Auto-llenado: ${nombreCampo} = ${mapaAutollenado[nombreCampo]}`
-          );
         }
       });
 
@@ -310,13 +293,11 @@ export default {
         }
       });
 
-      // Mostrar notificación de auto-llenado
-      toast.add({
-        severity: "success",
-        summary: "Auto-llenado completado",
-        detail: `Campos llenados automáticamente para ${paisData.nombre}`,
-        life: 3000,
-      });
+      // Mostrar notificacion de auto-llenado
+      toast.success(
+        "Auto-llenado completado",
+        `Campos llenados automáticamente para ${paisData.nombre}`
+      );
     };
 
     // Obtener etiqueta legible de un campo
@@ -339,7 +320,7 @@ export default {
       return resultadoValidacion.esValido;
     };
 
-    // Procesar envío del formulario
+    // Procesar envio del formulario
     const manejarEnvio = async () => {
       if (!validarFormulario()) {
         mostrarNotificacion("errorValidacion");
@@ -371,7 +352,7 @@ export default {
       }
     };
 
-    // Cancelar operación del formulario
+    // Cancelar operacion del formulario
     const cancelarFormulario = () => {
       datosFormulario.value = {};
       erroresValidacion.value = {};
@@ -413,20 +394,17 @@ export default {
     });
 
     return {
-      // Estado
       cargando,
       datosFormulario,
       erroresValidacion,
       configuracionEsquema,
       camposConfigurados,
 
-      // Computed
       nombreEsquema,
       esquemaValido,
       tieneErrores,
       mensajeCarga,
 
-      // Métodos
       actualizarCampo,
       manejarPaisSeleccionado,
       obtenerEtiquetaCampo,

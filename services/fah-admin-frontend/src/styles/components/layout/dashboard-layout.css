@@ -1,9 +1,11 @@
+/* services\fah-admin-frontend\src\styles\components\layout\dashboard-layout.css */
+
 /* Clases Tailwind personalizadas */
 .font-sans {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Breadcrumb más compacto */
+/* Breadcrumb mas compacto */
 .breadcrumb-compact {
   @apply bg-white px-7 py-1 border-b border-gray-300 shadow-sm backdrop-blur-md flex-shrink-0;
 }
@@ -25,7 +27,7 @@
   @apply bg-blue-400/50;
 }
 
-/* Animación de entrada */
+/* Animacion de entrada */
 .dashboard-layout {
   animation: fadeIn 0.5s ease;
 }
@@ -39,9 +41,9 @@
   }
 }
 
-/* Clase para contenido expandido (cuando sidebar está colapsado) */
+/* Clase para contenido expandido (cuando sidebar esta colapsado) */
 .content-expanded {
-  /* Estilos adicionales cuando sidebar está colapsado si los necesitas */
+  /* Estilos adicionales cuando sidebar esta colapsado si los necesitas */
 }
 
 /* Responsive adjustments */

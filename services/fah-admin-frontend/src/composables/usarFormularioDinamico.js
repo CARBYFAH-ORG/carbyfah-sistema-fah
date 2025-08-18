@@ -1,6 +1,7 @@
-// COMPOSABLE FORMULARIO DINÁMICO - CARBYFAH
-// Lógica reutilizable para todos los formularios CRUD
-//C:\FAH\services\fah-admin-frontend\src\composables\usarFormularioDinamico.js
+// services\fah-admin-frontend\src\composables\usarFormularioDinamico.js
+
+// Composable formulario dinamico - CARBYFAH
+// Logica reutilizable para todos los formularios CRUD
 
 import { ref, computed } from 'vue'
 import {
@@ -10,7 +11,7 @@ import {
     CONFIGURACION_GLOBAL
 } from '@/config/esquemaCatalogos'
 
-// 🏛️ AGREGADO: Soporte para esquemas de organización
+// Soporte para esquemas de organizacion
 import {
     obtenerEsquema as obtenerEsquemaOrganizacion,
     generarEtiquetaAmigable as generarEtiquetaOrganizacion,
@@ -19,9 +20,7 @@ import {
 
 import { useCatalogosStore } from '@/stores/catalogosStore'
 
-/**
- * 🏛️ NUEVA: Función para detectar tipo de esquema
- */
+// Funcion para detectar tipo de esquema
 const detectarTipoEsquema = (nombreTabla) => {
     const esquemasOrganizacion = [
         'departamentos',
@@ -36,9 +35,7 @@ const detectarTipoEsquema = (nombreTabla) => {
     return esquemasOrganizacion.includes(nombreTabla) ? 'organizacion' : 'catalogos'
 }
 
-/**
- * 🏛️ NUEVA: Función universal para obtener esquema
- */
+// Funcion universal para obtener esquema
 const obtenerEsquemaUniversal = (nombreTabla) => {
     const tipoEsquema = detectarTipoEsquema(nombreTabla)
 
@@ -49,10 +46,7 @@ const obtenerEsquemaUniversal = (nombreTabla) => {
     }
 }
 
-/**
- * Composable principal para manejar formularios dinámicos
- * Proporciona toda la lógica necesaria para CRUD de catálogos
- */
+// Proporciona toda la logica necesaria para CRUD de catalogos
 export const usarFormularioDinamico = () => {
     // Estado reactivo
     const cargandoEsquema = ref(false)
@@ -67,32 +61,32 @@ export const usarFormularioDinamico = () => {
     const esEsquemaValido = computed(() => {
         if (!esquemaActual.value) return false
 
-        // 🏛️ AGREGADO: Validar según el tipo de esquema
+        // Validar segun el tipo de esquema
         const tipoEsquema = detectarTipoEsquema(esquemaActual.value.tabla)
 
         if (tipoEsquema === 'organizacion') {
-            // Para organización, verificar que existe la configuración
+            // Para organizacion, verificar que existe la configuracion
             return esquemaActual.value !== null
         } else {
-            // Para catálogos, usar validación original
+            // Para catalogos, usar validacion original
             const validacion = validarEsquema(esquemaActual.value.tabla)
             return validacion.valido
         }
     })
 
-    // Configurar esquema desde configuración
+    // Configurar esquema desde configuracion
     const configurarEsquema = async (nombreTabla) => {
         cargandoEsquema.value = true
 
         try {
-            // 🏛️ ACTUALIZADO: Usar función universal
+            // Usar funcion universal
             const esquema = obtenerEsquemaUniversal(nombreTabla)
 
             if (!esquema) {
                 return null
             }
 
-            // 🏛️ ACTUALIZADO: Validar según el tipo
+            // Validar segun el tipo
             const tipoEsquema = detectarTipoEsquema(nombreTabla)
 
             if (tipoEsquema === 'catalogos') {
@@ -115,7 +109,7 @@ export const usarFormularioDinamico = () => {
         }
     }
 
-    // 🏛️ ACTUALIZADO: Esta función ahora soporta ambos tipos de esquemas
+    // Esta funcion ahora soporta ambos tipos de esquemas
     const analizarConfiguracionCampo = (configuracionCampo, nombreTabla = null) => {
         // Si ya es un objeto, devolverlo directamente
         if (typeof configuracionCampo === 'object' && configuracionCampo !== null) {
@@ -135,7 +129,7 @@ export const usarFormularioDinamico = () => {
 
         const [nombre, tipo, ...opciones] = partes
 
-        // 🏛️ AGREGADO: Detectar tipo de esquema
+        // Detectar tipo de esquema
         const tipoEsquema = nombreTabla ? detectarTipoEsquema(nombreTabla) : 'catalogos'
 
         const configuracion = {
@@ -151,7 +145,7 @@ export const usarFormularioDinamico = () => {
             columnas: 12
         }
 
-        // Procesamiento de opciones (MANTENER CÓDIGO ORIGINAL)
+        // Procesamiento de opciones
         for (let i = 0; i < opciones.length; i++) {
             const opcion = opciones[i]
 
@@ -206,7 +200,7 @@ export const usarFormularioDinamico = () => {
             }
         }
 
-        // Configurar columnas según el tipo (MANTENER LÓGICA ORIGINAL)
+        // Configurar columnas segun el tipo
         if (tipo === 'area_texto') {
             configuracion.columnas = 12
         } else if (tipo === 'booleano') {
@@ -221,9 +215,9 @@ export const usarFormularioDinamico = () => {
             configuracion.columnas = 6
         }
 
-        // Configuración de ayuda automática (MANTENER CÓDIGO ORIGINAL)
+        // Configuracion de ayuda automatica
         if (configuracion.tablaReferencia) {
-            configuracion.ayuda = "Este es un campo de búsqueda inteligente"
+            configuracion.ayuda = "Este es un campo de busqueda inteligente"
         }
 
         if (configuracion.patron) {
@@ -235,8 +229,8 @@ export const usarFormularioDinamico = () => {
             const rangoTexto = configuracion.minimo !== undefined && configuracion.maximo !== undefined
                 ? `Entre ${configuracion.minimo} y ${configuracion.maximo}`
                 : configuracion.minimo !== undefined
-                    ? `Mínimo: ${configuracion.minimo}`
-                    : `Máximo: ${configuracion.maximo}`
+                    ? `Minimo: ${configuracion.minimo}`
+                    : `Maximo: ${configuracion.maximo}`
 
             configuracion.ayuda = (configuracion.ayuda ? configuracion.ayuda + '. ' : '') + rangoTexto
         }
@@ -246,148 +240,146 @@ export const usarFormularioDinamico = () => {
         return configuracion
     }
 
-    // Generar etiqueta amigable desde nombre de campo (MANTENER CÓDIGO ORIGINAL)
+    // Generar etiqueta amigable desde nombre de campo
     const generarEtiquetaAmigable = (nombreCampo) => {
         const mapeoEtiquetas = {
-            codigo: 'Código',
+            codigo: 'Codigo',
             nombre: 'Nombre',
             abreviatura: 'Abreviatura',
-            codigo_categoria: 'Código Categoría',
-            nombre_categoria: 'Nombre Categoría',
-            orden_jerarquico: 'Orden Jerárquico',
-            codigo_especialidad: 'Código Especialidad',
+            codigo_categoria: 'Codigo Categoria',
+            nombre_categoria: 'Nombre Categoria',
+            orden_jerarquico: 'Orden Jerarquico',
+            codigo_especialidad: 'Codigo Especialidad',
             nombre_especialidad: 'Nombre Especialidad',
             insignia_url: 'URL Insignia',
-            categoria_personal_id: 'Categoría Personal',
-            codigo_grado: 'Código Grado',
+            categoria_personal_id: 'Categoria Personal',
+            codigo_grado: 'Codigo Grado',
             nombre_grado: 'Nombre Grado',
-            nivel_numerico: 'Nivel Numérico',
-            requiere_autorizacion: 'Requiere Autorización',
-            tiempo_retencion_anos: 'Tiempo Retención (años)',
+            nivel_numerico: 'Nivel Numerico',
+            requiere_autorizacion: 'Requiere Autorizacion',
+            tiempo_retencion_anos: 'Tiempo Retencion (anos)',
             nombre_oficial: 'Nombre Oficial',
-            codigo_iso3: 'Código ISO3',
-            codigo_telefono: 'Código Teléfono',
+            codigo_iso3: 'Codigo ISO3',
+            codigo_telefono: 'Codigo Telefono',
             moneda_oficial: 'Moneda Oficial',
             permite_operaciones: 'Permite Operaciones',
             es_estado_final: 'Es Estado Final',
-            requiere_justificacion: 'Requiere Justificación',
-            codigo_tipo: 'Código Tipo',
+            requiere_justificacion: 'Requiere Justificacion',
+            codigo_tipo: 'Codigo Tipo',
             nombre_tipo: 'Nombre Tipo',
             nivel_organizacional: 'Nivel Organizacional',
             nivel_autoridad: 'Nivel Autoridad',
-            codigo_evento: 'Código Evento',
+            codigo_evento: 'Codigo Evento',
             nombre_evento: 'Nombre Evento',
-            requiere_aprobacion: 'Requiere Aprobación'
+            requiere_aprobacion: 'Requiere Aprobacion'
         }
 
         return mapeoEtiquetas[nombreCampo] || formatearNombreCampo(nombreCampo)
     }
 
-    // Formatear nombre de campo como etiqueta (MANTENER CÓDIGO ORIGINAL)
+    // Formatear nombre de campo como etiqueta
     const formatearNombreCampo = (nombreCampo) => {
         return nombreCampo
             .replace(/_/g, ' ')
             .replace(/\b\w/g, l => l.toUpperCase())
     }
 
-    // Generar placeholder para campo específico por esquema (MANTENER CÓDIGO ORIGINAL COMPLETO)
+    // Generar placeholder para campo especifico por esquema
     const generarPlaceholder = (nombreCampo, tipoCampo, esquemaTabla = null) => {
         // Los campos booleanos (checkboxes) no necesitan placeholder
         if (tipoCampo === 'booleano') {
             return ''
         }
 
-        // Los campos de autocompletado foráneo tienen placeholder especial
+        // Los campos de autocompletado foraneo tienen placeholder especial
         if (tipoCampo === 'foraneo_autocompletado') {
             return `Buscar y seleccionar ${generarEtiquetaAmigable(nombreCampo).toLowerCase()}...`
         }
 
-        // Placeholders específicos por esquema
+        // Placeholders especificos por esquema
         const placeholdersEspecificos = {
-            // TIPOS DE GÉNERO
+            // Tipos de genero
             tipos_genero: {
                 codigo: 'Ej: M, F',
                 nombre: 'Ej: Masculino, Femenino',
                 abreviatura: 'Ej: M, F'
             },
 
-            // CATEGORÍAS PERSONAL
+            // Categorias personal
             categorias_personal: {
                 codigo_categoria: 'Ej: OFICIAL, SUBOFICIAL, TROPA',
                 nombre_categoria: 'Ej: Oficial, Suboficial, Tropa',
-                orden_jerarquico: 'Ej: 1 (más alto), 2, 3...'
+                orden_jerarquico: 'Ej: 1 (mas alto), 2, 3...'
             },
 
-            // ESPECIALIDADES
+            // Especialidades
             especialidades: {
                 codigo_especialidad: 'Ej: AVI, COM, INT, LOG',
-                nombre_especialidad: 'Ej: Aviación, Comunicaciones, Inteligencia',
+                nombre_especialidad: 'Ej: Aviacion, Comunicaciones, Inteligencia',
                 insignia_url: 'Ej: https://fah.mil.hn/insignias/aviacion.png'
             },
 
-            // GRADOS
+            // Grados
             grados: {
                 codigo_grado: 'Ej: GRL, CNL, TTE-CNL, MYR',
                 nombre_grado: 'Ej: General, Coronel, Teniente Coronel',
                 orden_jerarquico: 'Ej: 1 (General), 2 (Coronel)...',
                 abreviatura: 'Ej: GRL, CNL, TTE-CNL',
-                categoria_personal_id: 'Seleccionar categoría personal...'
+                categoria_personal_id: 'Seleccionar categoria personal...'
             },
 
-            // NIVELES PRIORIDAD
+            // Niveles prioridad
             niveles_prioridad: {
                 codigo: 'Ej: BAJA, MEDIA, ALTA, CRITICA',
-                nombre: 'Ej: Baja, Media, Alta, Crítica',
-                nivel_numerico: 'Ej: 1 (Baja), 2 (Media), 3 (Alta), 4 (Crítica)'
+                nombre: 'Ej: Baja, Media, Alta, Critica',
+                nivel_numerico: 'Ej: 1 (Baja), 2 (Media), 3 (Alta), 4 (Critica)'
             },
 
-            // NIVELES SEGURIDAD
+            // Niveles seguridad
             niveles_seguridad: {
                 codigo: 'Ej: PUBLICO, RESTRINGIDO, CONFIDENCIAL',
-                nombre: 'Ej: Público, Restringido, Confidencial, Secreto',
-                nivel_numerico: 'Ej: 1 (Público), 2 (Restringido), 3 (Confidencial)',
-                tiempo_retencion_anos: 'Ej: 5, 10, 25 años'
+                nombre: 'Ej: Publico, Restringido, Confidencial, Secreto',
+                nivel_numerico: 'Ej: 1 (Publico), 2 (Restringido), 3 (Confidencial)',
+                tiempo_retencion_anos: 'Ej: 5, 10, 25 anos'
             },
 
-            // PAÍSES
+            // Paises
             paises: {
                 nombre: 'Ej: Honduras, Guatemala, El Salvador',
-                nombre_oficial: 'Ej: República de Honduras',
+                nombre_oficial: 'Ej: Republica de Honduras',
                 codigo_iso3: 'Ej: HND, GTM, SLV (3 letras)',
                 codigo_telefono: 'Ej: +504, +502, +503',
-                moneda_oficial: 'Ej: Lempira, Quetzal, Dólar'
+                moneda_oficial: 'Ej: Lempira, Quetzal, Dolar'
             },
 
-            // TIPOS ESTADO GENERAL
+            // Tipos estado general
             tipos_estado_general: {
                 codigo: 'Ej: ACTIVO, INACTIVO, SUSPENDIDO',
-                nombre: 'Ej: Activo, Inactivo, Suspendido, En Revisión'
-                // permite_operaciones, es_estado_final, requiere_justificacion son booleanos - no necesitan placeholder
+                nombre: 'Ej: Activo, Inactivo, Suspendido, En Revision'
             },
 
-            // TIPOS ESTRUCTURA MILITAR
+            // Tipos estructura militar
             tipos_estructura_militar: {
                 codigo_tipo: 'Ej: CMD, BASE, ESC, COMP',
-                nombre_tipo: 'Ej: Comandancia, Base Aérea, Escuadrón',
-                nivel_organizacional: 'Ej: 1 (Comandancia), 2 (Base), 3 (Escuadrón)'
+                nombre_tipo: 'Ej: Comandancia, Base Aerea, Escuadron',
+                nivel_organizacional: 'Ej: 1 (Comandancia), 2 (Base), 3 (Escuadron)'
             },
 
-            // TIPOS EVENTO
+            // Tipos evento
             tipos_evento: {
                 codigo_evento: 'Ej: CAP, MIS, PER, ENT',
-                nombre_evento: 'Ej: Capacitación, Misión, Permiso, Entrenamiento'
-                // requiere_aprobacion es booleano - no necesita placeholder
+                nombre_evento: 'Ej: Capacitacion, Mision, Permiso, Entrenamiento'
             },
 
-            // TIPOS JERARQUÍA
+            // Tipos jerarquia
             tipos_jerarquia: {
                 codigo_tipo: 'Ej: CMD-DIR, CMD-OPE, CMD-ADM',
                 nombre_tipo: 'Ej: Comando Directo, Comando Operacional',
-                nivel_autoridad: 'Ej: 1 (Máxima), 2 (Alta), 3 (Media)'
+                nivel_autoridad: 'Ej: 1 (Maxima), 2 (Alta), 3 (Media)'
             }
         }
 
-        // Si hay esquema específico, buscar placeholder específico
+        // Si hay esquema especifico, buscar placeholder especifico
         if (esquemaTabla && placeholdersEspecificos[esquemaTabla]) {
             const placeholderEspecifico = placeholdersEspecificos[esquemaTabla][nombreCampo]
             if (placeholderEspecifico) {
@@ -395,24 +387,24 @@ export const usarFormularioDinamico = () => {
             }
         }
 
-        // Fallback a placeholders genéricos por tipo de campo
+        // Fallback a placeholders genericos por tipo de campo
         switch (tipoCampo) {
             case 'texto':
                 return `Ingrese ${generarEtiquetaAmigable(nombreCampo).toLowerCase()}`
             case 'numero':
-                return `Ingrese valor numérico`
+                return `Ingrese valor numerico`
             case 'area_texto':
-                return `Ingrese descripción detallada`
+                return `Ingrese descripcion detallada`
             case 'fecha':
                 return 'Seleccionar fecha'
             case 'seleccion':
-                return 'Seleccionar opción'
+                return 'Seleccionar opcion'
             default:
                 return `Ingrese ${generarEtiquetaAmigable(nombreCampo).toLowerCase()}`
         }
     }
 
-    // Obtener valores por defecto para un esquema (MANTENER CÓDIGO ORIGINAL)
+    // Obtener valores por defecto para un esquema
     const obtenerValoresDefecto = (esquema) => {
         const valores = {}
 
@@ -449,7 +441,7 @@ export const usarFormularioDinamico = () => {
         return valores
     }
 
-    // Validar datos del formulario (MANTENER CÓDIGO ORIGINAL)
+    // Validar datos del formulario
     const validarDatos = (esquema, datos) => {
         const errores = {}
         let esValido = true
@@ -470,23 +462,23 @@ export const usarFormularioDinamico = () => {
 
             // Validaciones adicionales solo si hay valor
             if (valor !== null && valor !== undefined && valor !== '') {
-                // Validar longitud máxima
+                // Validar longitud maxima
                 if (config.longitudMaxima && typeof valor === 'string' && valor.length > config.longitudMaxima) {
-                    errores[config.nombre] = `Máximo ${config.longitudMaxima} caracteres`
+                    errores[config.nombre] = `Maximo ${config.longitudMaxima} caracteres`
                     esValido = false
                 }
 
-                // Validar rango numérico
+                // Validar rango numerico
                 if (config.tipo === 'numero') {
                     const numValor = Number(valor)
 
                     if (config.minimo && numValor < config.minimo) {
-                        errores[config.nombre] = `Valor mínimo: ${config.minimo}`
+                        errores[config.nombre] = `Valor minimo: ${config.minimo}`
                         esValido = false
                     }
 
                     if (config.maximo && numValor > config.maximo) {
-                        errores[config.nombre] = `Valor máximo: ${config.maximo}`
+                        errores[config.nombre] = `Valor maximo: ${config.maximo}`
                         esValido = false
                     }
                 }
@@ -500,7 +492,7 @@ export const usarFormularioDinamico = () => {
         return resultado
     }
 
-    // Formatear datos para enviar al backend (MANTENER CÓDIGO ORIGINAL)
+    // Formatear datos para enviar al backend
     const formatearParaBackend = (esquema, datos) => {
         const datosFormateados = { ...datos }
 
@@ -511,7 +503,7 @@ export const usarFormularioDinamico = () => {
 
             const valor = datosFormateados[config.nombre]
 
-            // Formatear según tipo
+            // Formatear segun tipo
             switch (config.tipo) {
                 case 'numero':
                     if (valor !== null && valor !== undefined && valor !== '') {
@@ -535,11 +527,11 @@ export const usarFormularioDinamico = () => {
         return datosFormateados
     }
 
-    // Esta función está lista para cargar dependencias, analizaremos catalogosStore.js para seguir el análisis (MANTENER CÓDIGO ORIGINAL)
+    // Esta funcion esta lista para cargar dependencias
     const cargarDependenciasReferencia = async (esquema) => {
         const catalogosStore = useCatalogosStore()
 
-        // 🛡️ NUEVO: Agregar soporte para organización
+        // Agregar soporte para organizacion
         const { useOrganizacionStore } = await import('@/stores/organizacionStore')
         const organizacionStore = useOrganizacionStore()
 
@@ -558,7 +550,7 @@ export const usarFormularioDinamico = () => {
         for (const tablaReferencia of dependenciasDetectadas) {
             try {
                 switch (tablaReferencia) {
-                    // 🛡️ CATÁLOGOS EXISTENTES (mantener)
+                    // Catalogos existentes
                     case 'categorias_personal':
                         await catalogosStore.loadCategoriasPersonal()
                         break
@@ -578,7 +570,7 @@ export const usarFormularioDinamico = () => {
                         await catalogosStore.loadTiposEstructuraMilitar()
                         break
 
-                    // 🛡️ NUEVAS DEPENDENCIAS DE ORGANIZACIÓN
+                    // Nuevas dependencias de organizacion
                     case 'departamentos':
                         await organizacionStore.loadDepartamentos()
                         break
@@ -610,12 +602,13 @@ export const usarFormularioDinamico = () => {
             }
         }
     }
-    // Limpiar errores de validación (MANTENER CÓDIGO ORIGINAL)
+
+    // Limpiar errores de validacion
     const limpiarErrores = () => {
         erroresValidacionActual.value = {}
     }
 
-    // Obtener configuración de campo específico (MANTENER CÓDIGO ORIGINAL)
+    // Obtener configuracion de campo especifico
     const obtenerConfiguracionCampo = (esquema, nombreCampo) => {
         const configuracionCampo = esquema.campos.find(campo => {
             const config = analizarConfiguracionCampo(campo)
@@ -625,18 +618,18 @@ export const usarFormularioDinamico = () => {
         return configuracionCampo ? analizarConfiguracionCampo(configuracionCampo) : null
     }
 
-    // Generar ID único para campos (MANTENER CÓDIGO ORIGINAL)
+    // Generar ID unico para campos
     const generarIdCampo = (nombreCampo) => {
         return `campo-${nombreCampo}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
     }
 
-    // Verificar si un campo es de tipo selección con referencia (MANTENER CÓDIGO ORIGINAL)
+    // Verificar si un campo es de tipo seleccion con referencia
     const esCampoReferencia = (configuracionCampo) => {
         const config = analizarConfiguracionCampo(configuracionCampo)
         return config && config.tipo === 'seleccion' && config.tablaReferencia
     }
 
-    // Obtener nombre amigable para mostrar en notificaciones (MANTENER CÓDIGO ORIGINAL)
+    // Obtener nombre amigable para mostrar en notificaciones
     const obtenerNombreAmigable = (datos, esquema) => {
         const camposPrioridad = [
             'nombre',
@@ -680,7 +673,7 @@ export const usarFormularioDinamico = () => {
         formatearParaBackend,
         limpiarErrores,
 
-        // 🏛️ AGREGADO: Nuevas funciones de soporte
+        // Nuevas funciones de soporte
         detectarTipoEsquema,
         obtenerEsquemaUniversal,
 
@@ -693,7 +686,7 @@ export const usarFormularioDinamico = () => {
         esCampoReferencia,
         obtenerNombreAmigable,
 
-        // Configuración global
+        // Configuracion global
         configuracionGlobal: CONFIGURACION_GLOBAL
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+// services\fah-catalogos-service\app\Http\Controllers\EspecialidadController.php
+
 namespace App\Http\Controllers;
 
 use App\Models\Especialidad;
@@ -8,10 +10,7 @@ use Illuminate\Support\Facades\Validator;
 
 class EspecialidadController extends Controller
 {
-    /**
-     * Listar todas las especialidades
-     * GET /api/catalogos/especialidades
-     */
+    // Listar todas las especialidades
     public function index()
     {
         try {
@@ -33,10 +32,7 @@ class EspecialidadController extends Controller
         }
     }
 
-    /**
-     * Crear nueva especialidad
-     * POST /api/catalogos/especialidades
-     */
+    // Crear nueva especialidad
     public function store(Request $request)
     {
         try {
@@ -49,7 +45,7 @@ class EspecialidadController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Datos de entrada inválidos',
+                    'message' => 'Datos de entrada invalidos',
                     'errors' => $validator->errors()
                 ], 400);
             }
@@ -58,7 +54,7 @@ class EspecialidadController extends Controller
                 'codigo_especialidad' => $request->codigo_especialidad,
                 'nombre_especialidad' => $request->nombre_especialidad,
                 'insignia_url' => $request->insignia_url,
-                'created_by' => 1, // TODO: Obtener del usuario autenticado
+                'created_by' => 1,
                 'updated_by' => 1,
                 'version' => 1
             ]);
@@ -77,10 +73,7 @@ class EspecialidadController extends Controller
         }
     }
 
-    /**
-     * Obtener especialidad específica
-     * GET /api/catalogos/especialidades/{id}
-     */
+    // Obtener especialidad especifica
     public function show($id)
     {
         try {
@@ -107,10 +100,7 @@ class EspecialidadController extends Controller
         }
     }
 
-    /**
-     * Actualizar especialidad
-     * PUT /api/catalogos/especialidades/{id}
-     */
+    // Actualizar especialidad
     public function update(Request $request, $id)
     {
         try {
@@ -133,7 +123,7 @@ class EspecialidadController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Datos de entrada inválidos',
+                    'message' => 'Datos de entrada invalidos',
                     'errors' => $validator->errors()
                 ], 400);
             }
@@ -143,7 +133,7 @@ class EspecialidadController extends Controller
                 'nombre_especialidad' => $request->nombre_especialidad,
                 'insignia_url' => $request->insignia_url,
                 'is_active' => $request->is_active ?? true,
-                'updated_by' => 1, // TODO: Obtener del usuario autenticado
+                'updated_by' => 1,
                 'version' => $especialidad->version + 1
             ]);
 
@@ -161,10 +151,7 @@ class EspecialidadController extends Controller
         }
     }
 
-    /**
-     * Eliminar especialidad (soft delete)
-     * DELETE /api/catalogos/especialidades/{id}
-     */
+    // Eliminar especialidad (soft delete)
     public function destroy($id)
     {
         try {
@@ -178,7 +165,7 @@ class EspecialidadController extends Controller
             }
 
             $especialidad->update([
-                'deleted_by' => 1, // TODO: Obtener del usuario autenticado
+                'deleted_by' => 1,
             ]);
 
             $especialidad->delete();

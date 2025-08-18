@@ -1,9 +1,5 @@
+<!-- services\fah-admin-frontend\src\components\formularios\ModalFormularioOrganizacion.vue -->
 <template>
-  <!-- ============================================ -->
-  <!-- MODAL WRAPPER ESPECIALIZADO PARA ORGANIZACIÓN -->
-  <!-- Integra FormularioDinamicoOrganizacion con Dialog -->
-  <!-- Modos: crear | editar | eliminar -->
-  <!-- ============================================ -->
   <div>
     <Dialog
       v-model:visible="esVisible"
@@ -39,7 +35,7 @@
         </div>
       </template>
 
-      <!-- Contenido del formulario dinámico ORGANIZACIÓN -->
+      <!-- Contenido del formulario dinamico organizacion -->
       <div class="contenido-modal bg-gray-700 p-0">
         <FormularioDinamicoOrganizacion
           ref="formularioDinamicoRef"
@@ -54,10 +50,10 @@
         />
       </div>
 
-      <!-- Footer con botones especializados organización -->
+      <!-- Footer con botones especializados organizacion -->
       <template #footer>
         <div class="flex gap-3 justify-end items-center p-0 bg-gray-800">
-          <!-- Botón Cancelar -->
+          <!-- Boton Cancelar -->
           <Button
             label="Cancelar"
             icon="pi pi-times"
@@ -67,7 +63,7 @@
             unstyled
           />
 
-          <!-- Botón para Crear (Verde) -->
+          <!-- Boton para Crear (Verde) -->
           <Button
             v-if="modo === 'crear'"
             :label="etiquetaBotonAccion"
@@ -79,7 +75,7 @@
             unstyled
           />
 
-          <!-- Botón para Editar (Naranja) -->
+          <!-- Boton para Editar (Naranja) -->
           <Button
             v-else-if="modo === 'editar'"
             :label="etiquetaBotonAccion"
@@ -91,7 +87,7 @@
             unstyled
           />
 
-          <!-- Botón para Eliminar (Red) -->
+          <!-- Boton para Eliminar (Red) -->
           <Button
             v-else-if="modo === 'eliminar'"
             :label="etiquetaBotonAccion"
@@ -110,16 +106,13 @@
 
 <script>
 import { ref, computed, watch } from "vue";
-import { useToast } from "primevue/usetoast";
+import { useToastFAH } from "@/composables/useToastFAH";
 
-// Componentes PrimeVue
 import Dialog from "primevue/dialog";
 import Button from "primevue/button";
 
-// Componente propio ESPECIALIZADO
 import FormularioDinamicoOrganizacion from "./FormularioDinamicoOrganizacion.vue";
 
-// Store y configuración específicos para organización
 import { useOrganizacionStore } from "@/stores/organizacionStore";
 import {
   obtenerEsquema,
@@ -132,7 +125,7 @@ export default {
   components: {
     Dialog,
     Button,
-    FormularioDinamicoOrganizacion, // ✅ COMPONENTE ESPECIALIZADO
+    FormularioDinamicoOrganizacion,
   },
 
   props: {
@@ -162,23 +155,13 @@ export default {
   emits: ["update:visible", "guardado", "eliminado", "cancelado", "error"],
 
   setup(props, { emit }) {
-    // =====================================
-    // COMPOSABLES ESPECÍFICOS ORGANIZACIÓN
-    // =====================================
     const organizacionStore = useOrganizacionStore();
-    const toast = useToast();
+    const toast = useToastFAH();
 
-    // =====================================
-    // ESTADO REACTIVO
-    // =====================================
     const cargando = ref(false);
     const formularioValido = ref(true);
     const datosFormulario = ref({});
     const formularioDinamicoRef = ref(null);
-
-    // =====================================
-    // COMPUTED PROPERTIES
-    // =====================================
 
     // Manejar visibilidad del modal con v-model
     const esVisible = computed({
@@ -186,12 +169,12 @@ export default {
       set: (valor) => emit("update:visible", valor),
     });
 
-    // Obtener configuración del esquema
+    // Obtener configuracion del esquema
     const configuracionEsquema = computed(() => {
       return obtenerEsquema(props.esquema);
     });
 
-    // Generar encabezado del modal según modo
+    // Generar encabezado del modal segun modo
     const encabezadoModal = computed(() => {
       if (!configuracionEsquema.value) return "Formulario";
 
@@ -205,7 +188,7 @@ export default {
       return `${accion} ${configuracionEsquema.value.titulo}`;
     });
 
-    // Título principal del modal
+    // Titulo principal del modal
     const tituloModal = computed(() => {
       if (!configuracionEsquema.value) return "Formulario";
 
@@ -219,7 +202,7 @@ export default {
       return `${accion} ${configuracionEsquema.value.titulo}`;
     });
 
-    // Subtítulo descriptivo del modal
+    // Subtitulo descriptivo del modal
     const subtituloModal = computed(() => {
       const mensajes = {
         crear: "Complete los campos requeridos para crear un nuevo registro",
@@ -240,7 +223,7 @@ export default {
       return configuracionEsquema.value?.ancho || "600px";
     });
 
-    // Etiqueta del botón de acción principal
+    // Etiqueta del boton de accion principal
     const etiquetaBotonAccion = computed(() => {
       const etiquetas = {
         crear: "Crear",
@@ -251,7 +234,7 @@ export default {
       return etiquetas[props.modo] || "Guardar";
     });
 
-    // Icono del botón de acción principal
+    // Icono del boton de accion principal
     const iconoBotonAccion = computed(() => {
       const iconos = {
         crear: "pi pi-plus",
@@ -262,7 +245,7 @@ export default {
       return iconos[props.modo] || "pi pi-save";
     });
 
-    // Clase CSS del icono según modo (TEMA CATÁLOGOS)
+    // Clase CSS del icono segun modo
     const claseIconoSegunModo = computed(() => {
       const clases = {
         crear:
@@ -284,36 +267,30 @@ export default {
       return props.modo === "eliminar";
     });
 
-    // =====================================
-    // MÉTODOS DEL MODAL
-    // =====================================
-
     // Manejar cierre del modal desde X o Escape
     const manejarCerrar = () => {
       emit("update:visible", false);
       emit("cancelado");
     };
 
-    // Manejar click en botón Cancelar
+    // Manejar click en boton Cancelar
     const manejarCancelar = () => {
       manejarCerrar();
     };
 
-    // Activar envío del formulario
+    // Activar envio del formulario
     const activarEnvioFormulario = () => {
       if (formularioDinamicoRef.value) {
         formularioDinamicoRef.value.manejarEnvio();
       } else {
-        toast.add({
-          severity: "error",
-          summary: "Error",
-          detail: "No se pudo procesar el formulario de organización",
-          life: 3000,
-        });
+        toast.error(
+          "Error",
+          "No se pudo procesar el formulario de organización"
+        );
       }
     };
 
-    // Ejecutar eliminación directa sin formulario
+    // Ejecutar eliminacion directa sin formulario
     const manejarEliminarDirecto = async () => {
       cargando.value = true;
 
@@ -325,8 +302,9 @@ export default {
 
         if (resultado.success) {
           const nombreRegistro = obtenerNombreRegistro(props.datosIniciales);
-          toast.add(
-            obtenerNotificacion("eliminado", props.esquema, nombreRegistro)
+          toast.success(
+            "Registro Eliminado",
+            `${nombreRegistro} eliminado exitosamente`
           );
 
           emit("eliminado", {
@@ -337,7 +315,7 @@ export default {
 
           emit("update:visible", false);
         } else {
-          toast.add(obtenerNotificacion("errorEliminar", props.esquema));
+          toast.error("Error al Eliminar", "No se pudo eliminar el registro");
 
           emit("error", {
             modo: "eliminar",
@@ -346,7 +324,7 @@ export default {
           });
         }
       } catch (error) {
-        toast.add(obtenerNotificacion("errorConexion"));
+        toast.error("Error de Conexión", "No se pudo conectar con el servidor");
 
         emit("error", {
           modo: "eliminar",
@@ -379,13 +357,13 @@ export default {
           const tipoNotificacion =
             props.modo === "crear" ? "creado" : "actualizado";
 
-          toast.add(
-            obtenerNotificacion(
-              tipoNotificacion,
-              evento.esquema,
-              nombreRegistro
-            )
-          );
+          const mensaje =
+            props.modo === "crear"
+              ? "creado exitosamente"
+              : "actualizado exitosamente";
+          const titulo =
+            props.modo === "crear" ? "Registro Creado" : "Registro Actualizado";
+          toast.success(titulo, `${nombreRegistro} ${mensaje}`);
 
           emit("guardado", {
             modo: props.modo,
@@ -397,8 +375,8 @@ export default {
           emit("update:visible", false);
         } else {
           const tipoError =
-            props.modo === "crear" ? "errorCrear" : "errorActualizar";
-          toast.add(obtenerNotificacion(tipoError, evento.esquema));
+            props.modo === "crear" ? "Error al Crear" : "Error al Actualizar";
+          toast.error(tipoError, "No se pudo completar la operación");
 
           emit("error", {
             modo: props.modo,
@@ -407,7 +385,7 @@ export default {
           });
         }
       } catch (error) {
-        toast.add(obtenerNotificacion("errorConexion"));
+        toast.error("Error de Conexión", "No se pudo conectar con el servidor");
 
         emit("error", {
           modo: props.modo,
@@ -424,16 +402,12 @@ export default {
       emit("error", evento);
     };
 
-    // Manejar cancelación del FormularioDinamicoOrganizacion
+    // Manejar cancelacion del FormularioDinamicoOrganizacion
     const manejarCancelado = (evento) => {
       manejarCerrar();
     };
 
-    // =====================================
-    // FUNCIONES CRUD ESPECÍFICAS ORGANIZACIÓN
-    // =====================================
-
-    // Ejecutar creación según el tipo de esquema de organización
+    // Ejecutar creacion segun el tipo de esquema de organizacion
     const ejecutarCreacion = async (esquema, datos) => {
       switch (esquema) {
         case "departamentos":
@@ -455,7 +429,7 @@ export default {
       }
     };
 
-    // Ejecutar actualización según el tipo de esquema de organización
+    // Ejecutar actualizacion segun el tipo de esquema de organizacion
     const ejecutarActualizacion = async (esquema, datos) => {
       const id = props.datosIniciales.id;
 
@@ -479,7 +453,7 @@ export default {
       }
     };
 
-    // Ejecutar eliminación según el tipo de esquema de organización
+    // Ejecutar eliminacion segun el tipo de esquema de organizacion
     const eliminarRegistro = async (esquema, datos) => {
       const id = datos.id;
 
@@ -503,7 +477,7 @@ export default {
       }
     };
 
-    // Obtener nombre representativo del registro de organización
+    // Obtener nombre representativo del registro de organizacion
     const obtenerNombreRegistro = (datos) => {
       const camposPrioridad = [
         "nombre_departamento",
@@ -533,10 +507,6 @@ export default {
       return "Registro";
     };
 
-    // =====================================
-    // WATCHERS
-    // =====================================
-
     // Resetear estado cuando se cierra el modal
     watch(
       () => props.visible,
@@ -549,17 +519,12 @@ export default {
       }
     );
 
-    // =====================================
-    // RETURN
-    // =====================================
     return {
-      // Estado
       cargando,
       formularioValido,
       datosFormulario,
       formularioDinamicoRef,
 
-      // Computed
       esVisible,
       configuracionEsquema,
       encabezadoModal,
@@ -572,7 +537,6 @@ export default {
       claseIconoSegunModo,
       modoSoloLectura,
 
-      // Métodos
       manejarCerrar,
       manejarCancelar,
       manejarEnviado,
@@ -586,9 +550,7 @@ export default {
 </script>
 
 <style scoped>
-/* =====================================
-   ESTILOS PARA MODAL FORMULARIO ORGANIZACIÓN
-   ===================================== */
+/* Estilos para modal formulario organizacion */
 
 /* Modal principal con fondo oscuro como el original */
 .modal-formulario-organizacion :global(.p-dialog-mask) {
@@ -620,7 +582,7 @@ export default {
   @apply bg-gray-800 border-t border-gray-700 rounded-b-xl px-6 py-4 !important;
 }
 
-/* Animación de entrada */
+/* Animacion de entrada */
 .modal-formulario-organizacion :global(.p-dialog) {
   animation: modalFadeIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
 }
@@ -636,7 +598,7 @@ export default {
   }
 }
 
-/* Botón cerrar */
+/* Boton cerrar */
 .modal-formulario-organizacion :global(.p-dialog-header-close) {
   @apply bg-transparent text-gray-300 border-none w-8 h-8 rounded-full transition-all duration-300 !important;
 }

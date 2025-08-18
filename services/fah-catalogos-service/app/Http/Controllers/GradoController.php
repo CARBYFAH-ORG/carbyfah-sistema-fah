@@ -1,5 +1,7 @@
 <?php
 
+// services\fah-catalogos-service\app\Http\Controllers\GradoController.php
+
 namespace App\Http\Controllers;
 
 use App\Models\Grado;
@@ -9,10 +11,7 @@ use Illuminate\Support\Facades\Validator;
 
 class GradoController extends Controller
 {
-    /**
-     * Listar todos los grados
-     * GET /api/catalogos/grados
-     */
+    // Listar todos los grados
     public function index(Request $request)
     {
         try {
@@ -20,7 +19,7 @@ class GradoController extends Controller
                 ->activos()
                 ->ordenadoPorJerarquia();
 
-            // Filtrar por categoría si se especifica
+            // Filtrar por categoria si se especifica
             if ($request->has('categoria_id')) {
                 $query->porCategoria($request->categoria_id);
             }
@@ -41,10 +40,7 @@ class GradoController extends Controller
         }
     }
 
-    /**
-     * Crear nuevo grado
-     * POST /api/catalogos/grados
-     */
+    // Crear nuevo grado
     public function store(Request $request)
     {
         try {
@@ -60,7 +56,7 @@ class GradoController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Datos de entrada inválidos',
+                    'message' => 'Datos de entrada invalidos',
                     'errors' => $validator->errors()
                 ], 400);
             }
@@ -72,11 +68,11 @@ class GradoController extends Controller
                 'abreviatura' => $request->abreviatura,
                 'orden_jerarquico' => $request->orden_jerarquico,
                 'insignia_url' => $request->insignia_url,
-                'created_by' => 1, // TODO: Obtener del usuario autenticado
+                'created_by' => 1,
                 'updated_by' => 1
             ]);
 
-            // Cargar la relación para la respuesta
+            // Cargar la relacion para la respuesta
             $grado->load('categoriaPersonal');
 
             return response()->json([
@@ -93,10 +89,7 @@ class GradoController extends Controller
         }
     }
 
-    /**
-     * Obtener grado específico
-     * GET /api/catalogos/grados/{id}
-     */
+    // Obtener grado especifico
     public function show($id)
     {
         try {
@@ -123,10 +116,7 @@ class GradoController extends Controller
         }
     }
 
-    /**
-     * Actualizar grado
-     * PUT /api/catalogos/grados/{id}
-     */
+    // Actualizar grado
     public function update(Request $request, $id)
     {
         try {
@@ -152,7 +142,7 @@ class GradoController extends Controller
             if ($validator->fails()) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Datos de entrada inválidos',
+                    'message' => 'Datos de entrada invalidos',
                     'errors' => $validator->errors()
                 ], 400);
             }
@@ -165,7 +155,7 @@ class GradoController extends Controller
                 'orden_jerarquico' => $request->orden_jerarquico,
                 'insignia_url' => $request->insignia_url,
                 'is_active' => $request->is_active ?? true,
-                'updated_by' => 1, // TODO: Obtener del usuario autenticado
+                'updated_by' => 1,
                 'version' => $grado->version + 1
             ]);
 
@@ -185,10 +175,7 @@ class GradoController extends Controller
         }
     }
 
-    /**
-     * Eliminar grado (soft delete)
-     * DELETE /api/catalogos/grados/{id}
-     */
+    // Eliminar grado (soft delete)
     public function destroy($id)
     {
         try {
@@ -202,7 +189,7 @@ class GradoController extends Controller
             }
 
             $grado->update([
-                'deleted_by' => 1, // TODO: Obtener del usuario autenticado
+                'deleted_by' => 1,
             ]);
 
             $grado->delete();
@@ -220,10 +207,7 @@ class GradoController extends Controller
         }
     }
 
-    /**
-     * Obtener grados por categoría
-     * GET /api/catalogos/grados/por-categoria/{categoria_id}
-     */
+    // Obtener grados por categoria
     public function porCategoria($categoriaId)
     {
         try {
@@ -232,7 +216,7 @@ class GradoController extends Controller
             if (!$categoria) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Categoría no encontrada'
+                    'message' => 'Categoria no encontrada'
                 ], 404);
             }
 
@@ -243,7 +227,7 @@ class GradoController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Grados por categoría obtenidos correctamente',
+                'message' => 'Grados por categoria obtenidos correctamente',
                 'data' => [
                     'categoria' => $categoria,
                     'grados' => $grados
@@ -252,7 +236,7 @@ class GradoController extends Controller
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al obtener grados por categoría',
+                'message' => 'Error al obtener grados por categoria',
                 'error' => $e->getMessage()
             ], 500);
         }

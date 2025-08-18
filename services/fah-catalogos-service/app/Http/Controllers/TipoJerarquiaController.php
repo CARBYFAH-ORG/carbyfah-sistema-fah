@@ -1,4 +1,5 @@
 <?php
+// services\fah-catalogos-service\app\Http\Controllers\TipoJerarquiaController.php
 
 namespace App\Http\Controllers;
 
@@ -8,10 +9,7 @@ use Illuminate\Support\Facades\Validator;
 
 class TipoJerarquiaController extends Controller
 {
-    /**
-     * Listar todos los tipos de jerarquía
-     * GET /api/catalogos/tipos-jerarquia
-     */
+    // Listar todos los tipos de jerarquia
     public function index()
     {
         try {
@@ -31,10 +29,7 @@ class TipoJerarquiaController extends Controller
         }
     }
 
-    /**
-     * Crear nuevo tipo de jerarquía
-     * POST /api/catalogos/tipos-jerarquia
-     */
+    // Crear nuevo tipo de jerarquia
     public function store(Request $request)
     {
         try {
@@ -56,7 +51,7 @@ class TipoJerarquiaController extends Controller
                 'codigo_tipo' => $request->codigo_tipo,
                 'nombre_tipo' => $request->nombre_tipo,
                 'nivel_autoridad' => $request->nivel_autoridad,
-                'created_by' => 1, // TODO: Obtener del usuario autenticado
+                'created_by' => 1,
                 'updated_by' => 1,
                 'version' => 1
             ]);
@@ -75,10 +70,7 @@ class TipoJerarquiaController extends Controller
         }
     }
 
-    /**
-     * Obtener tipo de jerarquía específico
-     * GET /api/catalogos/tipos-jerarquia/{id}
-     */
+    // Obtener tipo de jerarquia específico
     public function show($id)
     {
         try {
@@ -105,10 +97,7 @@ class TipoJerarquiaController extends Controller
         }
     }
 
-    /**
-     * Actualizar tipo de jerarquía
-     * PUT /api/catalogos/tipos-jerarquia/{id}
-     */
+    // Actualizar tipo de jerarquia
     public function update(Request $request, $id)
     {
         try {
@@ -141,7 +130,7 @@ class TipoJerarquiaController extends Controller
                 'nombre_tipo' => $request->nombre_tipo,
                 'nivel_autoridad' => $request->nivel_autoridad,
                 'is_active' => $request->is_active ?? true,
-                'updated_by' => 1, // TODO: Obtener del usuario autenticado
+                'updated_by' => 1,
                 'version' => $tipo->version + 1
             ]);
 
@@ -159,10 +148,7 @@ class TipoJerarquiaController extends Controller
         }
     }
 
-    /**
-     * Eliminar tipo de jerarquía (soft delete)
-     * DELETE /api/catalogos/tipos-jerarquia/{id}
-     */
+    // Eliminar tipo de jerarquia (soft delete)
     public function destroy($id)
     {
         try {
@@ -176,7 +162,7 @@ class TipoJerarquiaController extends Controller
             }
 
             $tipo->update([
-                'deleted_by' => 1, // TODO: Obtener del usuario autenticado
+                'deleted_by' => 1,
             ]);
 
             $tipo->delete();
@@ -194,10 +180,7 @@ class TipoJerarquiaController extends Controller
         }
     }
 
-    /**
-     * Obtener tipos por nivel de autoridad
-     * GET /api/catalogos/tipos-jerarquia/por-nivel/{nivel}
-     */
+    // Obtener tipos por nivel de autoridad
     public function porNivel($nivel)
     {
         try {

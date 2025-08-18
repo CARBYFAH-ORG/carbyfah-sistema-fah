@@ -1,25 +1,27 @@
-// COMPOSABLE CRUD DINÁMICO - CARBYFAH
-// Operaciones CRUD universales para todos los catálogos
+// services\fah-admin-frontend\src\composables\usarCrudDinamico.js
+
+// Composable CRUD dinamico - CARBYFAH
+// Operaciones CRUD universales para todos los catalogos
 
 import { ref, computed } from 'vue'
-import { useToast } from 'primevue/usetoast'
+import { useToastFAH } from '@/composables/useToastFAH'
 import { useCatalogosStore } from '@/stores/catalogosStore'
 import { obtenerNotificacion, obtenerEsquema } from '@/config/esquemaCatalogos'
 
 /**
- * Composable para operaciones CRUD dinámicas
- * @param {string} esquema - Nombre del esquema del catálogo
+ * Composable para operaciones CRUD dinamicas
+ * @param {string} esquema - Nombre del esquema del catalogo
  */
 export const usarCrudDinamico = (esquema) => {
     // Composables y dependencias
-    const toast = useToast()
+    const toast = useToastFAH()
     const catalogosStore = useCatalogosStore()
 
     // Estado reactivo
     const cargando = ref(false)
     const error = ref(null)
 
-    // Obtener registros desde el store según el esquema
+    // Obtener registros desde el store segun el esquema
     const registros = computed(() => {
         switch (esquema) {
             case 'tipos_genero':
@@ -49,19 +51,19 @@ export const usarCrudDinamico = (esquema) => {
         }
     })
 
-    // Configuración del esquema
+    // Configuracion del esquema
     const configuracionEsquema = computed(() => {
         return obtenerEsquema(esquema)
     })
 
-    // Registros activos únicamente
+    // Registros activos unicamente
     const registrosActivos = computed(() => {
         return registros.value.filter(registro =>
             registro.is_active !== false
         )
     })
 
-    // Estadísticas de registros
+    // Estadisticas de registros
     const estadisticas = computed(() => ({
         total: registros.value.length,
         activos: registrosActivos.value.length,
@@ -74,7 +76,7 @@ export const usarCrudDinamico = (esquema) => {
         error.value = null
 
         try {
-            // Delegar al store según el esquema
+            // Delegar al store segun el esquema
             switch (esquema) {
                 case 'tipos_genero':
                     await catalogosStore.loadTiposGenero()
@@ -117,7 +119,7 @@ export const usarCrudDinamico = (esquema) => {
 
         } catch (err) {
             error.value = err.message || 'Error cargando datos'
-            toast.add(obtenerNotificacion('errorConexion'))
+            toast.error("Error de Conexion", "No se pudo conectar con el servidor")
         } finally {
             cargando.value = false
         }
@@ -166,12 +168,12 @@ export const usarCrudDinamico = (esquema) => {
                     resultado = await catalogosStore.createTipoEvento(datos)
                     break
                 default:
-                    throw new Error(`Creación no implementada para esquema: ${esquema}`)
+                    throw new Error(`Creacion no implementada para esquema: ${esquema}`)
             }
 
             if (resultado.success) {
                 const nombreRegistro = obtenerNombreRegistro(datos)
-                toast.add(obtenerNotificacion('creado', esquema, nombreRegistro))
+                toast.success("Registro Creado", `${nombreRegistro} creado exitosamente`)
                 return resultado
             } else {
                 throw new Error(resultado.error || 'Error desconocido')
@@ -179,7 +181,7 @@ export const usarCrudDinamico = (esquema) => {
 
         } catch (err) {
             error.value = err.message
-            toast.add(obtenerNotificacion('errorCrear', esquema))
+            toast.error("Error al Crear", `No se pudo crear el registro`)
             throw err
         } finally {
             cargando.value = false
@@ -229,12 +231,12 @@ export const usarCrudDinamico = (esquema) => {
                     resultado = await catalogosStore.updateTipoEvento(id, datos)
                     break
                 default:
-                    throw new Error(`Actualización no implementada para esquema: ${esquema}`)
+                    throw new Error(`Actualizacion no implementada para esquema: ${esquema}`)
             }
 
             if (resultado.success) {
                 const nombreRegistro = obtenerNombreRegistro(datos)
-                toast.add(obtenerNotificacion('actualizado', esquema, nombreRegistro))
+                toast.success("Registro Actualizado", `${nombreRegistro} actualizado exitosamente`)
                 return resultado
             } else {
                 throw new Error(resultado.error || 'Error desconocido')
@@ -242,7 +244,7 @@ export const usarCrudDinamico = (esquema) => {
 
         } catch (err) {
             error.value = err.message
-            toast.add(obtenerNotificacion('errorActualizar', esquema))
+            toast.error("Error al Actualizar", `No se pudo actualizar el registro`)
             throw err
         } finally {
             cargando.value = false
@@ -292,11 +294,11 @@ export const usarCrudDinamico = (esquema) => {
                     resultado = await catalogosStore.deleteTipoEvento(id)
                     break
                 default:
-                    throw new Error(`Eliminación no implementada para esquema: ${esquema}`)
+                    throw new Error(`Eliminacion no implementada para esquema: ${esquema}`)
             }
 
             if (resultado.success) {
-                toast.add(obtenerNotificacion('eliminado', esquema, 'Registro'))
+                toast.success("Registro Eliminado", "Registro eliminado exitosamente")
                 return resultado
             } else {
                 throw new Error(resultado.error || 'Error desconocido')
@@ -304,7 +306,7 @@ export const usarCrudDinamico = (esquema) => {
 
         } catch (err) {
             error.value = err.message
-            toast.add(obtenerNotificacion('errorEliminar', esquema))
+            toast.error("Error al Eliminar", `No se pudo eliminar el registro`)
             throw err
         } finally {
             cargando.value = false
@@ -443,7 +445,7 @@ export const usarCrudDinamico = (esquema) => {
         actualizarRegistro,
         eliminarRegistro,
 
-        // Búsqueda y filtrado
+        // Busqueda y filtrado
         buscarPorId,
         buscarPorCampo,
         filtrarRegistros,

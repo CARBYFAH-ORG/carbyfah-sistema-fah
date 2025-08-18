@@ -448,7 +448,6 @@ const rolUsuario = computed(() => {
 // Niveles jerárquicos según el rol
 const nivelesJerarquicos = computed(() => {
   if (!rolUsuario.value) return [];
-
   // Retornar array no vacío para mostrar la sección
   return ["nivel1"]; // Placeholder
 });
@@ -564,13 +563,6 @@ const navigateToEspacioTrabajo = async () => {
       `🎯 Navegando al espacio de trabajo: ${rolUsuario.value.display_name}`
     );
 
-    toast.add({
-      severity: "success",
-      summary: "Navegación FAH",
-      detail: `Accediendo al espacio de trabajo de ${rolUsuario.value.display_name}...`,
-      life: 2000,
-    });
-
     activeDropdown.value = null;
     await router.push("/espacio-trabajo");
     emit("navigate", "espacio-trabajo");
@@ -579,26 +571,12 @@ const navigateToEspacioTrabajo = async () => {
     console.log("✅ Navegación al espacio de trabajo exitosa");
   } catch (error) {
     console.error("❌ Error navegando al espacio de trabajo:", error);
-
-    toast.add({
-      severity: "error",
-      summary: "Error de Navegación",
-      detail: "No se pudo acceder al espacio de trabajo",
-      life: 4000,
-    });
   }
 };
 
 const navigateToRolesUsuarios = async () => {
   try {
     console.log("👤 Navegando a Roles y Usuarios...");
-
-    toast.add({
-      severity: "success",
-      summary: "Navegación Admin",
-      detail: "Accediendo a Roles y Usuarios...",
-      life: 2000,
-    });
 
     activeDropdown.value = null;
     await router.push("/admin/roles-usuarios");
@@ -608,13 +586,6 @@ const navigateToRolesUsuarios = async () => {
     console.log("✅ Navegación a Roles y Usuarios exitosa");
   } catch (error) {
     console.error("❌ Error navegando a Roles y Usuarios:", error);
-
-    toast.add({
-      severity: "error",
-      summary: "Error de Navegación",
-      detail: "No se pudo acceder a Roles y Usuarios",
-      life: 4000,
-    });
   }
 };
 
@@ -637,17 +608,10 @@ const navigateTo = (section) => {
     }
   }
 
-  // Para secciones no disponibles
-  toast.add({
-    severity: "warn",
-    summary: "Función no disponible",
-    detail: `${section.toUpperCase()} estará disponible en próximas versiones`,
-    life: 4000,
-  });
-
+  // Para secciones no disponibles - solo log, sin toast molesto
+  console.log(`⏳ Función pendiente de implementación: ${section}`);
   emit("navigate", section);
   handleNavigation();
-  console.log(`⏳ Función pendiente de implementación: ${section}`);
 };
 </script>
 

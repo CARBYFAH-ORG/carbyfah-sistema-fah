@@ -22,6 +22,9 @@ Route::get('/health', function () {
     return response()->json(['status' => 'OK', 'service' => 'fah-archivos-service']);
 });
 
+// Manual de usuario para tabla dinámica
+Route::get('/manual/tabla-dinamica', [ArchivosController::class, 'getManualTablaDinamica']);
+
 // ============================================
 // RUTAS ARCHIVOS (Upload/Download específico)
 // ============================================
@@ -34,6 +37,7 @@ Route::prefix('archivos')->group(function () {
     Route::get('/test-minio-simple', [ArchivosController::class, 'testMinioSimple']);
     Route::get('/debug-config', [ArchivosController::class, 'debugConfig']);
     Route::get('/storage-stats', [ArchivosController::class, 'storageStats']);
+    Route::get('/test-minio-files', [ArchivosController::class, 'testMinioFiles']); // <-- AGREGÁ ESTA LÍNEA
 
     // RUTAS CON PARÁMETROS AL FINAL
     Route::get('/{id}', [ArchivosController::class, 'show']);

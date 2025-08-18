@@ -1,60 +1,57 @@
-// =====================================
-// TEMAS Y ESTILOS PARA FORMULARIOS - CARBYFAH
-// Sistema de temas dinámicos para diferentes fuerzas militares
-// =====================================
+// services\fah-admin-frontend\src\utils\temasFormularios.js
 
 /**
- * Configuración de temas disponibles
+ * Configuracion de temas disponibles
  */
 export const TEMAS_DISPONIBLES = {
     'militar-oscuro': {
         nombre: 'Militar Oscuro',
         descripcion: 'Tema oscuro corporativo para uso general',
         colores: {
-            primario: '#3b82f6',      // Azul
-            secundario: '#6b7280',    // Gris
-            exito: '#10b981',         // Verde
-            error: '#ef4444',         // Rojo
-            advertencia: '#f59e0b',   // Amarillo
-            info: '#06b6d4',          // Cyan
-            fondoModal: '#374151',    // Gris oscuro
-            fondoCampo: '#ffffff',    // Blanco
-            textoClaro: '#f9fafb',    // Gris muy claro
-            textoOscuro: '#111827'    // Gris muy oscuro
+            primario: '#3b82f6',
+            secundario: '#6b7280',
+            exito: '#10b981',
+            error: '#ef4444',
+            advertencia: '#f59e0b',
+            info: '#06b6d4',
+            fondoModal: '#374151',
+            fondoCampo: '#ffffff',
+            textoClaro: '#f9fafb',
+            textoOscuro: '#111827'
         }
     },
 
     'fah-azul': {
         nombre: 'FAH Azul',
-        descripcion: 'Tema oficial de la Fuerza Aérea Hondureña',
+        descripcion: 'Tema oficial de la Fuerza Aerea Hondureña',
         colores: {
-            primario: '#1e40af',      // Azul FAH
-            secundario: '#3b82f6',    // Azul claro
-            exito: '#059669',         // Verde militar
-            error: '#dc2626',         // Rojo militar
-            advertencia: '#d97706',   // Naranja
-            info: '#0284c7',          // Azul info
-            fondoModal: '#1e3a8a',    // Azul oscuro FAH
-            fondoCampo: '#ffffff',    // Blanco
-            textoClaro: '#f0f9ff',    // Azul muy claro
-            textoOscuro: '#1e3a8a'    // Azul oscuro
+            primario: '#1e40af',
+            secundario: '#3b82f6',
+            exito: '#059669',
+            error: '#dc2626',
+            advertencia: '#d97706',
+            info: '#0284c7',
+            fondoModal: '#1e3a8a',
+            fondoCampo: '#ffffff',
+            textoClaro: '#f0f9ff',
+            textoOscuro: '#1e3a8a'
         }
     },
 
     'ejercito-verde': {
-        nombre: 'Ejército Verde',
-        descripcion: 'Tema para el Ejército de Honduras',
+        nombre: 'Ejercito Verde',
+        descripcion: 'Tema para el Ejercito de Honduras',
         colores: {
-            primario: '#166534',      // Verde ejército
-            secundario: '#22c55e',    // Verde claro
-            exito: '#15803d',         // Verde éxito
-            error: '#dc2626',         // Rojo
-            advertencia: '#ca8a04',   // Amarillo ejército
-            info: '#0369a1',          // Azul info
-            fondoModal: '#14532d',    // Verde muy oscuro
-            fondoCampo: '#ffffff',    // Blanco
-            textoClaro: '#f0fdf4',    // Verde muy claro
-            textoOscuro: '#14532d'    // Verde muy oscuro
+            primario: '#166534',
+            secundario: '#22c55e',
+            exito: '#15803d',
+            error: '#dc2626',
+            advertencia: '#ca8a04',
+            info: '#0369a1',
+            fondoModal: '#14532d',
+            fondoCampo: '#ffffff',
+            textoClaro: '#f0fdf4',
+            textoOscuro: '#14532d'
         }
     },
 
@@ -62,16 +59,16 @@ export const TEMAS_DISPONIBLES = {
         nombre: 'Naval Azul Marino',
         descripcion: 'Tema para la Fuerza Naval Hondureña',
         colores: {
-            primario: '#1e3a8a',      // Azul marino
-            secundario: '#3b82f6',    // Azul claro
-            exito: '#059669',         // Verde agua
-            error: '#dc2626',         // Rojo
-            advertencia: '#d97706',   // Naranja
-            info: '#0891b2',          // Azul turquesa
-            fondoModal: '#1e2a47',    // Azul marino oscuro
-            fondoCampo: '#ffffff',    // Blanco
-            textoClaro: '#f1f5f9',    // Azul muy claro
-            textoOscuro: '#1e2a47'    // Azul marino oscuro
+            primario: '#1e3a8a',
+            secundario: '#3b82f6',
+            exito: '#059669',
+            error: '#dc2626',
+            advertencia: '#d97706',
+            info: '#0891b2',
+            fondoModal: '#1e2a47',
+            fondoCampo: '#ffffff',
+            textoClaro: '#f1f5f9',
+            textoOscuro: '#1e2a47'
         }
     }
 }
@@ -81,22 +78,17 @@ export const TEMAS_DISPONIBLES = {
  * @param {string} nombreTema - Nombre del tema a aplicar
  */
 export const aplicarTemaFormulario = (nombreTema) => {
-    console.log('🎨 Aplicando tema:', nombreTema)
-
     const tema = TEMAS_DISPONIBLES[nombreTema]
 
     if (!tema) {
-        console.warn(`⚠️ Tema no encontrado: ${nombreTema}`)
         return
     }
 
-    // Aplicar variables CSS dinámicamente
+    // Aplicar variables CSS dinamicamente
     aplicarVariablesCSS(tema.colores)
 
     // Agregar clase de tema al body
     aplicarClaseTema(nombreTema)
-
-    console.log('✅ Tema aplicado exitosamente:', tema.nombre)
 }
 
 /**
@@ -155,9 +147,9 @@ export const obtenerTemaPorFuerza = (fuerza) => {
 }
 
 /**
- * Obtener configuración de tema
+ * Obtener configuracion de tema
  * @param {string} nombreTema - Nombre del tema
- * @returns {Object|null} Configuración del tema
+ * @returns {Object|null} Configuracion del tema
  */
 export const obtenerConfiguracionTema = (nombreTema) => {
     return TEMAS_DISPONIBLES[nombreTema] || null
@@ -165,7 +157,7 @@ export const obtenerConfiguracionTema = (nombreTema) => {
 
 /**
  * Obtener lista de todos los temas disponibles
- * @returns {Array} Array con información de temas
+ * @returns {Array} Array con informacion de temas
  */
 export const obtenerListaTemas = () => {
     return Object.entries(TEMAS_DISPONIBLES).map(([clave, tema]) => ({
@@ -182,7 +174,7 @@ export const restablecerTema = () => {
 }
 
 /**
- * Configuración de estilos personalizados por componente
+ * Configuracion de estilos personalizados por componente
  */
 export const ESTILOS_COMPONENTES = {
     formulario: {
@@ -219,7 +211,7 @@ export const ESTILOS_COMPONENTES = {
 }
 
 /**
- * Aplicar estilos específicos a un elemento
+ * Aplicar estilos especificos a un elemento
  * @param {HTMLElement} elemento - Elemento DOM
  * @param {string} componente - Tipo de componente
  * @param {string} variante - Variante del estilo
@@ -237,7 +229,7 @@ export const aplicarEstilosElemento = (elemento, componente, variante = 'default
 }
 
 /**
- * Generar clases CSS dinámicas para un tema
+ * Generar clases CSS dinamicas para un tema
  * @param {string} nombreTema - Nombre del tema
  * @returns {string} Clases CSS generadas
  */
@@ -246,8 +238,8 @@ export const generarClasesCSS = (nombreTema) => {
 
     if (!tema) return ''
 
-    // Esta función puede expandirse para generar CSS dinámico
-    // Por ahora retorna clases básicas
+    // Esta funcion puede expandirse para generar CSS dinamico
+    // Por ahora retorna clases basicas
     return `tema-${nombreTema}`
 }
 

@@ -1,3 +1,4 @@
+<!-- services\fah-admin-frontend\src\components\formularios\CampoFormularioOrganizacion.vue -->
 <template>
   <div
     :class="[
@@ -7,7 +8,7 @@
       { 'campo-con-error': tieneError },
     ]"
   >
-    <!-- CAMPO DE TEXTO ORGANIZACIÓN -->
+    <!-- Campo de texto organizacion -->
     <div v-if="esTipoTexto" class="grupo-campo-org">
       <label :for="idCampo" class="etiqueta-campo-org">
         {{ configuracion.etiqueta }}
@@ -31,7 +32,7 @@
       <AyudaCampo v-if="configuracion.ayuda" :texto="configuracion.ayuda" />
     </div>
 
-    <!-- CAMPO NUMÉRICO ORGANIZACIÓN -->
+    <!-- Campo numerico organizacion -->
     <div v-else-if="esTipoNumero" class="grupo-campo-org">
       <label :for="idCampo" class="etiqueta-campo-org">
         {{ configuracion.etiqueta }}
@@ -57,7 +58,7 @@
       <AyudaCampo v-if="configuracion.ayuda" :texto="configuracion.ayuda" />
     </div>
 
-    <!-- CAMPO DE SELECCIÓN ORGANIZACIÓN -->
+    <!-- Campo de seleccion organizacion -->
     <div v-else-if="esTipoSeleccion" class="grupo-campo-org">
       <label :for="idCampo" class="etiqueta-campo-org">
         {{ configuracion.etiqueta }}
@@ -84,7 +85,7 @@
       <AyudaCampo v-if="configuracion.ayuda" :texto="configuracion.ayuda" />
     </div>
 
-    <!-- CAMPO FORÁNEO AUTOCOMPLETADO ORGANIZACIÓN -->
+    <!-- Campo foraneo autocompletado organizacion -->
     <div v-else-if="esTipoForaneoAutocompletado" class="grupo-campo-org">
       <label :for="idCampo" class="etiqueta-campo-org">
         {{ configuracion.etiqueta }}
@@ -128,7 +129,7 @@
       <AyudaCampo v-if="configuracion.ayuda" :texto="configuracion.ayuda" />
     </div>
 
-    <!-- CAMPO DE ÁREA DE TEXTO ORGANIZACIÓN - ESTA ES LA SECCIÓN QUE FALTABA -->
+    <!-- Campo de area de texto organizacion -->
     <div v-else-if="esTipoAreaTexto" class="grupo-campo-org">
       <label :for="idCampo" class="etiqueta-campo-org">
         {{ configuracion.etiqueta }}
@@ -154,7 +155,7 @@
       <AyudaCampo v-if="configuracion.ayuda" :texto="configuracion.ayuda" />
     </div>
 
-    <!-- CAMPO BOOLEANO ORGANIZACIÓN -->
+    <!-- Campo booleano organizacion -->
     <div v-else-if="esTipoBooleano" class="grupo-campo-org grupo-switch-org">
       <label :for="idCampo" class="etiqueta-campo-org">
         {{ configuracion.etiqueta }}
@@ -181,7 +182,7 @@
       <AyudaCampo v-if="configuracion.ayuda" :texto="configuracion.ayuda" />
     </div>
 
-    <!-- CAMPO DE FECHA ORGANIZACIÓN -->
+    <!-- Campo de fecha organizacion -->
     <div v-else-if="esTipoFecha" class="grupo-campo-org">
       <label :for="idCampo" class="etiqueta-campo-org">
         {{ configuracion.etiqueta }}
@@ -206,7 +207,7 @@
       <AyudaCampo v-if="configuracion.ayuda" :texto="configuracion.ayuda" />
     </div>
 
-    <!-- TIPO DE CAMPO NO SOPORTADO -->
+    <!-- Tipo de campo no soportado -->
     <div v-else class="grupo-campo-org">
       <Message severity="warn" :closable="false">
         <strong>Tipo de campo no soportado:</strong>
@@ -218,7 +219,6 @@
 <script>
 import { computed, ref, watch, onMounted } from "vue";
 
-// Componentes PrimeVue
 import InputText from "primevue/inputtext";
 import InputNumber from "primevue/inputnumber";
 import Select from "primevue/select";
@@ -228,15 +228,12 @@ import AutoComplete from "primevue/autocomplete";
 import Calendar from "primevue/calendar";
 import Message from "primevue/message";
 
-// Componentes auxiliares
 import MensajeError from "./MensajeError.vue";
 import AyudaCampo from "./AyudaCampo.vue";
 
-// Stores específicos de organización
 import { useOrganizacionStore } from "@/stores/organizacionStore";
 import { useCatalogosStore } from "@/stores/catalogosStore";
 
-// Services específicos de organización
 import * as organizacionService from "@/services/organizacionService";
 import * as catalogosService from "@/services/catalogosService";
 
@@ -290,29 +287,20 @@ export default {
   emits: ["actualizar"],
 
   setup(props, { emit }) {
-    // Stores específicos organización
     const organizacionStore = useOrganizacionStore();
     const catalogosStore = useCatalogosStore();
 
-    // Estado reactivo
     const validandoCampo = ref(false);
     const sugerenciasAutocompletadoOrg = ref([]);
     const cargandoDatosForaneosOrg = ref(false);
     const datosForaneosCacheOrg = ref(new Map());
 
-    // Cargar datos al montar
     onMounted(async () => {
-      console.log(
-        "CampoFormularioOrganizacion montado:",
-        props.configuracion.nombre
-      );
-
       if (esTipoForaneoAutocompletado.value) {
         await cargarDatosForaneosOrg();
       }
     });
 
-    // Computed properties
     const idCampo = computed(() => {
       return `campo-org-${props.configuracion.nombre}-${Date.now()}`;
     });
@@ -323,7 +311,7 @@ export default {
       );
     });
 
-    // Detectores de tipo específicos organización
+    // Detectores de tipo especificos organizacion
     const esTipoTexto = computed(() => {
       return ["texto", "email", "password"].includes(props.configuracion.tipo);
     });
@@ -352,7 +340,7 @@ export default {
       return props.configuracion.tipo === "fecha";
     });
 
-    // Clases CSS dinámicas organizacion
+    // Clases CSS dinamicas organizacion
     const clasesCampoTextoOrg = computed(() => [
       "fah-form-control-org",
       "fah-form-control-texto-org",
@@ -463,7 +451,6 @@ export default {
 
       if (isNaN(valorId)) return props.valor;
 
-      // Buscar en datos según la tabla de organización
       let registro = null;
 
       switch (tablaReferencia) {
@@ -582,43 +569,27 @@ export default {
       return props.valor;
     });
 
-    // Métodos específicos organizacion
-
-    // Cargar datos foraneos específicos de organizacion
+    // Cargar datos foraneos especificos de organizacion
     const cargarDatosForaneosOrg = async () => {
       if (!props.configuracion.tablaReferencia) return;
 
       const tablaRef = props.configuracion.tablaReferencia;
 
-      // Detectar si requiere servicio externo catalogos
       const configuracionCompleta = props.configuracion.tipoCampoCompleto || "";
       const requiereCatalogos =
         configuracionCompleta.includes("servicio:catalogos");
 
-      console.log(
-        `Cargando datos foraneos: ${tablaRef}, requiere catalogos: ${requiereCatalogos}`
-      );
-
       if (datosForaneosCacheOrg.value.has(tablaRef)) {
-        console.log(`Usando cache organizacion para ${tablaRef}`);
         return;
       }
 
       cargandoDatosForaneosOrg.value = true;
 
       try {
-        // Si requiere catalogos, usar servicio de catalogos
         if (requiereCatalogos && tablaRef === "paises") {
-          console.log(`Cargando paises desde servicio de catalogos`);
-
           if (!catalogosStore.paises?.length) {
             await catalogosStore.loadPaises();
           }
-
-          console.log(
-            `Paises cargados desde catalogos:`,
-            catalogosStore.paises
-          );
 
           datosForaneosCacheOrg.value.set(
             tablaRef,
@@ -627,20 +598,11 @@ export default {
           return;
         }
 
-        console.log(`Cargando datos foraneos organizacion: ${tablaRef}`);
-
         switch (tablaRef) {
           case "paises":
-            console.log(`Cargando paises desde servicio de catalogos`);
-
             if (!catalogosStore.paises?.length) {
               await catalogosStore.loadPaises();
             }
-
-            console.log(
-              `Paises cargados desde catalogos:`,
-              catalogosStore.paises
-            );
 
             datosForaneosCacheOrg.value.set(
               tablaRef,
@@ -726,19 +688,10 @@ export default {
             break;
 
           default:
-            console.log(
-              "Tabla de referencia organizacion no soportada:",
-              tablaRef
-            );
             break;
         }
-
-        console.log(`Datos foraneos organizacion cargados: ${tablaRef}`);
       } catch (error) {
-        console.error(
-          `Error cargando datos foraneos organizacion ${tablaRef}:`,
-          error
-        );
+        console.error("Error cargando datos foraneos organizacion:", error);
       } finally {
         cargandoDatosForaneosOrg.value = false;
       }
@@ -836,7 +789,6 @@ export default {
           datosCompletos = catalogosStore.tiposEstructuraMilitar || [];
           break;
         default:
-          console.log("Tabla no encontrada en cache organizacion:", tablaRef);
           return [];
       }
 
@@ -871,21 +823,16 @@ export default {
       });
     };
 
-    // Buscar sugerencias foraneas organizacion - ESTA ES LA FUNCION CLAVE QUE NECESITA EL CASE PAISES
+    // Buscar sugerencias foraneas organizacion
     const buscarSugerenciasForaneasOrg = async (evento) => {
-      console.log("Buscando sugerencias organizacion:", evento.query);
-
       const query = evento.query.toLowerCase();
       const tablaRef = props.configuracion.tablaReferencia;
 
       if (query.length >= 2) {
         try {
-          console.log(`Busqueda API organizacion para ${tablaRef}: "${query}"`);
-
           let resultados = [];
 
           switch (tablaRef) {
-            // AGREGAR ESTE CASE QUE FALTABA
             case "paises":
               resultados = await catalogosService.buscarPaises(query);
               break;
@@ -930,26 +877,17 @@ export default {
               break;
 
             default:
-              console.log(
-                "Tabla de referencia no soportada en busqueda API:",
-                tablaRef
-              );
               resultados = [];
               break;
           }
 
           sugerenciasAutocompletadoOrg.value =
             formatearSugerenciasOrg(resultados);
-          console.log(
-            `Sugerencias encontradas para ${tablaRef}:`,
-            sugerenciasAutocompletadoOrg.value.length
-          );
         } catch (error) {
           console.error(`Error buscando ${tablaRef}:`, error);
           sugerenciasAutocompletadoOrg.value = [];
         }
       } else {
-        // busqueda local para consultas cortas
         const resultadosLocales = buscarEnCacheLocalOrg(query, tablaRef);
         sugerenciasAutocompletadoOrg.value =
           formatearSugerenciasOrg(resultadosLocales);
@@ -958,33 +896,20 @@ export default {
 
     // Manejar cambio foraneo organizacion
     const manejarCambioForaneoOrg = (nuevoValor) => {
-      console.log("Cambio foraneo organizacion:", nuevoValor);
-
       if (nuevoValor && typeof nuevoValor === "object" && nuevoValor.valor) {
-        // El usuario selecciono de la lista - EMITIR SOLO EL ID
-        console.log("Emitiendo ID:", nuevoValor.valor);
         emitirCambio(nuevoValor.valor);
       } else if (typeof nuevoValor === "number") {
-        // Valor numerico directo
         emitirCambio(nuevoValor);
       } else if (typeof nuevoValor === "string") {
-        // Si es texto, intentar encontrar coincidencia exacta
         const tablaRef = props.configuracion.tablaReferencia;
         const coincidencia = buscarCoincidenciaExactaOrg(nuevoValor, tablaRef);
 
         if (coincidencia) {
-          console.log(
-            "Coincidencia encontrada, emitiendo ID:",
-            coincidencia.id
-          );
           emitirCambio(coincidencia.id);
         } else {
-          // No hay coincidencia, emitir null
-          console.log("No hay coincidencia exacta, emitiendo null");
           emitirCambio(null);
         }
       } else {
-        // Valor nulo o undefined
         emitirCambio(null);
       }
     };
@@ -996,7 +921,6 @@ export default {
         tablaRef
       );
 
-      // Buscar coincidencia exacta por nombre
       return resultadosLocales.find((item) => {
         const nombres = [
           item.nombre,
@@ -1018,10 +942,6 @@ export default {
 
     // Emitir cambio con validacion
     const emitirCambio = (nuevoValor) => {
-      console.log(
-        `Emitiendo cambio para ${props.configuracion.nombre}:`,
-        nuevoValor
-      );
       emit("actualizar", nuevoValor);
     };
 
@@ -1034,7 +954,6 @@ export default {
       }, 500);
     };
 
-    // Watchers
     watch(
       () => props.configuracion.tablaReferencia,
       () => {
@@ -1045,12 +964,10 @@ export default {
     );
 
     return {
-      // Estado
       validandoCampo,
       sugerenciasAutocompletadoOrg,
       cargandoDatosForaneosOrg,
 
-      // Computed
       idCampo,
       tieneError,
       esTipoTexto,
@@ -1070,7 +987,6 @@ export default {
       opcionesSeleccion,
       valorMostrarOrg,
 
-      // Métodos
       cargarDatosForaneosOrg,
       formatearSugerenciasOrg,
       buscarEnCacheLocalOrg,
@@ -1085,9 +1001,7 @@ export default {
 </script>
 
 <style scoped>
-/* @import "@/styles/components/formularios/campo-formulario-organizacion.css"; */
-
-/* Estilos locales específicos organizacion */
+/* Estilos locales especificos organizacion */
 .contenedor-campo-organizacion {
   @apply mb-4;
 }

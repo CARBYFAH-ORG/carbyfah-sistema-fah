@@ -1,5 +1,7 @@
 <?php
 
+// services\fah-catalogos-service\app\Http\Controllers\CatalogosController.php
+
 namespace App\Http\Controllers;
 
 use App\Models\TipoGenero;
@@ -17,37 +19,31 @@ use Illuminate\Http\Request;
 
 class CatalogosController extends Controller
 {
-    /**
-     * Health check del servicio de catálogos
-     * GET /api/catalogos/health
-     */
+    // Health check del servicio de catalogos
     public function health()
     {
         return response()->json([
             'success' => true,
-            'message' => 'Servicio de catálogos FAH operativo',
+            'message' => 'Servicio de catalogos FAH operativo',
             'timestamp' => now(),
             'version' => '1.0.0',
             'service' => 'fah-catalogos-service'
         ], 200);
     }
 
-    /**
-     * Obtener todos los catálogos básicos - VERSIÓN EXPANDIDA
-     * GET /api/catalogos/basicos
-     */
+    // Obtener todos los catalogos basicos - version expandida
     public function catalogosBasicos()
     {
         try {
             $catalogos = [
-                // === GRUPO 1: BÁSICOS ===
+                // Grupo 1: Basicos
                 'tipos_genero' => TipoGenero::activos()->get(),
                 'categorias_personal' => CategoriaPersonal::activos()
                     ->orderBy('orden_jerarquico', 'asc')
                     ->get(),
                 'grados_por_categoria' => $this->getGradosPorCategoria(),
 
-                // === GRUPO 2: ESTADOS Y PRIORIDADES ===
+                // Grupo 2: Estados y prioridades
                 'tipos_estado_general' => TipoEstadoGeneral::activos()->get(),
                 'niveles_prioridad' => NivelPrioridad::activos()
                     ->orderBy('nivel_numerico', 'asc')
@@ -57,7 +53,7 @@ class CatalogosController extends Controller
                     ->get(),
                 'tipos_evento' => TipoEvento::activos()->get(),
 
-                // === GRUPO 3: ESTRUCTURA MILITAR ===
+                // Grupo 3: Estructura militar
                 'tipos_estructura_militar' => TipoEstructuraMilitar::activos()
                     ->orderBy('nivel_organizacional', 'asc')
                     ->get(),
@@ -66,7 +62,7 @@ class CatalogosController extends Controller
                     ->get(),
                 'especialidades' => Especialidad::activos()->get(),
 
-                // === GRUPO 4: GEOGRÁFICOS ===
+                // Grupo 4: Geograficos
                 'paises' => Pais::activos()
                     ->orderBy('nombre', 'asc')
                     ->get()
@@ -74,21 +70,19 @@ class CatalogosController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Catálogos básicos obtenidos correctamente',
+                'message' => 'Catalogos basicos obtenidos correctamente',
                 'data' => $catalogos
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al obtener catálogos básicos',
+                'message' => 'Error al obtener catalogos basicos',
                 'error' => $e->getMessage()
             ], 500);
         }
     }
 
-    /**
-     * Obtener grados agrupados por categoría
-     */
+    // Obtener grados agrupados por categoria
     private function getGradosPorCategoria()
     {
         $categorias = CategoriaPersonal::activos()
@@ -117,15 +111,12 @@ class CatalogosController extends Controller
         return $gradosPorCategoria;
     }
 
-    /**
-     * Estadísticas de catálogos - VERSIÓN EXPANDIDA
-     * GET /api/catalogos/estadisticas
-     */
+    // Estadisticas de catalogos - version expandida
     public function estadisticas()
     {
         try {
             $stats = [
-                // Grupo 1: Básicos
+                // Grupo 1: Basicos
                 'tipos_genero' => [
                     'total' => TipoGenero::count(),
                     'activos' => TipoGenero::activos()->count()
@@ -143,7 +134,7 @@ class CatalogosController extends Controller
                         ->get()
                 ],
 
-                // Grupo 2: Estados y Prioridades
+                // Grupo 2: Estados y prioridades
                 'tipos_estado_general' => [
                     'total' => TipoEstadoGeneral::count(),
                     'activos' => TipoEstadoGeneral::activos()->count()
@@ -161,7 +152,7 @@ class CatalogosController extends Controller
                     'activos' => TipoEvento::activos()->count()
                 ],
 
-                // Grupo 3: Estructura Militar
+                // Grupo 3: Estructura militar
                 'tipos_estructura_militar' => [
                     'total' => TipoEstructuraMilitar::count(),
                     'activos' => TipoEstructuraMilitar::activos()->count()
@@ -175,7 +166,7 @@ class CatalogosController extends Controller
                     'activos' => Especialidad::activos()->count()
                 ],
 
-                // Grupo 4: Geográficos
+                // Grupo 4: Geograficos
                 'paises' => [
                     'total' => Pais::count(),
                     'activos' => Pais::activos()->count()
@@ -191,13 +182,13 @@ class CatalogosController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Estadísticas de catálogos',
+                'message' => 'Estadisticas de catalogos',
                 'data' => $stats
             ], 200);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
-                'message' => 'Error al obtener estadísticas',
+                'message' => 'Error al obtener estadisticas',
                 'error' => $e->getMessage()
             ], 500);
         }

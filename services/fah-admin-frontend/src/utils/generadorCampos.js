@@ -1,20 +1,15 @@
-// =====================================
-// GENERADOR INTELIGENTE DE CAMPOS - CARBYFAH
-// Utilidades para generar opciones dinámicas para campos de selección
-// =====================================
+// services\fah-admin-frontend\src\utils\generadorCampos.js
 
 import { useCatalogosStore } from '@/stores/catalogosStore'
 
 /**
- * Obtener opciones dinámicas para campos de selección
+ * Obtener opciones dinamicas para campos de seleccion
  * Principalmente usado para referencias a otras tablas
- * @param {Object} configuracionCampo - Configuración del campo
+ * @param {Object} configuracionCampo - Configuracion del campo
  * @returns {Array} Array de opciones para el dropdown
  */
 export const obtenerOpcionesDinamicas = (configuracionCampo) => {
-    console.log('🔄 Obteniendo opciones dinámicas para:', configuracionCampo)
-
-    // Si ya tiene opciones estáticas, usarlas
+    // Si ya tiene opciones estaticas, usarlas
     if (configuracionCampo.opciones && Array.isArray(configuracionCampo.opciones)) {
         return configuracionCampo.opciones
     }
@@ -35,8 +30,6 @@ export const obtenerOpcionesDinamicas = (configuracionCampo) => {
  */
 const obtenerOpcionesDeTablaReferencia = (tablaReferencia) => {
     const catalogosStore = useCatalogosStore()
-
-    console.log('📋 Obteniendo opciones de tabla:', tablaReferencia)
 
     switch (tablaReferencia) {
         case 'categorias_personal':
@@ -89,13 +82,12 @@ const obtenerOpcionesDeTablaReferencia = (tablaReferencia) => {
             }))
 
         default:
-            console.warn('⚠️ Tabla de referencia no configurada:', tablaReferencia)
             return []
     }
 }
 
 /**
- * Obtener opciones predefinidas para campos específicos
+ * Obtener opciones predefinidas para campos especificos
  * @param {string} nombreCampo - Nombre del campo
  * @returns {Array} Opciones predefinidas
  */
@@ -103,8 +95,8 @@ const obtenerOpcionesPredefinidas = (nombreCampo) => {
     const opcionesPredefinidas = {
         // Campos booleanos comunes
         requiere_autorizacion: [
-            { etiqueta: 'Sí, requiere autorización', valor: true },
-            { etiqueta: 'No requiere autorización', valor: false }
+            { etiqueta: 'Si, requiere autorizacion', valor: true },
+            { etiqueta: 'No requiere autorizacion', valor: false }
         ],
 
         permite_operaciones: [
@@ -118,22 +110,22 @@ const obtenerOpcionesPredefinidas = (nombreCampo) => {
         ],
 
         requiere_justificacion: [
-            { etiqueta: 'Requiere justificación', valor: true },
-            { etiqueta: 'No requiere justificación', valor: false }
+            { etiqueta: 'Requiere justificacion', valor: true },
+            { etiqueta: 'No requiere justificacion', valor: false }
         ],
 
         requiere_aprobacion: [
-            { etiqueta: 'Requiere aprobación', valor: true },
-            { etiqueta: 'No requiere aprobación', valor: false }
+            { etiqueta: 'Requiere aprobacion', valor: true },
+            { etiqueta: 'No requiere aprobacion', valor: false }
         ],
 
-        // Niveles numéricos comunes
+        // Niveles numericos comunes
         nivel_numerico: generarOpcionesNumericas(1, 10, 'Nivel'),
         nivel_organizacional: generarOpcionesNumericas(1, 10, 'Nivel'),
         nivel_autoridad: generarOpcionesNumericas(1, 10, 'Nivel'),
         orden_jerarquico: generarOpcionesNumericas(1, 50, 'Orden'),
 
-        // Tiempo de retención
+        // Tiempo de retencion
         tiempo_retencion_anos: [
             { etiqueta: '1 año', valor: 1 },
             { etiqueta: '2 años', valor: 2 },
@@ -152,11 +144,11 @@ const obtenerOpcionesPredefinidas = (nombreCampo) => {
 }
 
 /**
- * Generar opciones numéricas para rangos
+ * Generar opciones numericas para rangos
  * @param {number} inicio - Valor inicial
  * @param {number} fin - Valor final
  * @param {string} prefijo - Prefijo para la etiqueta
- * @returns {Array} Opciones numéricas
+ * @returns {Array} Opciones numericas
  */
 const generarOpcionesNumericas = (inicio, fin, prefijo = '') => {
     const opciones = []
@@ -173,17 +165,11 @@ const generarOpcionesNumericas = (inicio, fin, prefijo = '') => {
 
 /**
  * Validar campo individual
- * @param {Object} configuracionCampo - Configuración del campo
+ * @param {Object} configuracionCampo - Configuracion del campo
  * @param {any} valor - Valor a validar
- * @returns {Object} Resultado de validación
+ * @returns {Object} Resultado de validacion
  */
 export const validarCampoIndividual = (configuracionCampo, valor) => {
-    console.log('🔍 Validando campo individual:', {
-        campo: configuracionCampo.nombre,
-        valor,
-        tipo: configuracionCampo.tipo
-    })
-
     const errores = []
     let esValido = true
 
@@ -195,7 +181,7 @@ export const validarCampoIndividual = (configuracionCampo, valor) => {
         }
     }
 
-    // Validaciones específicas por tipo
+    // Validaciones especificas por tipo
     if (valor !== null && valor !== undefined && valor !== '') {
         switch (configuracionCampo.tipo) {
             case 'texto':
@@ -227,7 +213,6 @@ export const validarCampoIndividual = (configuracionCampo, valor) => {
                 break
 
             default:
-                console.warn(`⚠️ Tipo de campo no soportado: ${configuracionCampo.tipo}`)
                 break
         }
     }
@@ -244,15 +229,15 @@ export const validarCampoIndividual = (configuracionCampo, valor) => {
 const validarCampoTexto = (config, valor, errores) => {
     let valido = true
 
-    // Validar longitud máxima
+    // Validar longitud maxima
     if (config.longitudMaxima && valor.length > config.longitudMaxima) {
-        errores.push(`Máximo ${config.longitudMaxima} caracteres`)
+        errores.push(`Maximo ${config.longitudMaxima} caracteres`)
         valido = false
     }
 
-    // Validaciones específicas por campo
+    // Validaciones especificas por campo
     if (config.nombre === 'codigo_iso3' && valor.length !== 3) {
-        errores.push('El código ISO3 debe tener exactamente 3 caracteres')
+        errores.push('El codigo ISO3 debe tener exactamente 3 caracteres')
         valido = false
     }
 
@@ -260,27 +245,27 @@ const validarCampoTexto = (config, valor, errores) => {
 }
 
 /**
- * Validar campo numérico
+ * Validar campo numerico
  */
 const validarCampoNumero = (config, valor, errores) => {
     let valido = true
     const numValor = Number(valor)
 
-    // Verificar que sea un número válido
+    // Verificar que sea un numero valido
     if (isNaN(numValor)) {
-        errores.push('Debe ser un número válido')
+        errores.push('Debe ser un numero valido')
         return false
     }
 
-    // Validar rango mínimo
+    // Validar rango minimo
     if (config.minimo && numValor < config.minimo) {
-        errores.push(`Valor mínimo: ${config.minimo}`)
+        errores.push(`Valor minimo: ${config.minimo}`)
         valido = false
     }
 
-    // Validar rango máximo
+    // Validar rango maximo
     if (config.maximo && numValor > config.maximo) {
-        errores.push(`Valor máximo: ${config.maximo}`)
+        errores.push(`Valor maximo: ${config.maximo}`)
         valido = false
     }
 
@@ -288,12 +273,12 @@ const validarCampoNumero = (config, valor, errores) => {
 }
 
 /**
- * Validar campo de selección
+ * Validar campo de seleccion
  */
 const validarCampoSeleccion = (config, valor, errores) => {
-    // Para campos de selección, solo validar que tenga un valor válido
+    // Para campos de seleccion, solo validar que tenga un valor valido
     if (config.requerido && (valor === null || valor === undefined)) {
-        errores.push(`Debe seleccionar una opción`)
+        errores.push(`Debe seleccionar una opcion`)
         return false
     }
 
@@ -301,14 +286,14 @@ const validarCampoSeleccion = (config, valor, errores) => {
 }
 
 /**
- * Validar área de texto
+ * Validar area de texto
  */
 const validarCampoAreaTexto = (config, valor, errores) => {
     let valido = true
 
-    // Validar longitud máxima
+    // Validar longitud maxima
     if (config.longitudMaxima && valor.length > config.longitudMaxima) {
-        errores.push(`Máximo ${config.longitudMaxima} caracteres`)
+        errores.push(`Maximo ${config.longitudMaxima} caracteres`)
         valido = false
     }
 
@@ -316,17 +301,11 @@ const validarCampoAreaTexto = (config, valor, errores) => {
 }
 
 /**
- * ✅ NUEVA: Validar campo booleano
+ * Validar campo booleano
  */
 const validarCampoBooleano = (config, valor, errores) => {
-    console.log('✅ Validando campo booleano:', {
-        campo: config.nombre,
-        valor,
-        tipo: typeof valor
-    })
-
-    // Los campos booleanos siempre son válidos si tienen un valor
-    // true/false son ambos valores válidos
+    // Los campos booleanos siempre son validos si tienen un valor
+    // true/false son ambos valores validos
     if (typeof valor === 'boolean') {
         return true
     }
@@ -340,9 +319,9 @@ const validarCampoBooleano = (config, valor, errores) => {
         return true
     }
 
-    // Si llega aquí y es requerido, es inválido
+    // Si llega aqui y es requerido, es invalido
     if (config.requerido) {
-        errores.push(`${config.etiqueta} debe tener un valor válido (Sí/No)`)
+        errores.push(`${config.etiqueta} debe tener un valor valido (Si/No)`)
         return false
     }
 
@@ -350,26 +329,20 @@ const validarCampoBooleano = (config, valor, errores) => {
 }
 
 /**
- * ✅ NUEVA: Validar campo foráneo autocompletado
+ * Validar campo foraneo autocompletado
  */
 const validarCampoForaneoAutocompletado = (config, valor, errores) => {
-    console.log('🔗 Validando campo foráneo autocompletado:', {
-        campo: config.nombre,
-        valor,
-        tablaReferencia: config.tablaReferencia
-    })
-
     // Si es requerido y no tiene valor
     if (config.requerido && (valor === null || valor === undefined || valor === '')) {
         errores.push(`Debe seleccionar un ${config.etiqueta.toLowerCase()}`)
         return false
     }
 
-    // Si tiene valor, verificar que sea un ID válido (número)
+    // Si tiene valor, verificar que sea un ID valido (numero)
     if (valor !== null && valor !== undefined && valor !== '') {
         const numValor = Number(valor)
         if (isNaN(numValor) || numValor <= 0) {
-            errores.push(`Debe seleccionar una opción válida`)
+            errores.push(`Debe seleccionar una opcion valida`)
             return false
         }
     }
@@ -378,26 +351,20 @@ const validarCampoForaneoAutocompletado = (config, valor, errores) => {
 }
 
 /**
- * ✅ NUEVA: Validar campo de fecha
+ * Validar campo de fecha
  */
 const validarCampoFecha = (config, valor, errores) => {
-    console.log('📅 Validando campo fecha:', {
-        campo: config.nombre,
-        valor,
-        tipo: typeof valor
-    })
-
     // Si es requerido y no tiene valor
     if (config.requerido && (valor === null || valor === undefined || valor === '')) {
         errores.push(`${config.etiqueta} es obligatorio`)
         return false
     }
 
-    // Si tiene valor, verificar que sea una fecha válida
+    // Si tiene valor, verificar que sea una fecha valida
     if (valor !== null && valor !== undefined && valor !== '') {
         const fecha = new Date(valor)
         if (isNaN(fecha.getTime())) {
-            errores.push(`Debe ser una fecha válida`)
+            errores.push(`Debe ser una fecha valida`)
             return false
         }
     }
@@ -408,7 +375,7 @@ const validarCampoFecha = (config, valor, errores) => {
 /**
  * Formatear valor para mostrar en tabla
  * @param {any} valor - Valor a formatear
- * @param {Object} configuracionCampo - Configuración del campo
+ * @param {Object} configuracionCampo - Configuracion del campo
  * @returns {string} Valor formateado
  */
 export const formatearValorParaTabla = (valor, configuracionCampo) => {
@@ -418,7 +385,7 @@ export const formatearValorParaTabla = (valor, configuracionCampo) => {
 
     switch (configuracionCampo.tipo) {
         case 'booleano':
-            return valor ? '✅ Sí' : '❌ No'
+            return valor ? 'Si' : 'No'
 
         case 'numero':
             return valor.toLocaleString('es-HN')
@@ -460,18 +427,12 @@ export const obtenerIconoCampo = (tipoCampo) => {
     return iconos[tipoCampo] || 'pi pi-question'
 }
 
-// =====================================
-// UTILIDADES PARA TEMAS Y ESTILOS
-// =====================================
-
 /**
  * Aplicar tema a formulario (placeholder para futuras implementaciones)
  * @param {string} nombreTema - Nombre del tema
  */
 export const aplicarTemaFormulario = (nombreTema) => {
-    console.log('🎨 Aplicando tema:', nombreTema)
-
-    // Por ahora solo log, en el futuro se pueden aplicar clases CSS dinámicas
+    // Por ahora solo log, en el futuro se pueden aplicar clases CSS dinamicas
     // o cambiar variables CSS personalizadas
 }
 

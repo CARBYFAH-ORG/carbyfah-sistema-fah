@@ -1,76 +1,54 @@
-// ESQUEMAS DE CATÁLOGOS CARBYFAH
-// Configuración ultra-simplificada para 11 tablas + GRADOS INTEGRADO
-
-/**
- * SINTAXIS DE CAMPOS:
- * 'nombre:tipo:opciones'
- * 
- * TIPOS DISPONIBLES:
- * - texto: Campo de texto simple
- * - numero: Campo numérico  
- * - seleccion: Dropdown con opciones
- * - area_texto: Textarea
- * - booleano: Checkbox
- * - fecha: Date picker
- * - foraneo_autocompletado: ✅ NUEVO - Campo con búsqueda inteligente para foráneas
- * 
- * OPCIONES:
- * - requerido: Campo obligatorio
- * - min:N: Valor mínimo (números)
- * - max:N: Valor máximo (números)
- * - longitud:N: Longitud máxima (texto)
- * - referencia:tabla: Para campos de selección que vienen de otra tabla
- */
+// services\fah-admin-frontend\src\config\esquemaCatalogos.js
 
 // Importar funciones desde el composable
 const generarEtiquetaAmigable = (nombreCampo) => {
     const mapeoEtiquetas = {
         // Campos comunes
-        codigo: 'Código',
+        codigo: 'Codigo',
         nombre: 'Nombre',
         abreviatura: 'Abreviatura',
 
-        // Categorías personal
-        codigo_categoria: 'Código Categoría',
-        nombre_categoria: 'Nombre Categoría',
-        orden_jerarquico: 'Orden Jerárquico',
+        // Categorias personal
+        codigo_categoria: 'Codigo Categoria',
+        nombre_categoria: 'Nombre Categoria',
+        orden_jerarquico: 'Orden Jerarquico',
 
         // Especialidades
-        codigo_especialidad: 'Código Especialidad',
+        codigo_especialidad: 'Codigo Especialidad',
         nombre_especialidad: 'Nombre Especialidad',
         insignia_url: 'URL Insignia',
 
-        // ✅ GRADOS - campos específicos CORREGIDOS
-        categoria_personal_id: 'Categoría Personal',
-        codigo_grado: 'Código Grado',
+        // Grados - campos especificos corregidos
+        categoria_personal_id: 'Categoria Personal',
+        codigo_grado: 'Codigo Grado',
         nombre_grado: 'Nombre Grado',
 
         // Niveles
-        nivel_numerico: 'Nivel Numérico',
-        requiere_autorizacion: 'Requiere Autorización',
-        tiempo_retencion_anos: 'Tiempo Retención (años)',
+        nivel_numerico: 'Nivel Numerico',
+        requiere_autorizacion: 'Requiere Autorizacion',
+        tiempo_retencion_anos: 'Tiempo Retencion (anos)',
 
-        // Países
+        // Paises
         nombre_oficial: 'Nombre Oficial',
-        codigo_iso3: 'Código ISO3',
-        codigo_telefono: 'Código Teléfono',
+        codigo_iso3: 'Codigo ISO3',
+        codigo_telefono: 'Codigo Telefono',
         moneda_oficial: 'Moneda Oficial',
 
         // Estados
         permite_operaciones: 'Permite Operaciones',
         es_estado_final: 'Es Estado Final',
-        requiere_justificacion: 'Requiere Justificación',
+        requiere_justificacion: 'Requiere Justificacion',
 
         // Estructura militar
-        codigo_tipo: 'Código Tipo',
+        codigo_tipo: 'Codigo Tipo',
         nombre_tipo: 'Nombre Tipo',
         nivel_organizacional: 'Nivel Organizacional',
         nivel_autoridad: 'Nivel Autoridad',
 
         // Eventos
-        codigo_evento: 'Código Evento',
+        codigo_evento: 'Codigo Evento',
         nombre_evento: 'Nombre Evento',
-        requiere_aprobacion: 'Requiere Aprobación'
+        requiere_aprobacion: 'Requiere Aprobacion'
     }
 
     return mapeoEtiquetas[nombreCampo] || formatearNombreCampo(nombreCampo)
@@ -84,7 +62,7 @@ const formatearNombreCampo = (nombreCampo) => {
 
 const generarPlaceholder = (nombreCampo, tipoCampo) => {
     const placeholders = {
-        // Específicos por campo
+        // Especificos por campo
         codigo: 'Ej: M, F, OFICIAL',
         nombre: 'Ej: Masculino, Femenino',
         abreviatura: 'Ej: M, F',
@@ -92,11 +70,11 @@ const generarPlaceholder = (nombreCampo, tipoCampo) => {
         nombre_categoria: 'Ej: Oficial, Suboficial',
         orden_jerarquico: 'Ej: 1, 2, 3...',
         codigo_especialidad: 'Ej: AVI, COM, INT',
-        nombre_especialidad: 'Ej: Aviación, Comunicaciones',
+        nombre_especialidad: 'Ej: Aviacion, Comunicaciones',
         insignia_url: 'Ej: https://ejemplo.com/insignia.png',
 
-        // ✅ GRADOS - placeholders específicos CORREGIDOS
-        categoria_personal_id: 'Buscar categoría personal...',
+        // Grados - placeholders especificos corregidos
+        categoria_personal_id: 'Buscar categoria personal...',
         codigo_grado: 'Ej: SUBTTE, TTE, CTTE',
         nombre_grado: 'Ej: Subteniente, Teniente',
 
@@ -104,23 +82,23 @@ const generarPlaceholder = (nombreCampo, tipoCampo) => {
         tiempo_retencion_anos: 'Ej: 5, 10, 15...',
         codigo_iso3: 'Ej: HND, USA, GTM',
         codigo_telefono: 'Ej: +504, +1, +502',
-        moneda_oficial: 'Ej: Lempira, Dólar',
+        moneda_oficial: 'Ej: Lempira, Dolar',
         codigo_tipo: 'Ej: CMD, BASE, ESC',
         nombre_tipo: 'Ej: Comandancia, Base',
         nivel_organizacional: 'Ej: 1, 2, 3...',
         nivel_autoridad: 'Ej: 1, 2, 3...',
         codigo_evento: 'Ej: CAP, MIS, PER',
-        nombre_evento: 'Ej: Capacitación, Misión'
+        nombre_evento: 'Ej: Capacitacion, Mision'
     }
 
     return placeholders[nombreCampo] || `Ingrese ${generarEtiquetaAmigable(nombreCampo).toLowerCase()}`
 }
 
 export const ESQUEMAS_CATALOGOS = {
-    // Tipos de género
+    // Tipos de genero
     tipos_genero: {
-        titulo: 'Tipo de Género',
-        icono: '👥',
+        titulo: 'Tipo de Genero',
+        icono: '👤',
         tabla: 'tipos_genero',
         ancho: '600px',
         campos: [
@@ -132,9 +110,9 @@ export const ESQUEMAS_CATALOGOS = {
         ordenarPor: 'nombre'
     },
 
-    // Categorías personal
+    // Categorias personal
     categorias_personal: {
-        titulo: 'Categoría de Personal',
+        titulo: 'Categoria de Personal',
         icono: '🏢',
         tabla: 'categorias_personal',
         ancho: '700px',
@@ -150,7 +128,7 @@ export const ESQUEMAS_CATALOGOS = {
     // Especialidades
     especialidades: {
         titulo: 'Especialidad Militar',
-        icono: '🎖️',
+        icono: '🛫',
         tabla: 'especialidades',
         ancho: '700px',
         campos: [
@@ -162,7 +140,7 @@ export const ESQUEMAS_CATALOGOS = {
         ordenarPor: 'nombre_especialidad'
     },
 
-    // ✅ GRADOS - CONFIGURACIÓN CORREGIDA PARA SISTEMA DINÁMICO
+    // Grados sistema dinamico
     grados: {
         titulo: 'Grado Militar',
         icono: '⭐',
@@ -211,9 +189,9 @@ export const ESQUEMAS_CATALOGOS = {
         ordenarPor: 'nivel_numerico'
     },
 
-    // Países
+    // Paises
     paises: {
-        titulo: 'País',
+        titulo: 'Pais',
         icono: '🌍',
         tabla: 'paises',
         ancho: '800px',
@@ -245,23 +223,6 @@ export const ESQUEMAS_CATALOGOS = {
         ordenarPor: 'nombre'
     },
 
-    // tipos_estado_general: {
-    //     titulo: 'Tipo de Estado General',
-    //     icono: '📊',
-    //     tabla: 'tipos_estado_general',
-    //     endpoint: 'catalogos/tipos-estado-general', // ← AGREGAR ESTA LÍNEA
-    //     ancho: '750px',
-    //     campos: [
-    //         'codigo:texto:requerido:longitud:20',
-    //         'nombre:texto:requerido:longitud:100',
-    //         'permite_operaciones:booleano',
-    //         'es_estado_final:booleano',
-    //         'requiere_justificacion:booleano'
-    //     ],
-    //     mostrarEnTabla: ['codigo', 'nombre', 'permite_operaciones'],
-    //     ordenarPor: 'nombre'
-    // },
-
     // Tipos estructura militar
     tipos_estructura_militar: {
         titulo: 'Tipo de Estructura Militar',
@@ -292,9 +253,9 @@ export const ESQUEMAS_CATALOGOS = {
         ordenarPor: 'nombre_evento'
     },
 
-    // Tipos de jerarquía
+    // Tipos de jerarquia
     tipos_jerarquia: {
-        titulo: 'Tipo de Jerarquía',
+        titulo: 'Tipo de Jerarquia',
         icono: '🎯',
         tabla: 'tipos_jerarquia',
         ancho: '700px',
@@ -317,7 +278,7 @@ export const CONFIGURACION_NOTIFICACIONES = {
         informacion: 2500
     },
 
-    // Posición en pantalla
+    // Posicion en pantalla
     posicion: 'top-right',
 
     // Plantillas de mensajes
@@ -368,29 +329,29 @@ export const CONFIGURACION_NOTIFICACIONES = {
 
         errorValidacion: () => ({
             severity: 'error',
-            summary: 'Error de Validación',
+            summary: 'Error de Validacion',
             detail: 'Por favor corrija los errores en el formulario',
             life: 5000
         }),
 
         errorConexion: () => ({
             severity: 'error',
-            summary: 'Error de Conexión',
+            summary: 'Error de Conexion',
             detail: 'No se pudo conectar con el servidor',
             life: 5000
         }),
 
         // Advertencias
         confirmacionEliminar: (tabla, nombre) => ({
-            mensaje: `¿Está seguro de eliminar el ${obtenerTituloTabla(tabla).toLowerCase()} "${nombre}"?`,
-            header: 'Confirmar Eliminación',
+            mensaje: `¿Esta seguro de eliminar el ${obtenerTituloTabla(tabla).toLowerCase()} "${nombre}"?`,
+            header: 'Confirmar Eliminacion',
             icon: 'pi pi-exclamation-triangle',
             acceptClass: 'p-button-danger',
-            acceptLabel: 'Sí, Eliminar',
+            acceptLabel: 'Si, Eliminar',
             rejectLabel: 'Cancelar'
         }),
 
-        // Información  
+        // Informacion
         cargando: (accion) => ({
             severity: 'info',
             summary: 'Procesando',
@@ -407,7 +368,7 @@ export const CONFIGURACION_NOTIFICACIONES = {
     }
 }
 
-// Obtener configuración de esquema por nombre
+// Obtener configuracion de esquema por nombre
 export const obtenerEsquema = (nombreTabla) => {
     const esquema = ESQUEMAS_CATALOGOS[nombreTabla]
     if (!esquema) {
@@ -416,13 +377,13 @@ export const obtenerEsquema = (nombreTabla) => {
     return esquema
 }
 
-// Obtener título amigable de tabla
+// Obtener titulo amigable de tabla
 export const obtenerTituloTabla = (nombreTabla) => {
     const esquema = obtenerEsquema(nombreTabla)
     return esquema ? esquema.titulo : nombreTabla
 }
 
-// Validar si existe configuración para una tabla
+// Validar si existe configuracion para una tabla
 export const tieneEsquema = (nombreTabla) => {
     return ESQUEMAS_CATALOGOS[nombreTabla] !== undefined
 }
@@ -432,7 +393,7 @@ export const obtenerNombresTablas = () => {
     return Object.keys(ESQUEMAS_CATALOGOS)
 }
 
-// Obtener configuración de notificación
+// Obtener configuracion de notificacion
 export const obtenerNotificacion = (tipo, tabla, nombre = null) => {
     const mensaje = CONFIGURACION_NOTIFICACIONES.mensajes[tipo]
 
@@ -443,7 +404,7 @@ export const obtenerNotificacion = (tipo, tabla, nombre = null) => {
     return mensaje || null
 }
 
-// Validar configuración de esquema
+// Validar configuracion de esquema
 export const validarEsquema = (nombreTabla) => {
     const esquema = obtenerEsquema(nombreTabla)
 
@@ -454,10 +415,10 @@ export const validarEsquema = (nombreTabla) => {
     const errores = []
 
     // Validar campos requeridos
-    if (!esquema.titulo) errores.push('Falta título')
+    if (!esquema.titulo) errores.push('Falta titulo')
     if (!esquema.tabla) errores.push('Falta nombre de tabla')
     if (!esquema.campos || !Array.isArray(esquema.campos)) {
-        errores.push('Falta configuración de campos')
+        errores.push('Falta configuracion de campos')
     }
 
     return {
@@ -473,14 +434,14 @@ export const CONFIGURACION_GLOBAL = {
     // Tema por defecto
     temaPorDefecto: 'militar-oscuro',
 
-    // Configuración de formularios
+    // Configuracion de formularios
     formularios: {
         validacionEnTiempoReal: true,
         mostrarAyuda: true,
         animacionesCampos: true
     },
 
-    // Configuración de tablas
+    // Configuracion de tablas
     tablas: {
         filasPorPagina: 10,
         paginacionTamaños: [5, 10, 25, 50],

@@ -1,8 +1,10 @@
+// services\fah-admin-frontend\src\stores\organizacionStore.js
+
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import * as organizacionService from '@/services/organizacionService'
 
-// STORE PRINCIPAL DE ORGANIZACIÓN
+// Store principal de organizacion
 export const useOrganizacionStore = defineStore('organizacion', () => {
 
     // Estado reactivo
@@ -19,7 +21,7 @@ export const useOrganizacionStore = defineStore('organizacion', () => {
     const error = ref(null)
     const errors = ref({})
 
-    // Datos de organización
+    // Datos de organizacion
     const departamentos = ref([])
     const municipios = ref([])
     const ciudades = ref([])
@@ -34,7 +36,7 @@ export const useOrganizacionStore = defineStore('organizacion', () => {
     const currentItem = ref(null)
     const currentTable = ref('departamentos')
 
-    // Filtros y búsquedas
+    // Filtros y busquedas
     const filtroPais = ref(null)
     const filtroDepartamento = ref(null)
     const filtroMunicipio = ref(null)
@@ -94,7 +96,7 @@ export const useOrganizacionStore = defineStore('organizacion', () => {
         loadingEstructuraMilitar.value || loadingCargos.value || loadingRolesFuncionales.value
     )
 
-    // Métodos generales
+    // Metodos generales
     const clearErrors = () => {
         error.value = null
         errors.value = {}
@@ -114,10 +116,12 @@ export const useOrganizacionStore = defineStore('organizacion', () => {
         clearErrors()
     }
 
-    // =====================================================
-    // ACTIONS DEPARTAMENTOS
-    // =====================================================
+    /* Actions departamentos */
     const loadDepartamentos = async () => {
+        if (typeof organizacionService.getDepartamentos !== 'function') {
+            return;
+        }
+
         loadingDepartamentos.value = true
         clearErrors()
 
@@ -206,9 +210,7 @@ export const useOrganizacionStore = defineStore('organizacion', () => {
         }
     }
 
-    // =====================================================
-    // ACTIONS MUNICIPIOS
-    // =====================================================
+    /* Actions municipios */
     const loadMunicipios = async () => {
         loadingMunicipios.value = true
         clearErrors()
@@ -298,9 +300,7 @@ export const useOrganizacionStore = defineStore('organizacion', () => {
         }
     }
 
-    // =====================================================
-    // ACTIONS CIUDADES
-    // =====================================================
+    /* Actions ciudades */
     const loadCiudades = async () => {
         loadingCiudades.value = true
         clearErrors()
@@ -390,9 +390,7 @@ export const useOrganizacionStore = defineStore('organizacion', () => {
         }
     }
 
-    // =====================================================
-    // ACTIONS UBICACIONES GEOGRÁFICAS
-    // =====================================================
+    /* Actions ubicaciones geograficas */
     const loadUbicacionesGeograficas = async () => {
         loadingUbicacionesGeograficas.value = true
         clearErrors()
@@ -406,7 +404,7 @@ export const useOrganizacionStore = defineStore('organizacion', () => {
                 error.value = response.error
             }
         } catch (err) {
-            error.value = 'Error cargando ubicaciones geográficas'
+            error.value = 'Error cargando ubicaciones geograficas'
         } finally {
             loadingUbicacionesGeograficas.value = false
         }
@@ -428,8 +426,8 @@ export const useOrganizacionStore = defineStore('organizacion', () => {
                 return { success: false, error: response.error }
             }
         } catch (err) {
-            error.value = 'Error creando ubicación geográfica'
-            return { success: false, error: 'Error creando ubicación geográfica' }
+            error.value = 'Error creando ubicacion geografica'
+            return { success: false, error: 'Error creando ubicacion geografica' }
         } finally {
             loading.value = false
         }
@@ -454,8 +452,8 @@ export const useOrganizacionStore = defineStore('organizacion', () => {
                 return { success: false, error: response.error }
             }
         } catch (err) {
-            error.value = 'Error actualizando ubicación geográfica'
-            return { success: false, error: 'Error actualizando ubicación geográfica' }
+            error.value = 'Error actualizando ubicacion geografica'
+            return { success: false, error: 'Error actualizando ubicacion geografica' }
         } finally {
             loading.value = false
         }
@@ -475,16 +473,14 @@ export const useOrganizacionStore = defineStore('organizacion', () => {
                 return { success: false, error: response.error }
             }
         } catch (err) {
-            error.value = 'Error eliminando ubicación geográfica'
-            return { success: false, error: 'Error eliminando ubicación geográfica' }
+            error.value = 'Error eliminando ubicacion geografica'
+            return { success: false, error: 'Error eliminando ubicacion geografica' }
         } finally {
             loading.value = false
         }
     }
 
-    // =====================================================
-    // ACTIONS ESTRUCTURA MILITAR
-    // =====================================================
+    /* Actions estructura militar */
     const loadEstructuraMilitar = async () => {
         loadingEstructuraMilitar.value = true
         clearErrors()
@@ -574,9 +570,7 @@ export const useOrganizacionStore = defineStore('organizacion', () => {
         }
     }
 
-    // =====================================================
-    // ACTIONS CARGOS
-    // =====================================================
+    /* Actions cargos */
     const loadCargos = async () => {
         loadingCargos.value = true
         clearErrors()
@@ -666,9 +660,7 @@ export const useOrganizacionStore = defineStore('organizacion', () => {
         }
     }
 
-    // =====================================================
-    // ACTIONS ROLES FUNCIONALES
-    // =====================================================
+    /* Actions roles funcionales */
     const loadRolesFuncionales = async () => {
         loadingRolesFuncionales.value = true
         clearErrors()
@@ -758,9 +750,7 @@ export const useOrganizacionStore = defineStore('organizacion', () => {
         }
     }
 
-    // =====================================================
-    // MÉTODOS AUXILIARES
-    // =====================================================
+    /* Metodos auxiliares */
     const getDepartamentoById = (id) => {
         return departamentos.value.find(depto => depto.id === id)
     }
@@ -810,7 +800,7 @@ export const useOrganizacionStore = defineStore('organizacion', () => {
         error,
         errors,
 
-        // Datos de organización
+        // Datos de organizacion
         departamentos,
         municipios,
         ciudades,
@@ -863,7 +853,7 @@ export const useOrganizacionStore = defineStore('organizacion', () => {
         updateCiudad,
         deleteCiudad,
 
-        // Actions ubicaciones geográficas
+        // Actions ubicaciones geograficas
         loadUbicacionesGeograficas,
         createUbicacionGeografica,
         updateUbicacionGeografica,
